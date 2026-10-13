@@ -1,0 +1,365 @@
+{
+  "version": 1,
+  "exportedAt": "2026-10-01T00:00:00.000Z",
+  "teams": [
+    {
+      "id": "t_red",
+      "name": "SAMPLE — Team Red",
+      "active": true,
+      "sample": true,
+      "updatedAt": "2026-10-01T00:00:00.000Z"
+    },
+    {
+      "id": "t_green",
+      "name": "SAMPLE — Team Green",
+      "active": true,
+      "sample": true,
+      "updatedAt": "2026-10-01T00:00:00.000Z"
+    },
+    {
+      "id": "t_black",
+      "name": "SAMPLE — Team Black",
+      "active": true,
+      "sample": true,
+      "updatedAt": "2026-10-01T00:00:00.000Z"
+    },
+    {
+      "id": "t_brass",
+      "name": "SAMPLE — Team Brass",
+      "active": true,
+      "sample": true,
+      "updatedAt": "2026-10-01T00:00:00.000Z"
+    }
+  ],
+  "players": [
+    {
+      "id": "p_t_red_1",
+      "teamId": "t_red",
+      "name": "SAMPLE — Red 1",
+      "active": true,
+      "sample": true,
+      "updatedAt": "2026-10-01T00:00:00.000Z"
+    },
+    {
+      "id": "p_t_red_2",
+      "teamId": "t_red",
+      "name": "SAMPLE — Red 2",
+      "active": true,
+      "sample": true,
+      "updatedAt": "2026-10-01T00:00:00.000Z"
+    },
+    {
+      "id": "p_t_red_3",
+      "teamId": "t_red",
+      "name": "SAMPLE — Red 3",
+      "active": true,
+      "sample": true,
+      "updatedAt": "2026-10-01T00:00:00.000Z"
+    },
+    {
+      "id": "p_t_red_4",
+      "teamId": "t_red",
+      "name": "SAMPLE — Red 4",
+      "active": true,
+      "sample": true,
+      "updatedAt": "2026-10-01T00:00:00.000Z"
+    },
+    {
+      "id": "p_t_green_1",
+      "teamId": "t_green",
+      "name": "SAMPLE — Green 1",
+      "active": true,
+      "sample": true,
+      "updatedAt": "2026-10-01T00:00:00.000Z"
+    },
+    {
+      "id": "p_t_green_2",
+      "teamId": "t_green",
+      "name": "SAMPLE — Green 2",
+      "active": true,
+      "sample": true,
+      "updatedAt": "2026-10-01T00:00:00.000Z"
+    },
+    {
+      "id": "p_t_green_3",
+      "teamId": "t_green",
+      "name": "SAMPLE — Green 3",
+      "active": true,
+      "sample": true,
+      "updatedAt": "2026-10-01T00:00:00.000Z"
+    },
+    {
+      "id": "p_t_green_4",
+      "teamId": "t_green",
+      "name": "SAMPLE — Green 4",
+      "active": true,
+      "sample": true,
+      "updatedAt": "2026-10-01T00:00:00.000Z"
+    },
+    {
+      "id": "p_t_black_1",
+      "teamId": "t_black",
+      "name": "SAMPLE — Black 1",
+      "active": true,
+      "sample": true,
+      "updatedAt": "2026-10-01T00:00:00.000Z"
+    },
+    {
+      "id": "p_t_black_2",
+      "teamId": "t_black",
+      "name": "SAMPLE — Black 2",
+      "active": true,
+      "sample": true,
+      "updatedAt": "2026-10-01T00:00:00.000Z"
+    },
+    {
+      "id": "p_t_black_3",
+      "teamId": "t_black",
+      "name": "SAMPLE — Black 3",
+      "active": true,
+      "sample": true,
+      "updatedAt": "2026-10-01T00:00:00.000Z"
+    },
+    {
+      "id": "p_t_black_4",
+      "teamId": "t_black",
+      "name": "SAMPLE — Black 4",
+      "active": true,
+      "sample": true,
+      "updatedAt": "2026-10-01T00:00:00.000Z"
+    },
+    {
+      "id": "p_t_brass_1",
+      "teamId": "t_brass",
+      "name": "SAMPLE — Brass 1",
+      "active": true,
+      "sample": true,
+      "updatedAt": "2026-10-01T00:00:00.000Z"
+    },
+    {
+      "id": "p_t_brass_2",
+      "teamId": "t_brass",
+      "name": "SAMPLE — Brass 2",
+      "active": true,
+      "sample": true,
+      "updatedAt": "2026-10-01T00:00:00.000Z"
+    },
+    {
+      "id": "p_t_brass_3",
+      "teamId": "t_brass",
+      "name": "SAMPLE — Brass 3",
+      "active": true,
+      "sample": true,
+      "updatedAt": "2026-10-01T00:00:00.000Z"
+    },
+    {
+      "id": "p_t_brass_4",
+      "teamId": "t_brass",
+      "name": "SAMPLE — Brass 4",
+      "active": true,
+      "sample": true,
+      "updatedAt": "2026-10-01T00:00:00.000Z"
+    }
+  ],
+  "matches": [
+    {
+      "id": "m_sample_1",
+      "date": "2026-10-01",
+      "homeTeamId": "t_red",
+      "awayTeamId": "t_green",
+      "homeGamesWon": 5,
+      "awayGamesWon": 3,
+      "games": [
+        {
+          "label": "Game 1",
+          "homePlayerId": "",
+          "homePlayerName": "",
+          "awayPlayerId": "",
+          "awayPlayerName": "",
+          "winner": "home"
+        },
+        {
+          "label": "Game 2",
+          "homePlayerId": "",
+          "homePlayerName": "",
+          "awayPlayerId": "",
+          "awayPlayerName": "",
+          "winner": "home"
+        },
+        {
+          "label": "Game 3",
+          "homePlayerId": "",
+          "homePlayerName": "",
+          "awayPlayerId": "",
+          "awayPlayerName": "",
+          "winner": "home"
+        },
+        {
+          "label": "Game 4",
+          "homePlayerId": "",
+          "homePlayerName": "",
+          "awayPlayerId": "",
+          "awayPlayerName": "",
+          "winner": "home"
+        },
+        {
+          "label": "Game 5",
+          "homePlayerId": "",
+          "homePlayerName": "",
+          "awayPlayerId": "",
+          "awayPlayerName": "",
+          "winner": "home"
+        },
+        {
+          "label": "Game 6",
+          "homePlayerId": "",
+          "homePlayerName": "",
+          "awayPlayerId": "",
+          "awayPlayerName": "",
+          "winner": "away"
+        },
+        {
+          "label": "Game 7",
+          "homePlayerId": "",
+          "homePlayerName": "",
+          "awayPlayerId": "",
+          "awayPlayerName": "",
+          "winner": "away"
+        },
+        {
+          "label": "Game 8",
+          "homePlayerId": "",
+          "homePlayerName": "",
+          "awayPlayerId": "",
+          "awayPlayerName": "",
+          "winner": "away"
+        }
+      ],
+      "submittedAt": "2026-10-01T00:00:00.000Z",
+      "updatedAt": "2026-10-01T00:00:00.000Z",
+      "sample": true
+    },
+    {
+      "id": "m_sample_2",
+      "date": "2026-10-08",
+      "homeTeamId": "t_black",
+      "awayTeamId": "t_brass",
+      "homeGamesWon": 4,
+      "awayGamesWon": 2,
+      "games": [
+        {
+          "label": "Game 1",
+          "homePlayerId": "",
+          "homePlayerName": "",
+          "awayPlayerId": "",
+          "awayPlayerName": "",
+          "winner": "home"
+        },
+        {
+          "label": "Game 2",
+          "homePlayerId": "",
+          "homePlayerName": "",
+          "awayPlayerId": "",
+          "awayPlayerName": "",
+          "winner": "home"
+        },
+        {
+          "label": "Game 3",
+          "homePlayerId": "",
+          "homePlayerName": "",
+          "awayPlayerId": "",
+          "awayPlayerName": "",
+          "winner": "home"
+        },
+        {
+          "label": "Game 4",
+          "homePlayerId": "",
+          "homePlayerName": "",
+          "awayPlayerId": "",
+          "awayPlayerName": "",
+          "winner": "home"
+        },
+        {
+          "label": "Game 5",
+          "homePlayerId": "",
+          "homePlayerName": "",
+          "awayPlayerId": "",
+          "awayPlayerName": "",
+          "winner": "away"
+        },
+        {
+          "label": "Game 6",
+          "homePlayerId": "",
+          "homePlayerName": "",
+          "awayPlayerId": "",
+          "awayPlayerName": "",
+          "winner": "away"
+        }
+      ],
+      "submittedAt": "2026-10-08T00:00:00.000Z",
+      "updatedAt": "2026-10-08T00:00:00.000Z",
+      "sample": true
+    },
+    {
+      "id": "m_sample_3",
+      "date": "2026-10-08",
+      "homeTeamId": "t_red",
+      "awayTeamId": "t_brass",
+      "homeGamesWon": 3,
+      "awayGamesWon": 3,
+      "games": [
+        {
+          "label": "Game 1",
+          "homePlayerId": "",
+          "homePlayerName": "",
+          "awayPlayerId": "",
+          "awayPlayerName": "",
+          "winner": "home"
+        },
+        {
+          "label": "Game 2",
+          "homePlayerId": "",
+          "homePlayerName": "",
+          "awayPlayerId": "",
+          "awayPlayerName": "",
+          "winner": "home"
+        },
+        {
+          "label": "Game 3",
+          "homePlayerId": "",
+          "homePlayerName": "",
+          "awayPlayerId": "",
+          "awayPlayerName": "",
+          "winner": "home"
+        },
+        {
+          "label": "Game 4",
+          "homePlayerId": "",
+          "homePlayerName": "",
+          "awayPlayerId": "",
+          "awayPlayerName": "",
+          "winner": "away"
+        },
+        {
+          "label": "Game 5",
+          "homePlayerId": "",
+          "homePlayerName": "",
+          "awayPlayerId": "",
+          "awayPlayerName": "",
+          "winner": "away"
+        },
+        {
+          "label": "Game 6",
+          "homePlayerId": "",
+          "homePlayerName": "",
+          "awayPlayerId": "",
+          "awayPlayerName": "",
+          "winner": "away"
+        }
+      ],
+      "submittedAt": "2026-10-08T00:00:00.000Z",
+      "updatedAt": "2026-10-08T00:00:00.000Z",
+      "sample": true
+    }
+  ]
+}

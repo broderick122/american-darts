@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="robots" content="noindex">
+  <title>Admin · Roslyn American Darts</title>
+  <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="page-admin">
+  <a class="skip-link" href="#admin-main">Skip to content</a>
+  <header class="site-header">
+    <div class="dart-stripe" aria-hidden="true"></div>
+    <div class="header-bar wrap">
+      <a class="wordmark" href="index.html">
+        <img src="images/favicon.svg" alt="" width="36" height="36">
+        <span>
+          <strong>Roslyn</strong>
+          <small>American Darts</small>
+        </span>
+      </a>
+      <a href="index.html">Back to the site</a>
+    </div>
+  </header>
+  <main id="admin-main" class="wrap">
+    <section id="lock-screen" class="lock-card">
+      <p class="eyebrow">Admin</p>
+      <h1>Unlock the lists</h1>
+      <div class="security-note">
+        <p><strong>This lock is light, not real security.</strong> The site is static files on GitHub Pages. There is no private server behind this form. Anyone can read the JavaScript.</p>
+        <p id="lock-detail">While Google Sheets is not connected, the passcode is <code>fallbackAdminPasscode</code> in config.js. When the Apps Script web app is connected, admin saves are also checked against the <code>ADMIN_SECRET</code> script property. That secret is still typed into this page and can be copied from the browser. Don’t store anything sensitive in the sheet.</p>
+      </div>
+      <form id="lock-form" class="stack">
+        <label class="field">Admin passcode
+          <input id="passcode" type="password" autocomplete="current-password" required>
+        </label>
+        <button class="btn btn-primary" type="submit">Unlock</button>
+      </form>
+      <p id="lock-status" class="status" role="status"></p>
+    </section>
+
+    <section id="admin-app" hidden>
+      <div class="admin-top">
+        <div>
+          <p class="eyebrow">Admin</p>
+          <h1>Teams, players, matches</h1>
+        </div>
+        <button class="btn btn-ink btn-small" type="button" id="lock-again">Lock</button>
+      </div>
+      <p class="security-note"><strong>Still not real security.</strong> Client-side protection on a static site only hides the buttons. Admin writes send a shared secret to Apps Script, and anyone who can use this page can see that request. Score sheets from the public page do not need the secret.</p>
+      <p id="admin-mode" class="mode-line"></p>
+      <p id="admin-message" class="status" role="status"></p>
+
+      <section class="section" id="admin-standings" style="padding-top:1rem">
+        <h2>Standings</h2>
+        <p>These numbers recalculate after every save, edit, or delete on this page.</p>
+        <p class="swipe-hint">Swipe sideways to read the full table.</p>
+        <div id="admin-standings-table"></div>
+        <p class="formula" id="admin-rule"></p>
+      </section>
+
+      <section class="admin-card">
+        <h2>Teams</h2>
+        <form id="team-form" class="stack">
+          <input type="hidden" id="team-id">
+          <label class="field">Team name
+            <input id="team-name" required maxlength="80">
+          </label>
+          <label><input id="team-active" type="checkbox" checked> Active (shows on the score sheet)</label>
+          <div class="form-actions">
+            <button class="btn btn-primary btn-small" type="submit">Save team</button>
+            <button class="btn btn-ink btn-small" type="button" id="team-cancel" hidden>Cancel edit</button>
+          </div>
+        </form>
+        <div id="team-list" class="list-block"></div>
+      </section>
+
+      <section class="admin-card">
+        <h2>Players</h2>
+        <form id="player-form" class="stack">
+          <input type="hidden" id="player-id">
+          <label class="field">Player name
+            <input id="player-name" required maxlength="80">
+          </label>
+          <label class="field">Team
+            <select id="player-team" required></select>
+          </label>
+          <label><input id="player-active" type="checkbox" checked> Active</label>
+          <div class="form-actions">
+            <button class="btn btn-primary btn-small" type="submit">Save player</button>
+            <button class="btn btn-ink btn-small" type="button" id="player-cancel" hidden>Cancel edit</button>
+          </div>
+        </form>
+        <div id="player-list" class="list-block"></div>
+      </section>
+
+      <section class="admin-card">
+        <h2>Matches and results</h2>
+        <form id="match-form" class="stack">
+          <input type="hidden" id="match-id">
+          <div class="form-grid cols-3">
+            <label class="field">Date
+              <input id="match-date" type="date" required>
+            </label>
+            <label class="field">Home
+              <select id="match-home" required></select>
+            </label>
+            <label class="field">Away
+              <select id="match-away" required></select>
+            </label>
+          </div>
+          <div id="match-games" class="game-list"></div>
+          <div class="form-actions">
+            <button class="btn btn-ink btn-small" type="button" id="match-add-game">Add a game</button>
+          </div>
+          <p class="tally" id="match-tally">Mark a winner on each game.</p>
+          <div class="form-actions">
+            <button class="btn btn-primary btn-small" type="submit" id="match-save">Save match</button>
+            <button class="btn btn-ink btn-small" type="button" id="match-cancel" hidden>Cancel edit</button>
+          </div>
+        </form>
+        <div id="match-list" class="list-block"></div>
+      </section>
+
+      <section class="admin-card">
+        <h2>Backup</h2>
+        <p>Export is a JSON file of teams, players, and matches. Import replaces the whole list, then standings recalculate. Restoring the SAMPLE starter does the same with the names that shipped in this mock.</p>
+        <div class="form-actions">
+          <button class="btn btn-primary btn-small" type="button" id="export-json">Export JSON</button>
+          <label class="btn btn-ink btn-small file-btn">Import JSON
+            <input id="import-json" type="file" accept="application/json,.json" hidden>
+          </label>
+          <button class="btn btn-ink btn-small" type="button" id="restore-sample">Restore SAMPLE starter</button>
+        </div>
+      </section>
+    </section>
+  </main>
+  <script src="config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
