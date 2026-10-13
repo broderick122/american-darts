@@ -911,3 +911,70 @@ tr.is-fresh td { animation: fresh 2.6s ease; }
   from { background: rgba(180, 35, 24, 0.2); }
   to { background: transparent; }
 }
+
+.experimental-banner {
+  margin: 0;
+  padding: 0.55rem 1rem;
+  background: var(--red-deep);
+  color: white;
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.page-upload main { padding: 1.25rem 0 3rem; }
+
+.page-upload h1 {
+  margin: 0.15rem 0 0.8rem;
+  font-family: var(--display);
+  font-size: clamp(2.6rem, 8vw, 4.4rem);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 0.9;
+}
+
+.ocr-summary { font-weight: 650; }
+
+.warning-list {
+  margin: 0.35rem 0 1rem;
+  padding-left: 1.15rem;
+  color: var(--red-deep);
+  font-weight: 650;
+}
+
+.align-preview {
+  display: block;
+  width: min(100%, 960px);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: white;
+}
+
+.confirm-games { display: grid; gap: 0.35rem; margin: 1rem 0; }
+
+.confirm-game {
+  display: grid;
+  gap: 0.65rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--line);
+}
+
+.confirm-game h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.final-score {
+  margin: 0.15rem 0 0.7rem;
+  font-family: var(--display);
+  font-size: 3.4rem;
+  letter-spacing: 0.04em;
+  line-height: 0.9;
+}
+
+@media (min-width: 800px) {
+  .confirm-game {
+    grid-template-columns: 5.5rem 1fr 1fr 1fr;
+    align-items: end;
+  }
+}

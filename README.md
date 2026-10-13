@@ -12,6 +12,7 @@ There is no build step. Edit the files and refresh. Paths are relative (`images/
 | --- | --- |
 | Home, About, Schedule, News, Join | Copy in `index.html` |
 | Standings, Teams, Score sheet | Don’t hard-code these. They come from the data module. |
+| Upload score sheet | `upload.html`. Experimental photo reading. |
 | Photos | Files in `images/`. Captions in `index.html`. |
 | Admin | `admin.html` |
 
@@ -114,6 +115,16 @@ Admin, secret required: `saveTeam`, `deleteTeam`, `savePlayer`, `deletePlayer`, 
 `verifyAdmin` is a `doGet` so the admin page can check the secret and read the answer. Data reads for the public page stay on the gviz endpoint, not on `doGet`.
 
 A team that is on a match cannot be deleted. Delete the matches first, or rename the team. Deleting a team also removes its players.
+
+## Upload a photo of the paper sheet (experimental)
+
+`upload.html` is for the end of the night: a captain photographs the filled v2 score sheet and the browser tries to read it. There is no server. [Tesseract.js 5.1.1](https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js) runs in the phone, and `scoresheet/layout_spec.json` is the map of the printed boxes (the same spec the sheet generator writes).
+
+The page looks for the four black corner squares, straightens the photo, and crops known fields. Filled winner bubbles are counted as ink. Blank digit boxes are skipped so they are not read as 0. Inning digits and the team names then go through Tesseract. Games 1–3 (innings 1–18) become the match score. The beer frame is shown and is not a league game. Extra innings 19–20 count only toward the sheet’s point total.
+
+The reading lands in an editable form: team names, games won, and the final score. The captain fixes mistakes and saves. The save uses the same data module as the typed score sheet, so standings update immediately. Until Google Sheets is connected, that save stays in `localStorage`. A short receipt is also kept under `rad.uploads.v1`. The photo itself is not stored.
+
+Handwriting OCR on a static page is rough. The typed score sheet on the home page is the reliable path. A later version could send the photo to a hosted vision API (Google Cloud Vision document text is about $1.50 per 1,000 images, with the first 1,000 a month free, so a small league stays at $0) or to Amazon Textract (about $1.50 per 1,000 pages for plain detection). That needs a small backend, because a browser should not hold a cloud API key. The typed form remains the $0 option that does not depend on a vendor.
 
 ## GitHub Pages
 

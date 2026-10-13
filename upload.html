@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#10241c">
+  <title>Upload score sheet · Roslyn American Darts</title>
+  <meta name="description" content="Experimental: photograph a filled Roslyn darts score sheet and check the reading before it updates the standings.">
+  <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="page-upload">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <p class="experimental-banner">Experimental · handwriting reading is rough</p>
+  <header class="site-header">
+    <div class="dart-stripe" aria-hidden="true"></div>
+    <div class="header-bar wrap">
+      <a class="wordmark" href="index.html">
+        <img src="images/favicon.svg" alt="" width="36" height="36">
+        <span>
+          <strong>Roslyn</strong>
+          <small>American Darts</small>
+        </span>
+      </a>
+      <button class="nav-button" type="button" aria-expanded="false" aria-controls="site-nav">
+        <span class="nav-bars" aria-hidden="true"></span>
+        <span class="nav-label">Menu</span>
+      </button>
+      <nav id="site-nav" aria-label="Sections">
+        <ul>
+          <li><a href="index.html#about">About</a></li>
+          <li><a href="index.html#schedule">Schedule</a></li>
+          <li><a href="index.html#standings">Standings</a></li>
+          <li><a href="index.html#score">Score sheet</a></li>
+          <li><a href="upload.html" aria-current="page">Upload sheet</a></li>
+          <li><a href="index.html#teams">Teams</a></li>
+          <li><a href="index.html#location">Location</a></li>
+          <li><a href="index.html#photos">Photos</a></li>
+          <li><a href="index.html#news">News</a></li>
+          <li><a href="index.html#join">Join</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="wrap">
+    <section>
+      <p class="eyebrow">Score sheet photo</p>
+      <h1>Upload a score sheet</h1>
+      <div class="security-note">
+        <p><strong>This is an experiment.</strong> A phone photo of handwriting is a hard thing for the browser to read. Digits get missed, names come out wrong, and a blank box can look like a mark. Nothing here is trusted until you look at it.</p>
+        <p>The reliable path is still the <a href="index.html#score">typed score sheet</a>. Use that when the reading is a mess. The photo is not saved. Only the score you confirm is stored, in this browser for now.</p>
+      </div>
+      <p>At the end of the night, photograph the filled v2 sheet. Keep all four black corner squares in the frame, on a flat table, in even light. The page uses those marks to line the photo up with the printed boxes, then tries to read team names, the three game winners, and the inning digits.</p>
+      <form id="pick-form" class="sheet stack">
+        <label class="field">Photo of the filled sheet
+          <input id="sheet-file" name="photo" type="file" accept="image/*">
+        </label>
+        <div class="form-actions">
+          <button class="btn btn-primary" id="read-photo" type="submit">Read this photo</button>
+          <button class="btn btn-ink" id="type-instead" type="button">Type the result instead</button>
+        </div>
+        <p id="ocr-status" class="status" role="status" aria-live="polite"></p>
+        <p id="ocr-error" class="alert" role="alert" hidden></p>
+      </form>
+      <p id="ocr-summary" class="ocr-summary"></p>
+      <ul id="ocr-warnings" class="warning-list"></ul>
+      <figure id="align-figure" hidden>
+        <img id="align-preview" class="align-preview" alt="The score sheet after the page straightened it" width="960" height="720">
+        <figcaption id="align-note"></figcaption>
+      </figure>
+    </section>
+
+    <section id="confirm-section" hidden>
+      <div class="section-head">
+        <p class="eyebrow">Confirm</p>
+        <h2>Check the reading</h2>
+      </div>
+      <p>Fix anything that is wrong, then save. Games won is the match score the standings use. The beer frame is not a league game. Inning totals are only a cross-check.</p>
+      <form id="confirm-form" class="sheet">
+        <div class="form-grid cols-3">
+          <label class="field">Match date
+            <input id="confirm-date" name="date" type="date">
+          </label>
+          <label class="field">Home team, as written
+            <input id="home-name" name="home-name" type="text" autocomplete="off" maxlength="80">
+          </label>
+          <label class="field">Home team on the list
+            <select id="home-team" name="home-team"></select>
+          </label>
+          <label class="field">Away team, as written
+            <input id="away-name" name="away-name" type="text" autocomplete="off" maxlength="80">
+          </label>
+          <label class="field">Away team on the list
+            <select id="away-team" name="away-team"></select>
+          </label>
+        </div>
+
+        <div class="confirm-games">
+          <div class="confirm-game">
+            <h3>Game 1</h3>
+            <label class="field">Home points
+              <input id="g1-home-pts" type="number" min="0" max="400" inputmode="numeric">
+            </label>
+            <label class="field">Away points
+              <input id="g1-away-pts" type="number" min="0" max="400" inputmode="numeric">
+            </label>
+            <label class="field">Winner
+              <select id="g1-winner">
+                <option value="">Not sure</option>
+                <option value="home">Home</option>
+                <option value="away">Away</option>
+              </select>
+            </label>
+          </div>
+          <div class="confirm-game">
+            <h3>Game 2</h3>
+            <label class="field">Home points
+              <input id="g2-home-pts" type="number" min="0" max="400" inputmode="numeric">
+            </label>
+            <label class="field">Away points
+              <input id="g2-away-pts" type="number" min="0" max="400" inputmode="numeric">
+            </label>
+            <label class="field">Winner
+              <select id="g2-winner">
+                <option value="">Not sure</option>
+                <option value="home">Home</option>
+                <option value="away">Away</option>
+              </select>
+            </label>
+          </div>
+          <div class="confirm-game">
+            <h3>Game 3</h3>
+            <label class="field">Home points
+              <input id="g3-home-pts" type="number" min="0" max="400" inputmode="numeric">
+            </label>
+            <label class="field">Away points
+              <input id="g3-away-pts" type="number" min="0" max="400" inputmode="numeric">
+            </label>
+            <label class="field">Winner
+              <select id="g3-winner">
+                <option value="">Not sure</option>
+                <option value="home">Home</option>
+                <option value="away">Away</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-grid cols-3">
+          <label class="field">Beer frame (not counted)
+            <select id="beer-winner">
+              <option value="">Not marked</option>
+              <option value="home">Home</option>
+              <option value="away">Away</option>
+            </select>
+          </label>
+          <label class="field">Home games won
+            <input id="home-won" type="number" min="0" max="30" inputmode="numeric" value="0">
+          </label>
+          <label class="field">Away games won
+            <input id="away-won" type="number" min="0" max="30" inputmode="numeric" value="0">
+          </label>
+        </div>
+        <p class="eyebrow">Final score</p>
+        <p id="final-score" class="final-score" aria-live="polite">0–0</p>
+        <p id="sheet-points" class="status">Inning totals show up here after a photo is read. They do not decide the match.</p>
+        <p id="confirm-error" class="alert" role="alert" hidden></p>
+        <div class="form-actions">
+          <button class="btn btn-primary" id="confirm-submit" type="submit">Save and update standings</button>
+        </div>
+      </form>
+      <p id="saved-note" class="status" role="status" hidden></p>
+    </section>
+
+    <section id="live-standings">
+      <div class="section-head">
+        <p class="eyebrow">Standings</p>
+        <h2>Standings on this phone</h2>
+      </div>
+      <p id="upload-mode" class="status"></p>
+      <div id="upload-standings"></div>
+      <p><a href="index.html#standings">Open standings on the home page</a></p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <a class="wordmark" href="index.html">
+          <img src="images/favicon.svg" alt="" width="36" height="36">
+          <span>
+            <strong>Roslyn</strong>
+            <small>American Darts</small>
+          </span>
+        </a>
+        <p>Experimental photo reading for the v2 paper score sheet. SAMPLE marks invented names, numbers, and dates.</p>
+      </div>
+      <address class="address">
+        <p>1140 Easton Rd<br>Abington, PA 19001</p>
+        <p>VFW phone: <a href="tel:+12155769349">(215) 576-9349</a></p>
+      </address>
+      <p><a href="index.html#score">Typed score sheet</a><br><a href="admin.html">Admin</a></p>
+    </div>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/sheet-ocr.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
+  <script src="js/upload.js"></script>
+</body>
+</html>
