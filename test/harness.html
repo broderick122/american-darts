@@ -57,6 +57,7 @@
 
     function slim(result) {
       return {
+        version: result.version || "",
         mode: result.mode,
         notch: result.notch,
         upsideDown: result.upsideDown,
@@ -83,9 +84,44 @@
 
     var params = new URLSearchParams(location.search);
     var phone = params.get("photo") === "1";
+    var sheet = params.get("sheet");
 
-    Promise.all([
-      fetch("../scoresheet/scansheet_v7_layout_spec.json").then(function (response) { return response.json(); }),
+    function specJson(name) {
+      return fetch("../scoresheet/" + name).then(function (response) { return response.json(); });
+    }
+
+    if (sheet === "v8") {
+      Promise.all([
+        specJson("scansheet_v8_layout_spec.json"),
+        specJson("scansheet_v7_layout_spec.json"),
+        loadImage("fixtures/filled-v8.jpg"),
+        loadImage("fixtures/filled-v7.jpg")
+      ]).then(function (parts) {
+        var specs = [parts[0], parts[1]];
+        var canvas = downscale(draw(parts[2]), 1600);
+        var letter = downscale(draw(parts[3]), 1600);
+        var turns = [0, 1, 2, 3];
+        var readings = [];
+        function next(index) {
+          if (index >= turns.length) {
+            return RAD_OCR.readSheet(letter, specs).then(function (detected) {
+              document.getElementById("result").textContent = JSON.stringify({
+                v8: readings,
+                letter: slim(detected)
+              });
+            });
+          }
+          return RAD_OCR.readSheet(rotateTurns(canvas, turns[index]), specs).then(function (result) {
+            readings.push(slim(result));
+            return next(index + 1);
+          });
+        }
+        return next(0);
+      }).catch(function (err) {
+        document.getElementById("result").textContent = JSON.stringify({ error: String(err && err.message || err) });
+      });
+    } else Promise.all([
+      specJson("scansheet_v7_layout_spec.json"),
       loadImage(phone ? "fixtures/phone-sheet.jpg" : "fixtures/filled-v7.jpg")
     ]).then(function (parts) {
       var spec = parts[0];
