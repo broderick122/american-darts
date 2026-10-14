@@ -1,10 +1,11 @@
 /* Reader for the v7 Roslyn results scan sheet.
-   Finds the four corner squares, uses the white notch in the top-left
-   square to turn a rotated photo upright, then samples each bubble
-   against the others in its row. One clearly darker bubble is the mark.
-   A row with none is blank (missing, not zero). A row with two is flagged.
-   The 100+ flag is the exception: blank means 0, filled means +100.
-   Names, captain, and the date are handwritten and are not read. */
+   Finds the black corner squares, turns a 0/90/180/270 photo upright
+   from those squares plus the header and QR pattern, and samples each
+   bubble against the others in its row. One clearly darker bubble is
+   the mark. A row with none is blank (missing, not zero). A row with
+   two is flagged. The 100+ flag is the exception: blank means 0,
+   filled means +100. Names, captain, and the date are handwritten
+   and are not read. */
 (function (root) {
   "use strict";
 
@@ -256,6 +257,304 @@
     return { x: tr[0] - tl[0], y: bl[1] - tl[1] };
   }
 
+  function limitCanvas(canvas, maxDim) {
+    var longest = Math.max(canvas.width, canvas.height);
+    if (longest <= maxDim) return canvas;
+    var scale = maxDim / longest;
+    var next = root.document.createElement("canvas");
+    next.width = Math.max(1, Math.round(canvas.width * scale));
+    next.height = Math.max(1, Math.round(canvas.height * scale));
+    var ctx = next.getContext("2d", { willReadFrequently: true });
+    ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(canvas, 0, 0, next.width, next.height);
+    return next;
+  }
+
+  function ringOf(pts) {
+    var cx = 0;
+    var cy = 0;
+    pts.forEach(function (pt) { cx += pt.x; cy += pt.y; });
+    cx /= pts.length;
+    cy /= pts.length;
+    return pts.slice().sort(function (a, b) {
+      return Math.atan2(a.y - cy, a.x - cx) - Math.atan2(b.y - cy, b.x - cx);
+    });
+  }
+
+  function rotateRing(ring, turns) {
+    return {
+      TL: ring[turns % 4],
+      TR: ring[(turns + 1) % 4],
+      BR: ring[(turns + 2) % 4],
+      BL: ring[(turns + 3) % 4]
+    };
+  }
+
+  /* The missing corner of a near-rectangle is opposite the right angle. */
+  function completeParallelogram(pts) {
+    var pairs = [[0, 1], [0, 2], [1, 2]];
+    var diagonal = pairs[0];
+    var longest = 0;
+    pairs.forEach(function (pair) {
+      var length = dist(pts[pair[0]], pts[pair[1]]);
+      if (length > longest) {
+        longest = length;
+        diagonal = pair;
+      }
+    });
+    var vertexIndex = [0, 1, 2].filter(function (index) {
+      return index !== diagonal[0] && index !== diagonal[1];
+    })[0];
+    var vertex = pts[vertexIndex];
+    var endA = pts[diagonal[0]];
+    var endB = pts[diagonal[1]];
+    var v1x = endA.x - vertex.x;
+    var v1y = endA.y - vertex.y;
+    var v2x = endB.x - vertex.x;
+    var v2y = endB.y - vertex.y;
+    var denom = Math.sqrt((v1x * v1x + v1y * v1y) * (v2x * v2x + v2y * v2y));
+    var cos = denom ? (v1x * v2x + v1y * v2y) / denom : 1;
+    if (Math.abs(cos) > 0.5) return null;
+    var legA = Math.hypot(v1x, v1y);
+    var legB = Math.hypot(v2x, v2y);
+    var ratio = Math.max(legA, legB) / Math.min(legA, legB);
+    if (ratio < 1.05 || ratio > 1.8) return null;
+    var area = 0;
+    pts.forEach(function (pt) { area += pt.area || 0; });
+    return {
+      x: endA.x + endB.x - vertex.x,
+      y: endA.y + endB.y - vertex.y,
+      area: area / pts.length,
+      side: vertex.side,
+      notch: false,
+      estimated: true
+    };
+  }
+
+  function normHomography(ordered) {
+    return homography(
+      [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 0, y: 1 }, { x: 1, y: 1 }],
+      [ordered.TL, ordered.TR, ordered.BL, ordered.BR]
+    );
+  }
+
+  function applyNorm(H, nx, ny) {
+    var den = H[6] * nx + H[7] * ny + 1;
+    return {
+      x: (H[0] * nx + H[1] * ny + H[2]) / den,
+      y: (H[3] * nx + H[4] * ny + H[5]) / den
+    };
+  }
+
+  function qrScore(data, width, height, H, box) {
+    if (!H || !box) return 0;
+    var lums = [];
+    var outside = 0;
+    var iy, ix, point, xi, yi;
+    for (iy = 0; iy < 7; iy += 1) {
+      for (ix = 0; ix < 7; ix += 1) {
+        point = applyNorm(H, box[0] + box[2] * (ix + 0.5) / 7, box[1] + box[3] * (iy + 0.5) / 7);
+        xi = Math.round(point.x);
+        yi = Math.round(point.y);
+        if (xi < 1 || yi < 1 || xi >= width - 1 || yi >= height - 1) {
+          outside += 1;
+          continue;
+        }
+        lums.push(luminance(data, (yi * width + xi) * 4));
+      }
+    }
+    if (lums.length < 24) return -1;
+    var sum = 0;
+    var dark = 0;
+    lums.forEach(function (value) {
+      sum += value;
+      if (value < 110) dark += 1;
+    });
+    var mean = sum / lums.length;
+    var variance = 0;
+    lums.forEach(function (value) { variance += (value - mean) * (value - mean); });
+    var std = Math.sqrt(variance / lums.length);
+    var ratio = dark / lums.length;
+    var score = 0;
+    if (ratio > 0.15 && ratio < 0.78) score += 2;
+    if (std > 32) score += 2;
+    if (mean > 45 && mean < 200) score += 1;
+    if (outside > 8) score -= 2;
+    return score;
+  }
+
+  function headerScore(data, width, height, H) {
+    if (!H) return 0;
+    var dark = 0;
+    var total = 0;
+    var ix, point, xi, yi;
+    for (ix = 0; ix < 12; ix += 1) {
+      point = applyNorm(H, 0.08 + ix * 0.04, 0.012);
+      xi = Math.round(point.x);
+      yi = Math.round(point.y);
+      if (xi < 1 || yi < 1 || xi >= width - 1 || yi >= height - 1) continue;
+      total += 1;
+      if (luminance(data, (yi * width + xi) * 4) < 120) dark += 1;
+    }
+    if (!total) return -1;
+    var ratio = dark / total;
+    if (ratio > 0.08 && ratio < 0.7) return 1;
+    return 0;
+  }
+
+  function eachTrio(list, fn) {
+    var i, j, k;
+    for (i = 0; i < list.length; i += 1) {
+      for (j = i + 1; j < list.length; j += 1) {
+        for (k = j + 1; k < list.length; k += 1) fn([list[i], list[j], list[k]]);
+      }
+    }
+  }
+
+  function placementScore(ordered, data, width, height, spec, span) {
+    var geom = scoreCorners(ordered, span.x, span.y);
+    if (geom < 0) return -1;
+    var H = normHomography(ordered);
+    if (!H) return -1;
+    var qr = qrScore(data, width, height, H, spec.qr && spec.qr.bbox_norm);
+    var header = headerScore(data, width, height, H);
+    if (qr < 2 && !ordered.TL.notch) return -1;
+    var estimated = ordered.TL.estimated || ordered.TR.estimated || ordered.BL.estimated || ordered.BR.estimated;
+    return geom / 100000 + qr * 4 + header + (ordered.TL.notch ? 6 : 0) + (estimated ? -1 : 2);
+  }
+
+  function pickSeparated(comps, canvas) {
+    var minSep = 0.12 * Math.min(canvas.width, canvas.height);
+    var largest = comps.length ? comps[0].area : 0;
+    var picked = [];
+    comps.forEach(function (comp) {
+      if (!largest || comp.area < largest * 0.25) return;
+      var close = picked.some(function (pt) { return dist(pt, comp) <= minSep; });
+      if (!close) picked.push(comp);
+    });
+    return picked.slice(0, 6);
+  }
+
+  function rotationOf(ordered) {
+    var angle = Math.atan2(ordered.TR.y - ordered.TL.y, ordered.TR.x - ordered.TL.x);
+    var snapped = Math.round((angle * 180 / Math.PI) / 90) * 90;
+    return ((snapped % 360) + 360) % 360;
+  }
+
+  function isConvexQuad(ordered) {
+    var pts = [ordered.TL, ordered.TR, ordered.BR, ordered.BL];
+    var sign = 0;
+    var i, a, b, c, cross;
+    for (i = 0; i < 4; i += 1) {
+      a = pts[i];
+      b = pts[(i + 1) % 4];
+      c = pts[(i + 2) % 4];
+      cross = (b.x - a.x) * (c.y - b.y) - (b.y - a.y) * (c.x - b.x);
+      if (Math.abs(cross) < 1) continue;
+      if (!sign) sign = cross > 0 ? 1 : -1;
+      else if ((cross > 0 ? 1 : -1) !== sign) return false;
+    }
+    return sign !== 0;
+  }
+
+  function placeDigits(field, placeName) {
+    if (!field || !field.digits) return null;
+    var found = null;
+    field.digits.forEach(function (place) {
+      if (place.place === placeName) found = place;
+    });
+    return found;
+  }
+
+  function rowContrast(data, width, height, H, place, radius) {
+    if (!H || !place || !place.bubbles) return 0;
+    var lums = place.bubbles.map(function (bubble) {
+      var p = applyNorm(H, bubble.center_norm[0], bubble.center_norm[1]);
+      return sampleAnnulus(data, width, height, p.x, p.y, radius);
+    });
+    if (lums.length < 2) return 0;
+    lums.sort(function (a, b) { return a - b; });
+    if (lums[0] >= 150) return 0;
+    return lums[1] - lums[0];
+  }
+
+  function alignmentScore(ordered, data, width, height, spec) {
+    if (!isConvexQuad(ordered)) return -1;
+    var H = normHomography(ordered);
+    if (!H) return -1;
+    var spanPx = dist(ordered.TL, ordered.TR);
+    var radius = Math.max(2.5, spec.bubble_radius.pt * spanPx / markerSpan(spec).x);
+    var rows = [
+      ["home_g1_s1", "tens"],
+      ["home_g1_s1", "ones"],
+      ["home_g1_s4", "tens"],
+      ["home_g1_s4", "ones"],
+      ["away_g3_s1", "tens"],
+      ["away_g3_s1", "ones"],
+      ["away_g1_team", "tens"],
+      ["away_g1_team", "ones"]
+    ];
+    var total = 0;
+    rows.forEach(function (row) {
+      total += rowContrast(data, width, height, H, placeDigits(spec.number_fields[row[0]], row[1]), radius);
+    });
+    return total;
+  }
+
+  /* Nudge a cut-off corner so filled bubbles land on the darker mark. */
+  function refineEstimated(ordered, data, width, height, spec) {
+    var key = null;
+    ["TL", "TR", "BL", "BR"].forEach(function (name) {
+      if (ordered[name].estimated) key = name;
+    });
+    if (!key) return { ordered: ordered, align: alignmentScore(ordered, data, width, height, spec) };
+
+    function moved(x, y) {
+      var next = { TL: ordered.TL, TR: ordered.TR, BL: ordered.BL, BR: ordered.BR };
+      next[key] = {
+        x: x,
+        y: y,
+        area: ordered[key].area,
+        side: ordered[key].side,
+        notch: false,
+        estimated: true
+      };
+      return next;
+    }
+
+    var bestOrdered = ordered;
+    var bestScore = alignmentScore(ordered, data, width, height, spec);
+    var step = Math.max(6, Math.round(Math.min(width, height) * 0.014));
+    var range = step * 7;
+    var originX = ordered[key].x;
+    var originY = ordered[key].y;
+    var dx, dy, candidate, score;
+    for (dy = -range; dy <= range; dy += step) {
+      for (dx = -range; dx <= range; dx += step) {
+        candidate = moved(originX + dx, originY + dy);
+        score = alignmentScore(candidate, data, width, height, spec);
+        if (score > bestScore) {
+          bestScore = score;
+          bestOrdered = candidate;
+        }
+      }
+    }
+    var fineX = bestOrdered[key].x;
+    var fineY = bestOrdered[key].y;
+    var fine = Math.max(2, Math.round(step / 3));
+    for (dy = -step; dy <= step; dy += fine) {
+      for (dx = -step; dx <= step; dx += fine) {
+        candidate = moved(fineX + dx, fineY + dy);
+        score = alignmentScore(candidate, data, width, height, spec);
+        if (score > bestScore) {
+          bestScore = score;
+          bestOrdered = candidate;
+        }
+      }
+    }
+    return { ordered: bestOrdered, align: bestScore };
+  }
+
   function locateMarks(canvas, spec) {
     var span = markerSpan(spec);
     var maxDim = 960;
@@ -297,27 +596,57 @@
     });
     comps.sort(function (a, b) { return b.area - a.area; });
     if (comps.length > 14) comps = comps.slice(0, 14);
+    var pool = pickSeparated(comps, canvas);
+    if (pool.length < 3) pool = comps.slice(0, 8);
 
     var best = null;
-    eachCombo(comps, function (group) {
-      var notched = group.filter(function (pt) { return pt.notch; });
-      var ordered = notched.length === 1
-        ? labelFromTL(notched[0], group.filter(function (pt) { return pt !== notched[0]; }))
-        : orderByAngle(group);
-      var score = scoreCorners(ordered, span.x, span.y);
+    function consider(ordered) {
+      var score = placementScore(ordered, full.data, full.width, full.height, spec, span);
       if (score < 0) return;
-      if (notched.length === 1) score *= 1.25;
-      if (!best || score > best.score) best = { ordered: ordered, score: score, notch: notched.length === 1 };
+      var estimated = !!(ordered.TL.estimated || ordered.TR.estimated || ordered.BL.estimated || ordered.BR.estimated);
+      if (!best || score > best.score) {
+        best = {
+          ordered: ordered,
+          score: score,
+          notch: !!ordered.TL.notch,
+          rotation: rotationOf(ordered),
+          estimated: estimated
+        };
+      }
+    }
+    eachCombo(pool, function (group) {
+      var ring = ringOf(group);
+      var turn;
+      for (turn = 0; turn < 4; turn += 1) consider(rotateRing(ring, turn));
     });
+    if (pool.length >= 3) {
+      eachTrio(pool, function (trio) {
+        var missing = completeParallelogram(trio);
+        if (!missing) return;
+        var ring = ringOf(trio.concat([missing]));
+        var turn;
+        for (turn = 0; turn < 4; turn += 1) consider(rotateRing(ring, turn));
+      });
+    }
 
+    var retake = "Retake the photo so all four black corner squares are in the frame. Lay the sheet flat, and keep every corner visible.";
     if (!best) {
       return {
         mode: "rejected",
         notch: false,
         upsideDown: false,
+        rotation: 0,
+        estimatedCorner: false,
         squares: comps.length,
-        warning: "The four black corner squares were not found. Retake the photo so all four are in the frame, on a flat page."
+        warning: retake
       };
+    }
+    if (best.estimated) {
+      var refined = refineEstimated(best.ordered, full.data, full.width, full.height, spec);
+      if (refined && refined.ordered) {
+        best.ordered = refined.ordered;
+        best.rotation = rotationOf(best.ordered);
+      }
     }
     var topSpan = dist(best.ordered.TL, best.ordered.TR);
     if (topSpan < Math.min(canvas.width, canvas.height) * 0.22) {
@@ -325,17 +654,24 @@
         mode: "rejected",
         notch: best.notch,
         upsideDown: false,
+        rotation: 0,
+        estimatedCorner: false,
         squares: comps.length,
         warning: "The corner squares are too small in the frame. Move closer, and keep all four in the photo."
       };
     }
     var fit = Math.max(1.15, Math.min(2.35, topSpan / span.x));
+    var warning = best.estimated
+      ? "One corner square was cut off. That corner was estimated from the other three. Check the bubbles near the edge of the sheet."
+      : "";
     return {
       mode: "fiducial",
       notch: best.notch,
-      upsideDown: best.ordered.TL.y > canvas.height * 0.55 && best.ordered.TL.y > best.ordered.BL.y,
+      upsideDown: best.rotation === 180,
+      rotation: best.rotation,
+      estimatedCorner: best.estimated,
       squares: comps.length,
-      warning: best.notch ? "" : "The white notch in the top-left square was hard to see. This read assumes the photo is upright.",
+      warning: warning,
       scale: fit,
       span: span,
       src: best.ordered,
@@ -562,6 +898,8 @@
       mode: "rejected",
       notch: !!(located && located.notch),
       upsideDown: false,
+      rotation: 0,
+      estimatedCorner: false,
       warnings: warnings.filter(Boolean),
       previewUrl: canvas ? previewUrl(canvas) : "",
       teams: emptyTeams(),
@@ -745,7 +1083,9 @@
       version: spec.version || "v7",
       mode: "fiducial",
       notch: !!located.notch,
-      upsideDown: !!located.upsideDown,
+      upsideDown: (located.rotation || 0) === 180,
+      rotation: located.rotation || 0,
+      estimatedCorner: !!located.estimatedCorner,
       warnings: unique,
       teams: teams,
       winners: winners,
@@ -763,19 +1103,24 @@
       return Promise.reject(new Error("The v7 scan sheet layout is missing."));
     }
     say(onProgress, "Looking for the corner squares…");
+    var canvas = limitCanvas(sourceCanvas, 1700);
     return nextFrame().then(function () {
-      var located = locateMarks(sourceCanvas, spec);
+      var located = locateMarks(canvas, spec);
       if (located.mode !== "fiducial") {
-        var note = located.warning || "The corner squares were not found.";
-        if (located.squares != null) note += " (" + located.squares + " dark squares seen.)";
-        return rejected(spec, sourceCanvas, located, [note]);
+        var note = located.warning || "Retake the photo so all four black corner squares are in the frame. Lay the sheet flat, and keep every corner visible.";
+        return rejected(spec, canvas, located, [note]);
       }
-      say(onProgress, located.upsideDown ? "Turning the upside-down photo upright…" : "Straightening the photo…");
-      return warp(sourceCanvas, located).then(function (aligned) {
+      var turning = located.rotation === 180
+        ? "Turning the upside-down photo upright…"
+        : (located.rotation === 90 || located.rotation === 270)
+          ? "Turning the sideways photo upright…"
+          : "Straightening the photo…";
+      say(onProgress, turning);
+      return warp(canvas, located).then(function (aligned) {
         var image = aligned.getContext("2d", { willReadFrequently: true }).getImageData(0, 0, aligned.width, aligned.height);
         if (!cornersAreMarks(image, located)) {
-          return rejected(spec, sourceCanvas, located, [
-            "Those dark shapes are not the scan sheet's corner squares. Retake the photo with all four black squares in the frame."
+          return rejected(spec, canvas, located, [
+            "Retake the photo so all four black corner squares are in the frame. Lay the sheet flat, and keep every corner visible."
           ]);
         }
         say(onProgress, "Reading the bubbles…");
@@ -788,27 +1133,112 @@
     });
   }
 
+  function jpegOrientation(buffer) {
+    var view = new DataView(buffer);
+    if (view.byteLength < 4 || view.getUint16(0) !== 0xFFD8) return 1;
+    var offset = 2;
+    while (offset + 4 < view.byteLength) {
+      if (view.getUint8(offset) !== 0xFF) break;
+      var marker = view.getUint8(offset + 1);
+      var size = view.getUint16(offset + 2);
+      if (marker === 0xE1 && size >= 14) {
+        var start = offset + 4;
+        if (view.getUint32(start) === 0x45786966) {
+          var tiff = start + 6;
+          var little = view.getUint16(tiff) === 0x4949;
+          var get16 = function (at) { return view.getUint16(at, little); };
+          var get32 = function (at) { return view.getUint32(at, little); };
+          if (get16(tiff + 2) === 42) {
+            var ifd = tiff + get32(tiff + 4);
+            if (ifd + 2 < view.byteLength) {
+              var count = get16(ifd);
+              var entry, i;
+              for (i = 0; i < count; i += 1) {
+                entry = ifd + 2 + i * 12;
+                if (entry + 10 > view.byteLength) break;
+                if (get16(entry) === 0x0112) return get16(entry + 8);
+              }
+            }
+          }
+        }
+      }
+      if (marker === 0xDA || marker === 0xD9) break;
+      if (!size) break;
+      offset += 2 + size;
+    }
+    return 1;
+  }
+
+  function drawBitmap(bitmap, orientation, maxDim) {
+    var swap = orientation > 4 && orientation < 9;
+    var rawW = swap ? bitmap.height : bitmap.width;
+    var rawH = swap ? bitmap.width : bitmap.height;
+    var scale = Math.min(1, maxDim / Math.max(rawW, rawH));
+    var canvas = root.document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(rawW * scale));
+    canvas.height = Math.max(1, Math.round(rawH * scale));
+    var ctx = canvas.getContext("2d", { willReadFrequently: true });
+    ctx.save();
+    ctx.scale(scale, scale);
+    if (orientation === 2) ctx.transform(-1, 0, 0, 1, rawW, 0);
+    else if (orientation === 3) ctx.transform(-1, 0, 0, -1, rawW, rawH);
+    else if (orientation === 4) ctx.transform(1, 0, 0, -1, 0, rawH);
+    else if (orientation === 5) ctx.transform(0, 1, 1, 0, 0, 0);
+    else if (orientation === 6) ctx.transform(0, 1, -1, 0, rawW, 0);
+    else if (orientation === 7) ctx.transform(0, -1, -1, 0, rawW, rawH);
+    else if (orientation === 8) ctx.transform(0, -1, 1, 0, 0, rawH);
+    ctx.drawImage(bitmap, 0, 0);
+    ctx.restore();
+    if (bitmap.close) bitmap.close();
+    return canvas;
+  }
+
+  function jpegSize(buffer) {
+    var view = new DataView(buffer);
+    if (view.byteLength < 10 || view.getUint16(0) !== 0xFFD8) return null;
+    var offset = 2;
+    var marker, size;
+    while (offset + 9 < view.byteLength) {
+      if (view.getUint8(offset) !== 0xFF) break;
+      marker = view.getUint8(offset + 1);
+      size = view.getUint16(offset + 2);
+      if (marker >= 0xC0 && marker <= 0xC2) {
+        return { height: view.getUint16(offset + 5), width: view.getUint16(offset + 7) };
+      }
+      if (marker === 0xDA || marker === 0xD9) break;
+      if (!size) break;
+      offset += 2 + size;
+    }
+    return null;
+  }
+
   function loadImageFile(file) {
-    function toCanvas(bitmap) {
-      var maxDim = 2200;
-      var scale = Math.min(1, maxDim / Math.max(bitmap.width, bitmap.height));
-      var canvas = root.document.createElement("canvas");
-      canvas.width = Math.max(1, Math.round(bitmap.width * scale));
-      canvas.height = Math.max(1, Math.round(bitmap.height * scale));
-      var ctx = canvas.getContext("2d", { willReadFrequently: true });
-      ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-      if (bitmap.close) bitmap.close();
-      return canvas;
-    }
-    var attempt;
-    try {
-      attempt = root.createImageBitmap(file, { imageOrientation: "from-image" });
-    } catch (err) {
-      attempt = root.createImageBitmap(file);
-    }
-    return Promise.resolve(attempt).catch(function () {
+    var maxDim = 1700;
+    function plainBitmap() {
       return root.createImageBitmap(file);
-    }).then(toCanvas);
+    }
+    function orientedBitmap() {
+      try {
+        return root.createImageBitmap(file, { imageOrientation: "from-image" });
+      } catch (err) {
+        return Promise.reject(err);
+      }
+    }
+    var bytes = file && file.arrayBuffer ? file.arrayBuffer() : Promise.resolve(null);
+    return bytes.then(function (buffer) {
+      var orientation = buffer ? jpegOrientation(buffer) : 1;
+      var stored = buffer ? jpegSize(buffer) : null;
+      return Promise.resolve(orientedBitmap()).then(function (bitmap) {
+        var needsSwap = orientation > 4 && orientation < 9;
+        var already = !stored || !needsSwap || (bitmap.width === stored.height && bitmap.height === stored.width);
+        if (already) return drawBitmap(bitmap, 1, maxDim);
+        return drawBitmap(bitmap, orientation, maxDim);
+      }).catch(function () {
+        return plainBitmap().then(function (bitmap) {
+          return drawBitmap(bitmap, orientation, maxDim);
+        });
+      });
+    });
   }
 
   root.RAD_OCR = {
