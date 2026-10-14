@@ -104,6 +104,38 @@
     return count ? sum / count : 255;
   }
 
+  /* Local contrast mask. A fixed cutoff misses a corner square in warm light
+     or glare, and it paints a whole shadow as ink. */
+  function adaptiveMask(lum, width, height) {
+    var integ = new Float64Array((width + 1) * (height + 1));
+    var stride = width + 1;
+    var y, x, row, idx;
+    for (y = 0; y < height; y += 1) {
+      row = 0;
+      for (x = 0; x < width; x += 1) {
+        row += lum[y * width + x];
+        idx = (y + 1) * stride + (x + 1);
+        integ[idx] = integ[y * stride + (x + 1)] + row;
+      }
+    }
+    var radius = Math.max(12, Math.round(Math.min(width, height) * 0.045));
+    var mask = new Uint8Array(width * height);
+    for (y = 0; y < height; y += 1) {
+      var y0 = Math.max(0, y - radius);
+      var y1 = Math.min(height - 1, y + radius);
+      for (x = 0; x < width; x += 1) {
+        var x0 = Math.max(0, x - radius);
+        var x1 = Math.min(width - 1, x + radius);
+        var sum = integ[(y1 + 1) * stride + (x1 + 1)] - integ[y0 * stride + (x1 + 1)] - integ[(y1 + 1) * stride + x0] + integ[y0 * stride + x0];
+        var area = (x1 - x0 + 1) * (y1 - y0 + 1);
+        var mean = sum / area;
+        var value = lum[y * width + x];
+        if (value < mean - 28 && value < mean * 0.72 && value < 165) mask[y * width + x] = 1;
+      }
+    }
+    return mask;
+  }
+
   /* Mean luminance of the ring inside the printed circle, outside the digit. */
   function sampleAnnulus(data, width, height, cx, cy, radius) {
     var inner = Math.max(1, radius * 0.46);
@@ -128,6 +160,53 @@
       }
     }
     return count ? sum / count : 255;
+  }
+
+  /* Share of the inner disk that is darker than the paper beside the bubble.
+     A pen scribble counts even when it does not fill the ring. The printed
+     gray digit stays above the cutoff. */
+  function inkFraction(data, width, height, cx, cy, radius) {
+    var spots = [[1, 1], [1, -1], [-1, 1], [-1, -1]];
+    var papers = [];
+    var i;
+    for (i = 0; i < spots.length; i += 1) {
+      papers.push(regionLuminance(
+        data,
+        width,
+        height,
+        cx + spots[i][0] * radius * 1.55,
+        cy + spots[i][1] * radius * 1.55,
+        Math.max(1.5, radius * 0.18)
+      ));
+    }
+    var paper = median(papers);
+    if (paper == null) paper = 210;
+    var cutoff = Math.min(paper - 42, paper * 0.58);
+    var inner = Math.max(1.5, radius * 0.66);
+    var inner2 = inner * inner;
+    var x0 = Math.max(0, Math.floor(cx - inner));
+    var y0 = Math.max(0, Math.floor(cy - inner));
+    var x1 = Math.min(width - 1, Math.ceil(cx + inner));
+    var y1 = Math.min(height - 1, Math.ceil(cy + inner));
+    var dark = 0;
+    var count = 0;
+    var y, x, dx, dy;
+    for (y = y0; y <= y1; y += 1) {
+      for (x = x0; x <= x1; x += 1) {
+        dx = x + 0.5 - cx;
+        dy = y + 0.5 - cy;
+        if (dx * dx + dy * dy > inner2) continue;
+        count += 1;
+        if (luminance(data, (y * width + x) * 4) < cutoff) dark += 1;
+      }
+    }
+    return count ? dark / count : 0;
+  }
+
+  function bubbleLum(data, width, height, cx, cy, radius) {
+    var annulus = sampleAnnulus(data, width, height, cx, cy, radius);
+    var fromInk = 255 * (1 - inkFraction(data, width, height, cx, cy, radius));
+    return Math.min(annulus, fromInk);
   }
 
   function findComponents(mask, width, height) {
@@ -248,6 +327,15 @@
       for (j = t + 1; j < 4; j += 1) idx[j] = idx[j - 1] + 1;
       fn(idx.map(function (at) { return list[at]; }));
     }
+  }
+
+  /* 0 when the sheet's top edge points right, 90 when it points down. */
+  function rotationOf(ordered) {
+    var ang = Math.atan2(ordered.TR.y - ordered.TL.y, ordered.TR.x - ordered.TL.x);
+    var deg = Math.round(ang / (Math.PI / 2)) * 90;
+    deg %= 360;
+    if (deg < 0) deg += 360;
+    return deg;
   }
 
   function markerSpan(spec) {
@@ -567,9 +655,10 @@
     var sctx = small.getContext("2d", { willReadFrequently: true });
     sctx.drawImage(canvas, 0, 0, sw, sh);
     var smallData = sctx.getImageData(0, 0, sw, sh).data;
-    var mask = new Uint8Array(sw * sh);
+    var lum = new Float32Array(sw * sh);
     var i;
-    for (i = 0; i < sw * sh; i += 1) mask[i] = luminance(smallData, i * 4) < 90 ? 1 : 0;
+    for (i = 0; i < sw * sh; i += 1) lum[i] = luminance(smallData, i * 4);
+    var mask = adaptiveMask(lum, sw, sh);
     var full = canvas.getContext("2d", { willReadFrequently: true }).getImageData(0, 0, canvas.width, canvas.height);
     var backX = canvas.width / sw;
     var backY = canvas.height / sh;
@@ -590,12 +679,14 @@
         x: cx,
         y: cy,
         area: comp.count,
-        notch: inner > 140 && inner > edge + 50,
+        inner: inner,
+        edge: edge,
+        notch: inner > edge + 40 && inner > edge * 1.45 && inner > 80,
         side: side
       };
     });
     comps.sort(function (a, b) { return b.area - a.area; });
-    if (comps.length > 14) comps = comps.slice(0, 14);
+    if (comps.length > 16) comps = comps.slice(0, 16);
     var pool = pickSeparated(comps, canvas);
     if (pool.length < 3) pool = comps.slice(0, 8);
 
@@ -603,6 +694,9 @@
     function consider(ordered) {
       var score = placementScore(ordered, full.data, full.width, full.height, spec, span);
       if (score < 0) return;
+      var contrast = (ordered.TL.inner || 0) - (ordered.TL.edge || 0);
+      if (ordered.TL.notch) score += 2;
+      score += Math.max(0, contrast) / 80;
       var estimated = !!(ordered.TL.estimated || ordered.TR.estimated || ordered.BL.estimated || ordered.BR.estimated);
       if (!best || score > best.score) {
         best = {
@@ -629,7 +723,6 @@
       });
     }
 
-    var retake = "Retake the photo so all four black corner squares are in the frame. Lay the sheet flat, and keep every corner visible.";
     if (!best) {
       return {
         mode: "rejected",
@@ -638,7 +731,9 @@
         rotation: 0,
         estimatedCorner: false,
         squares: comps.length,
-        warning: retake
+        warning: comps.length < 4
+          ? "The four black corner squares were not found, so this photo was not lined up. Keep all four in the frame, including the notched square at the sheet's top-left. Sideways and upside-down photos are fine."
+          : "Dark squares were found, but they do not form this scan sheet. Retake the photo so all four corner squares are fully in the frame."
       };
     }
     if (best.estimated) {
@@ -663,7 +758,9 @@
     var fit = Math.max(1.15, Math.min(2.35, topSpan / span.x));
     var warning = best.estimated
       ? "One corner square was cut off. That corner was estimated from the other three. Check the bubbles near the edge of the sheet."
-      : "";
+      : best.notch
+        ? ""
+        : "The white notch was faint. The lightest corner square was used as the sheet's top-left.";
     return {
       mode: "fiducial",
       notch: best.notch,
@@ -760,7 +857,7 @@
         var x = Math.round(spot.x + dir[0] * step);
         var y = Math.round(spot.y + dir[1] * step);
         if (x < 1 || y < 1 || x >= image.width - 1 || y >= image.height - 1) return;
-        if (luminance(image.data, (y * image.width + x) * 4) < 80) dark += 1;
+        if (luminance(image.data, (y * image.width + x) * 4) < 120) dark += 1;
       });
       if (dark >= 3) good += 1;
     });
@@ -779,7 +876,7 @@
       var p = mapPoint(located, bubble.center_norm[0], bubble.center_norm[1]);
       return {
         value: bubble.value,
-        lum: sampleAnnulus(image.data, image.width, image.height, p.x, p.y, radius)
+        lum: bubbleLum(image.data, image.width, image.height, p.x, p.y, radius)
       };
     });
   }
@@ -950,7 +1047,7 @@
         var p = mapPoint(located, bubble.center_norm[0], bubble.center_norm[1]);
         return {
           value: bubble.value,
-          lum: sampleAnnulus(image.data, image.width, image.height, p.x, p.y, winnerRadius)
+          lum: bubbleLum(image.data, image.width, image.height, p.x, p.y, winnerRadius)
         };
       });
     });
@@ -1213,30 +1310,37 @@
   }
 
   function loadImageFile(file) {
-    var maxDim = 1700;
-    function plainBitmap() {
-      return root.createImageBitmap(file);
-    }
-    function orientedBitmap() {
-      try {
-        return root.createImageBitmap(file, { imageOrientation: "from-image" });
-      } catch (err) {
-        return Promise.reject(err);
-      }
-    }
+    /* Phone JPEGs are often 12 megapixels. Draw them through an Image element
+       onto a canvas whose long side is at most 1600, so a 4096px bitmap limit
+       never has to hold the full photo. EXIF orientation is applied here when
+       the browser has not already turned the pixels. */
+    var maxDim = 1600;
     var bytes = file && file.arrayBuffer ? file.arrayBuffer() : Promise.resolve(null);
     return bytes.then(function (buffer) {
       var orientation = buffer ? jpegOrientation(buffer) : 1;
       var stored = buffer ? jpegSize(buffer) : null;
-      return Promise.resolve(orientedBitmap()).then(function (bitmap) {
-        var needsSwap = orientation > 4 && orientation < 9;
-        var already = !stored || !needsSwap || (bitmap.width === stored.height && bitmap.height === stored.width);
-        if (already) return drawBitmap(bitmap, 1, maxDim);
-        return drawBitmap(bitmap, orientation, maxDim);
-      }).catch(function () {
-        return plainBitmap().then(function (bitmap) {
-          return drawBitmap(bitmap, orientation, maxDim);
-        });
+      return new Promise(function (resolve, reject) {
+        var url = URL.createObjectURL(file);
+        var img = new Image();
+        img.onload = function () {
+          try {
+            var w = img.naturalWidth || img.width;
+            var h = img.naturalHeight || img.height;
+            if (!w || !h) throw new Error("This photo could not be opened. Use a JPEG that shows the whole sheet.");
+            var needsSwap = orientation > 4 && orientation < 9;
+            var alreadyTurned = !!(stored && needsSwap && w === stored.height && h === stored.width);
+            URL.revokeObjectURL(url);
+            resolve(drawBitmap(img, alreadyTurned ? 1 : orientation, maxDim));
+          } catch (err) {
+            URL.revokeObjectURL(url);
+            reject(err instanceof Error ? err : new Error("This photo could not be opened."));
+          }
+        };
+        img.onerror = function () {
+          URL.revokeObjectURL(url);
+          reject(new Error("This photo could not be opened. Use a JPEG that shows the whole sheet."));
+        };
+        img.src = url;
       });
     });
   }
