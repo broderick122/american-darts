@@ -1,3 +1,5 @@
 node_modules/
 test/fixtures/filled-v7.jpg
+test/fixtures/filled-v8.jpg
 test/fixtures/expected.json
+test/fixtures/expected-v8.json

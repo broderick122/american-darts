@@ -1,11 +1,14 @@
-/* Reader for the v7 Roslyn results scan sheet.
+/* Reader for the Roslyn results scan sheets.
+   v8 is the legal keypad sheet (HOME left, AWAY right). v7 is the letter bubble sheet.
+   Pass one spec, or both, and the corner-marker aspect picks the version.
    Finds the black corner squares, turns a 0/90/180/270 photo upright
    from those squares plus the header and QR pattern, and samples each
-   bubble against the others in its row. One clearly darker bubble is
-   the mark. A row with none is blank (missing, not zero). A row with
-   two is flagged. The 100+ flag is the exception: blank means 0,
-   filled means +100. Names, captain, and the date are handwritten
-   and are not read. */
+   bubble against the others in its row. On the keypad sheet, a key is
+   the mark when its ink coverage is clearly above the other keys in
+   that pad. A row with none is blank (missing, not zero). A row with
+   two is flagged. The 100 flag is the exception: blank means 0,
+   filled means +100. Handwritten score boxes are not read. Names,
+   captain, and the date are handwritten and are not read. */
 (function (root) {
   "use strict";
 
@@ -311,6 +314,16 @@
     if (Math.abs(perp(ordered.TR, ordered.TL, ordered.BL)) > 0.55) return -1;
     if (Math.abs(perp(ordered.BR, ordered.TR, ordered.TL)) > 0.55) return -1;
     return (top * left) / (1 + sideMismatch * 3 + aspectErr * 3);
+  }
+
+  function quadAspect(ordered) {
+    var top = dist(ordered.TL, ordered.TR);
+    var bottom = dist(ordered.BL, ordered.BR);
+    var left = dist(ordered.TL, ordered.BL);
+    var right = dist(ordered.TR, ordered.BR);
+    var width = (top + bottom) / 2;
+    var height = (left + right) / 2;
+    return height ? width / height : 0;
   }
 
   function eachCombo(list, fn) {
@@ -643,8 +656,8 @@
     return { ordered: bestOrdered, align: bestScore };
   }
 
-  function locateMarks(canvas, spec) {
-    var span = markerSpan(spec);
+  function locateMarks(canvas, specOrSpecs) {
+    var specs = Array.isArray(specOrSpecs) ? specOrSpecs : [specOrSpecs];
     var maxDim = 960;
     var scaleDown = Math.min(1, maxDim / Math.max(canvas.width, canvas.height));
     var sw = Math.max(1, Math.round(canvas.width * scaleDown));
@@ -692,21 +705,30 @@
 
     var best = null;
     function consider(ordered) {
-      var score = placementScore(ordered, full.data, full.width, full.height, spec, span);
-      if (score < 0) return;
-      var contrast = (ordered.TL.inner || 0) - (ordered.TL.edge || 0);
-      if (ordered.TL.notch) score += 2;
-      score += Math.max(0, contrast) / 80;
-      var estimated = !!(ordered.TL.estimated || ordered.TR.estimated || ordered.BL.estimated || ordered.BR.estimated);
-      if (!best || score > best.score) {
-        best = {
-          ordered: ordered,
-          score: score,
-          notch: !!ordered.TL.notch,
-          rotation: rotationOf(ordered),
-          estimated: estimated
-        };
-      }
+      var aspect = quadAspect(ordered);
+      specs.forEach(function (candidate) {
+        var candidateSpan = markerSpan(candidate);
+        var score = placementScore(ordered, full.data, full.width, full.height, candidate, candidateSpan);
+        if (score < 0) return;
+        var aspectErr = Math.abs(aspect - candidateSpan.x / candidateSpan.y);
+        /* Legal v8 is about 1.71; letter v7 is about 1.32. Prefer the closer sheet. */
+        if (specs.length > 1) score += (0.55 - aspectErr) * 30;
+        var contrast = (ordered.TL.inner || 0) - (ordered.TL.edge || 0);
+        if (ordered.TL.notch) score += 2;
+        score += Math.max(0, contrast) / 80;
+        var estimated = !!(ordered.TL.estimated || ordered.TR.estimated || ordered.BL.estimated || ordered.BR.estimated);
+        if (!best || score > best.score) {
+          best = {
+            ordered: ordered,
+            score: score,
+            notch: !!ordered.TL.notch,
+            rotation: rotationOf(ordered),
+            estimated: estimated,
+            spec: candidate,
+            span: candidateSpan
+          };
+        }
+      });
     }
     eachCombo(pool, function (group) {
       var ring = ringOf(group);
@@ -730,6 +752,7 @@
         upsideDown: false,
         rotation: 0,
         estimatedCorner: false,
+        spec: specs[0],
         squares: comps.length,
         warning: comps.length < 4
           ? "The four black corner squares were not found, so this photo was not lined up. Keep all four in the frame, including the notched square at the sheet's top-left. Sideways and upside-down photos are fine."
@@ -737,7 +760,7 @@
       };
     }
     if (best.estimated) {
-      var refined = refineEstimated(best.ordered, full.data, full.width, full.height, spec);
+      var refined = refineEstimated(best.ordered, full.data, full.width, full.height, best.spec);
       if (refined && refined.ordered) {
         best.ordered = refined.ordered;
         best.rotation = rotationOf(best.ordered);
@@ -751,10 +774,12 @@
         upsideDown: false,
         rotation: 0,
         estimatedCorner: false,
+        spec: best.spec,
         squares: comps.length,
         warning: "The corner squares are too small in the frame. Move closer, and keep all four in the photo."
       };
     }
+    var span = best.span;
     var fit = Math.max(1.15, Math.min(2.35, topSpan / span.x));
     var warning = best.estimated
       ? "One corner square was cut off. That corner was estimated from the other three. Check the bubbles near the edge of the sheet."
@@ -767,6 +792,8 @@
       upsideDown: best.rotation === 180,
       rotation: best.rotation,
       estimatedCorner: best.estimated,
+      spec: best.spec,
+      version: best.spec.version || "",
       squares: comps.length,
       warning: warning,
       scale: fit,
@@ -871,13 +898,56 @@
     };
   }
 
-  function samplePlace(place, image, located, radius) {
+  /* Share of the inner key that is darker than the paper. The printed digit
+     covers a similar fraction on every key; a fill covers most of the disk.
+     Pixels inside a handwritten score box are skipped so its outline cannot
+     count as ink on a neighboring 0. */
+  function keyCoverage(data, width, height, cx, cy, radius, located, boxes) {
+    var inner = Math.max(1.5, radius * 0.7);
+    var inner2 = inner * inner;
+    var spanX = located.span.x * located.scale;
+    var spanY = located.span.y * located.scale;
+    var x0 = Math.max(0, Math.floor(cx - inner));
+    var y0 = Math.max(0, Math.floor(cy - inner));
+    var x1 = Math.min(width - 1, Math.ceil(cx + inner));
+    var y1 = Math.min(height - 1, Math.ceil(cy + inner));
+    var dark = 0;
+    var count = 0;
+    var y, x, dx, dy, nx, ny, b, box;
+    for (y = y0; y <= y1; y += 1) {
+      for (x = x0; x <= x1; x += 1) {
+        dx = x + 0.5 - cx;
+        dy = y + 0.5 - cy;
+        if (dx * dx + dy * dy > inner2) continue;
+        if (boxes && boxes.length && spanX && spanY) {
+          nx = (x + 0.5 - PAD) / spanX;
+          ny = (y + 0.5 - PAD) / spanY;
+          for (b = 0; b < boxes.length; b += 1) {
+            box = boxes[b].bbox_norm;
+            if (nx >= box[0] && ny >= box[1] && nx <= box[0] + box[2] && ny <= box[1] + box[3]) break;
+          }
+          if (b < boxes.length) continue;
+        }
+        count += 1;
+        if (luminance(data, (y * width + x) * 4) < 150) dark += 1;
+      }
+    }
+    return count ? dark / count : 0;
+  }
+
+  function sampleBubble(bubble, image, located, radius, boxes) {
+    var p = mapPoint(located, bubble.center_norm[0], bubble.center_norm[1]);
+    var sample = {
+      value: bubble.value,
+      lum: bubbleLum(image.data, image.width, image.height, p.x, p.y, radius)
+    };
+    if (boxes) sample.cover = keyCoverage(image.data, image.width, image.height, p.x, p.y, radius, located, boxes);
+    return sample;
+  }
+
+  function samplePlace(place, image, located, radius, boxes) {
     return place.bubbles.map(function (bubble) {
-      var p = mapPoint(located, bubble.center_norm[0], bubble.center_norm[1]);
-      return {
-        value: bubble.value,
-        lum: bubbleLum(image.data, image.width, image.height, p.x, p.y, radius)
-      };
+      return sampleBubble(bubble, image, located, radius, boxes);
     });
   }
 
@@ -910,9 +980,47 @@
     return { status: "ambiguous", value: null, lum: sample.lum };
   }
 
+  /* Keypad digits are printed dark gray, so absolute darkness cannot separate
+     a fill from the printed key. Compare coverage inside one pad. */
+  function judgeCoverage(samples) {
+    var ranked = samples.slice().sort(function (a, b) { return b.cover - a.cover; });
+    var best = ranked[0];
+    var neighbors = ranked.slice(1);
+    var neighborLevel = median(neighbors.map(function (sample) { return sample.cover; }));
+    var gapNext = neighbors.length ? best.cover - neighbors[0].cover : 1;
+    var gapRow = neighborLevel == null ? 1 : best.cover - neighborLevel;
+    var rivals = neighbors.filter(function (sample) {
+      return sample.cover >= (neighborLevel || 0) + 0.22 && best.cover - sample.cover < 0.16;
+    });
+    if (gapRow >= 0.28 && gapNext >= 0.18 && best.cover >= 0.55 && rivals.length === 0) {
+      return { status: "filled", value: best.value, lum: best.lum, cover: best.cover };
+    }
+    if (best.cover >= 0.55 && neighbors.some(function (sample) { return sample.cover >= 0.45; })) {
+      return { status: "ambiguous", value: null, lum: best.lum, cover: best.cover };
+    }
+    if (gapRow < 0.18 && best.cover < 0.48) {
+      return { status: "blank", value: null, lum: best.lum, cover: best.cover };
+    }
+    return { status: "ambiguous", value: null, lum: best.lum, cover: best.cover };
+  }
+
+  function judgeFlagCoverage(sample, baseline) {
+    var base = baseline == null ? 0.24 : baseline;
+    if (sample.cover >= Math.max(0.55, base + 0.28)) {
+      return { status: "filled", value: 100, lum: sample.lum, cover: sample.cover };
+    }
+    if (sample.cover <= base + 0.14) return { status: "blank", value: 0, lum: sample.lum, cover: sample.cover };
+    return { status: "ambiguous", value: null, lum: sample.lum, cover: sample.cover };
+  }
+
   function lighterHalf(samples) {
     var lums = samples.map(function (sample) { return sample.lum; }).sort(function (a, b) { return a - b; });
     return median(lums.slice(Math.floor(lums.length / 2)));
+  }
+
+  function lighterHalfOf(values) {
+    var sorted = values.slice().sort(function (a, b) { return a - b; });
+    return median(sorted.slice(Math.floor(sorted.length / 2)));
   }
 
   function slimPlace(place) {
@@ -1013,13 +1121,20 @@
     return side.charAt(0).toUpperCase() + side.slice(1) + " Game " + game + " " + whoLabel + " " + placeLabel;
   }
 
+  function sheetUsesCoverage(spec) {
+    return spec.version === "v8" || (spec.digit_layout && String(spec.digit_layout).indexOf("keypad") === 0);
+  }
+
   function readAligned(image, spec, located) {
     var warnings = [];
     if (located.warning) warnings.push(located.warning);
     var radius = spec.bubble_radius.pt * located.scale;
     var winnerRadius = (spec.winner_bubble_radius || spec.bubble_radius).pt * located.scale;
+    var keypad = sheetUsesCoverage(spec);
+    var boxes = keypad ? ((spec.human_only && spec.human_only.score_boxes) || []) : null;
     var sampled = {};
     var emptyRefs = [];
+    var coverRefs = [];
     SIDES.forEach(function (side) {
       [1, 2, 3].forEach(function (game) {
         SHOOTERS.forEach(function (shooter) {
@@ -1027,32 +1142,36 @@
           var field = spec.number_fields[key];
           sampled[key] = {};
           field.digits.forEach(function (place) {
-            var samples = samplePlace(place, image, located, radius);
+            var samples = samplePlace(place, image, located, radius, boxes);
             sampled[key][place.place] = samples;
-            if (samples.length >= 8) emptyRefs.push(lighterHalf(samples));
+            if (samples.length >= 8) {
+              emptyRefs.push(lighterHalf(samples));
+              if (keypad) coverRefs.push(lighterHalfOf(samples.map(function (sample) { return sample.cover; })));
+            }
           });
         });
         var teamKey = side + "_g" + game + "_team";
         sampled[teamKey] = {};
         spec.number_fields[teamKey].digits.forEach(function (place) {
-          var samples = samplePlace(place, image, located, radius);
+          var samples = samplePlace(place, image, located, radius, boxes);
           sampled[teamKey][place.place] = samples;
-          if (samples.length >= 8) emptyRefs.push(lighterHalf(samples));
+          if (samples.length >= 8) {
+            emptyRefs.push(lighterHalf(samples));
+            if (keypad) coverRefs.push(lighterHalfOf(samples.map(function (sample) { return sample.cover; })));
+          }
         });
       });
     });
     var winnerSamples = {};
     Object.keys(spec.winner_fields).forEach(function (key) {
       winnerSamples[key] = spec.winner_fields[key].map(function (bubble) {
-        var p = mapPoint(located, bubble.center_norm[0], bubble.center_norm[1]);
-        return {
-          value: bubble.value,
-          lum: bubbleLum(image.data, image.width, image.height, p.x, p.y, winnerRadius)
-        };
+        return sampleBubble(bubble, image, located, winnerRadius, boxes);
       });
     });
     var emptyLevel = median(emptyRefs);
     if (emptyLevel == null) emptyLevel = 210;
+    var coverBaseline = median(coverRefs);
+    if (coverBaseline == null) coverBaseline = 0.24;
 
     var counts = { filled: 0, blank: 0, ambiguous: 0 };
     function track(row) {
@@ -1061,7 +1180,12 @@
       else counts.blank += 1;
     }
     function judged(samples) {
-      var row = samples.length === 1 ? judgeFlag(samples[0], emptyLevel) : judgeRow(samples, emptyLevel);
+      var row;
+      if (samples.length && samples[0].cover != null) {
+        row = samples.length === 1 ? judgeFlagCoverage(samples[0], coverBaseline) : judgeCoverage(samples);
+      } else {
+        row = samples.length === 1 ? judgeFlag(samples[0], emptyLevel) : judgeRow(samples, emptyLevel);
+      }
       if (samples.length === 1 && row.status === "blank") {
         /* A blank 100+ flag is a real zero, not a missing digit. */
         counts.filled += 1;
@@ -1084,9 +1208,9 @@
             if (digits[place].status === "filled") return;
             var label = placeLabel(side, game, "s" + shooter, place);
             if (digits[place].status === "blank") {
-              warnings.push(label + ": no bubble filled. Left blank, not read as 0.");
+              warnings.push(label + ": no " + (keypad ? "key" : "bubble") + " filled. Left blank, not read as 0.");
             } else {
-              warnings.push(label + ": more than one bubble looks filled, or the mark is too light to call.");
+              warnings.push(label + ": more than one " + (keypad ? "key" : "bubble") + " looks filled, or the mark is too light to call.");
             }
           });
           return composeDigits(digits, false);
@@ -1098,15 +1222,15 @@
           ones: judged(sampled[teamKey].ones)
         };
         if (teamDigits.hundreds.status === "ambiguous") {
-          warnings.push(placeLabel(side, game, "team", "hundreds") + ": the 100+ bubble is too light to call.");
+          warnings.push(placeLabel(side, game, "team", "hundreds") + ": the 100 mark is too light to call.");
         }
         ["tens", "ones"].forEach(function (place) {
           if (teamDigits[place].status === "filled") return;
           var label = placeLabel(side, game, "team", place);
           if (teamDigits[place].status === "blank") {
-            warnings.push(label + ": no bubble filled. Left blank, not read as 0.");
+            warnings.push(label + ": no " + (keypad ? "key" : "bubble") + " filled. Left blank, not read as 0.");
           } else {
-            warnings.push(label + ": more than one bubble looks filled, or the mark is too light to call.");
+            warnings.push(label + ": more than one " + (keypad ? "key" : "bubble") + " looks filled, or the mark is too light to call.");
           }
         });
         var team = composeDigits(teamDigits, true);
@@ -1145,7 +1269,9 @@
     var winners = emptyWinners();
     Object.keys(winnerMap).forEach(function (key) {
       var id = winnerMap[key];
-      var row = judgeRow(winnerSamples[key], emptyLevel);
+      var row = winnerSamples[key][0] && winnerSamples[key][0].cover != null
+        ? judgeCoverage(winnerSamples[key])
+        : judgeRow(winnerSamples[key], emptyLevel);
       var value = row.status === "filled" ? row.value : "";
       var status = row.status === "filled" ? "ok" : row.status;
       winners[id] = { value: value, status: status };
@@ -1189,23 +1315,38 @@
       homeGamesWon: won.home,
       awayGamesWon: won.away,
       counts: counts,
-      calibration: { emptyLevel: Math.round(emptyLevel) }
+      calibration: {
+        emptyLevel: Math.round(emptyLevel),
+        coverBaseline: keypad ? Math.round(coverBaseline * 1000) / 1000 : null
+      }
     };
     if (trace) result.trace = trace;
     return result;
   }
 
+  function specsOf(spec) {
+    var list = Array.isArray(spec) ? spec : [spec];
+    var i;
+    if (!list.length) return null;
+    for (i = 0; i < list.length; i += 1) {
+      if (!list[i] || !list[i].number_fields || !list[i].fiducials) return null;
+    }
+    return list;
+  }
+
   function readSheet(sourceCanvas, spec, onProgress) {
-    if (!spec || !spec.number_fields || !spec.fiducials) {
-      return Promise.reject(new Error("The v7 scan sheet layout is missing."));
+    var specs = specsOf(spec);
+    if (!specs) {
+      return Promise.reject(new Error("The scan sheet layout is missing."));
     }
     say(onProgress, "Looking for the corner squares…");
     var canvas = limitCanvas(sourceCanvas, 1700);
     return nextFrame().then(function () {
-      var located = locateMarks(canvas, spec);
+      var located = locateMarks(canvas, specs);
+      var chosen = located.spec || specs[0];
       if (located.mode !== "fiducial") {
         var note = located.warning || "Retake the photo so all four black corner squares are in the frame. Lay the sheet flat, and keep every corner visible.";
-        return rejected(spec, canvas, located, [note]);
+        return rejected(chosen, canvas, located, [note]);
       }
       var turning = located.rotation === 180
         ? "Turning the upside-down photo upright…"
@@ -1216,13 +1357,13 @@
       return warp(canvas, located).then(function (aligned) {
         var image = aligned.getContext("2d", { willReadFrequently: true }).getImageData(0, 0, aligned.width, aligned.height);
         if (!cornersAreMarks(image, located)) {
-          return rejected(spec, canvas, located, [
+          return rejected(chosen, canvas, located, [
             "Retake the photo so all four black corner squares are in the frame. Lay the sheet flat, and keep every corner visible."
           ]);
         }
         say(onProgress, "Reading the bubbles…");
         return nextFrame().then(function () {
-          var result = readAligned(image, spec, located);
+          var result = readAligned(image, chosen, located);
           result.previewUrl = previewUrl(aligned);
           return result;
         });

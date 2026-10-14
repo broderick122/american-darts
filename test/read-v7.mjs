@@ -98,7 +98,7 @@ async function main() {
   });
   try {
     const page = await browser.newPage();
-    page.setDefaultTimeout(90000);
+    page.setDefaultTimeout(120000);
     await page.goto("http://127.0.0.1:" + port + "/test/harness.html", { waitUntil: "domcontentloaded" });
     await page.waitForFunction(() => {
       const text = document.getElementById("result").textContent;
@@ -264,6 +264,73 @@ async function main() {
       return err && !err.hidden && /corner/i.test(err.textContent);
     });
     console.log("missing corners show an error");
+
+    const v8Expected = JSON.parse(readFileSync(join(root, "test/fixtures/expected-v8.json"), "utf8"));
+    const v8Page = await browser.newPage();
+    v8Page.setDefaultTimeout(120000);
+    await v8Page.goto("http://127.0.0.1:" + port + "/test/harness.html?sheet=v8", { waitUntil: "domcontentloaded" });
+    await v8Page.waitForFunction(() => {
+      const text = document.getElementById("result").textContent;
+      return text && text !== "reading";
+    });
+    const v8Payload = JSON.parse(await v8Page.$eval("#result", (el) => el.textContent));
+    if (v8Payload.error) throw new Error(v8Payload.error);
+    const v8Problems = [];
+    const v8Rotation = [0, 90, 180, 270];
+    (v8Payload.v8 || []).forEach((reading, index) => {
+      v8Problems.push.apply(v8Problems, assertReading(reading, v8Expected, "v8 rot " + index));
+      if (reading.version !== "v8") v8Problems.push("v8 rot " + index + " version " + reading.version);
+      if (reading.rotation !== v8Rotation[index]) {
+        v8Problems.push("v8 rot " + index + " reported " + reading.rotation + ", want " + v8Rotation[index]);
+      }
+      if (!reading.notch) v8Problems.push("v8 rot " + index + " missed the notch");
+      if (index === 2 && !reading.upsideDown) v8Problems.push("v8 180 was not marked upside down");
+    });
+    if (!v8Payload.v8 || v8Payload.v8.length !== 4) v8Problems.push("v8 readings " + (v8Payload.v8 && v8Payload.v8.length));
+    v8Problems.push.apply(v8Problems, assertReading(v8Payload.letter || { mode: "missing" }, expected, "aspect picked v7"));
+    if (!v8Payload.letter || v8Payload.letter.version !== "v7") {
+      v8Problems.push("letter sheet was read as " + (v8Payload.letter && v8Payload.letter.version));
+    }
+    if (v8Problems.length) {
+      console.error(v8Problems.join("\n"));
+      throw new Error(v8Problems.length + " v8 reader checks failed");
+    }
+    console.log("v8 keypad sheet recovered at 0/90/180/270; letter sheet stayed v7");
+
+    const legal = await browser.newPage();
+    await legal.setViewport({ width: 1100, height: 1400, deviceScaleFactor: 1 });
+    await legal.goto("http://127.0.0.1:" + port + "/upload.html", { waitUntil: "networkidle0" });
+    const v8Link = await legal.$eval("a[href='scoresheet/roslyn_scansheet_v8.pdf']", (el) => el.textContent);
+    const v7Link = await legal.$eval("a[href='scoresheet/roslyn_scansheet_v7.pdf']", (el) => el.textContent);
+    if (!/v8/i.test(v8Link) || !/legal/i.test(v8Link)) throw new Error("v8 download link: " + v8Link);
+    if (!/v7/i.test(v7Link)) throw new Error("v7 download link: " + v7Link);
+    await (await legal.$("#sheet-file")).uploadFile(join(root, "test/fixtures/filled-v8.jpg"));
+    await legal.waitForFunction(() => {
+      const box = document.getElementById("home-g1-s1");
+      const err = document.getElementById("ocr-error");
+      return box && box.value === "27" && err && err.hidden;
+    });
+    const legalForm = await legal.evaluate(() => ({
+      home: [1, 2, 3, 4].map((n) => document.getElementById("home-g1-s" + n).value).concat([document.getElementById("home-g1-team").value]),
+      awayTeam: document.getElementById("away-g1-team").value,
+      blank: document.getElementById("home-g2-s4").value,
+      ambiguous: document.getElementById("away-g2-s2").classList.contains("is-ambiguous"),
+      winners: ["win-g1", "win-g2", "win-g3", "win-beer", "win-points"].map((id) => document.getElementById(id).value),
+      summary: document.getElementById("ocr-summary").textContent
+    }));
+    if (legalForm.home.join(",") !== "27,15,8,40,90") throw new Error("v8 form home g1 " + legalForm.home.join(","));
+    if (legalForm.awayTeam !== "116") throw new Error("v8 form 100+ " + legalForm.awayTeam);
+    if (legalForm.blank !== "") throw new Error("v8 blank shooter was stored as " + legalForm.blank);
+    if (!legalForm.ambiguous) throw new Error("v8 double key was not flagged");
+    if (legalForm.winners.join(",") !== "away,home,home,,away") throw new Error("v8 winners " + legalForm.winners.join(","));
+    if (!/v8/i.test(legalForm.summary)) throw new Error("v8 summary did not name the sheet: " + legalForm.summary);
+    await legal.evaluate(() => {
+      document.documentElement.style.scrollBehavior = "auto";
+      document.getElementById("confirm-section").scrollIntoView({ block: "start" });
+    });
+    const legalSection = await legal.$("#confirm-section");
+    await legalSection.screenshot({ path: "/opt/cursor/artifacts/upload_v8_review.png" });
+    console.log("upload page read the v8 sheet and offers both downloads");
   } finally {
     await browser.close();
     server.close();

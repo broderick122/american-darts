@@ -261,9 +261,14 @@
       ? " One corner was cut off and estimated from the other three."
       : "";
     var notch = result.notch ? "" : " The top-left notch was faint.";
+    var sheet = result.version === "v8"
+      ? " Read as the v8 legal sheet."
+      : result.version === "v7"
+        ? " Read as the v7 letter sheet."
+        : "";
     return "Read the bubbles. " + result.homeGamesWon + "–" + result.awayGamesWon +
       " from the game-winner marks. " + counts.blank + " digit rows were blank and left empty. " +
-      counts.ambiguous + " rows need a look." + turnNote(result) + estimated + notch;
+      counts.ambiguous + " rows need a look." + turnNote(result) + estimated + notch + sheet;
   }
 
   function applyReading(result) {
@@ -334,11 +339,17 @@
       if (canvas.width < 500 || canvas.height < 360) {
         throw new Error("That photo is too small to read. Move closer and include all four corner squares.");
       }
-      return fetch("scoresheet/scansheet_v7_layout_spec.json").then(function (response) {
-        if (!response.ok) throw new Error("The scan sheet layout could not be loaded.");
-        return response.json();
-      }).then(function (spec) {
-        return RAD_OCR.readSheet(canvas, spec, setStatus);
+      function loadSpec(path) {
+        return fetch(path).then(function (response) {
+          if (!response.ok) throw new Error("The scan sheet layout could not be loaded.");
+          return response.json();
+        });
+      }
+      return Promise.all([
+        loadSpec("scoresheet/scansheet_v8_layout_spec.json"),
+        loadSpec("scoresheet/scansheet_v7_layout_spec.json")
+      ]).then(function (specs) {
+        return RAD_OCR.readSheet(canvas, specs, setStatus);
       });
     }).then(function (result) {
       applyReading(result);

@@ -12,9 +12,11 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 
 ROOT = Path(__file__).resolve().parents[1]
-PDF = ROOT / "scoresheet" / "roslyn_scansheet_v7.pdf"
-SPEC_PATH = ROOT / "scoresheet" / "scansheet_v7_layout_spec.json"
 OUT = Path(__file__).resolve().parent / "fixtures"
+SHEETS = (
+    ("v7", ROOT / "scoresheet" / "roslyn_scansheet_v7.pdf", ROOT / "scoresheet" / "scansheet_v7_layout_spec.json"),
+    ("v8", ROOT / "scoresheet" / "roslyn_scansheet_v8.pdf", ROOT / "scoresheet" / "scansheet_v8_layout_spec.json"),
+)
 
 # None means the shooter row is left blank. "amb" is a double-filled ones row.
 HOME = {
@@ -146,10 +148,22 @@ def expected_side(block):
     return {"games": games}
 
 
-def main():
-    spec = json.loads(SPEC_PATH.read_text())
-    OUT.mkdir(parents=True, exist_ok=True)
-    doc = pymupdf.open(PDF)
+def scribble_boxes(draw, spec, point):
+    """Ink inside the human-only score boxes. The reader must ignore it."""
+    boxes = spec.get("human_only", {}).get("score_boxes") or []
+    for box in boxes:
+        x, y, w, h = box["bbox_norm"]
+        a = point(x + 0.18 * w, y + 0.28 * h)
+        b = point(x + 0.82 * w, y + 0.72 * h)
+        c = point(x + 0.22 * w, y + 0.70 * h)
+        d = point(x + 0.78 * w, y + 0.30 * h)
+        draw.line([a, b], fill=(12, 12, 14), width=4)
+        draw.line([c, d], fill=(12, 12, 14), width=4)
+
+
+def render_sheet(version, pdf_path, spec_path):
+    spec = json.loads(spec_path.read_text())
+    doc = pymupdf.open(pdf_path)
     page = doc[0]
     pix = page.get_pixmap(matrix=pymupdf.Matrix(2.15, 2.15), alpha=False)
     image = Image.frombytes("RGB", (pix.width, pix.height), pix.samples)
@@ -166,10 +180,12 @@ def main():
         for bubble in spec["winner_fields"][name]:
             if bubble["value"] == choice:
                 fill_circle(draw, *point(*bubble["center_norm"]), winner_radius)
+    scribble_boxes(draw, spec, point)
     photo = distort(image)
-    jpg = OUT / "filled-v7.jpg"
+    jpg = OUT / f"filled-{version}.jpg"
     photo.save(jpg, format="JPEG", quality=78)
     payload = {
+        "version": version,
         "home": expected_side(HOME),
         "away": expected_side(AWAY),
         "winners": {
@@ -182,8 +198,15 @@ def main():
         "homeGamesWon": 2,
         "awayGamesWon": 1,
     }
-    (OUT / "expected.json").write_text(json.dumps(payload, indent=2))
+    expected_name = "expected.json" if version == "v7" else f"expected-{version}.json"
+    (OUT / expected_name).write_text(json.dumps(payload, indent=2))
     print(f"wrote {jpg} ({photo.size[0]}x{photo.size[1]})")
+
+
+def main():
+    OUT.mkdir(parents=True, exist_ok=True)
+    for version, pdf_path, spec_path in SHEETS:
+        render_sheet(version, pdf_path, spec_path)
 
 
 if __name__ == "__main__":
