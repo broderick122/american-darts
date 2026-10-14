@@ -122,7 +122,7 @@ A team that is on a match cannot be deleted. Delete the matches first, or rename
 
 There is no server and no handwriting recognition. `js/sheet-ocr.js` runs in the browser:
 
-1. It finds the four solid black corner squares. The top-left square has a white notch. If that notch is the only one, it is treated as the sheet’s top-left, which turns an upside-down photo upright.
+1. Large photos are scaled down before the corners are measured, and phone EXIF orientation is applied. It finds the solid black corner squares and tries the photo at 0°, 90°, 180°, and 270°. The white notch in the top-left square, the header line, and the QR pattern (used as a dark-and-light patch, not decoded) pick the rotation. If one corner is cut off, that corner is estimated from the other three and then nudged so the filled bubbles line up. If the corners still cannot be found, the page asks for a new photo instead of guessing a score.
 2. A perspective warp straightens the page so those four centers sit on a rectangle.
 3. Each bubble is sampled in a ring inside the printed circle (away from the gray digit and the navy outline). On a row of 0–9, the bubble that is clearly darker than the others in that same row is the mark. No mark means the row is blank, and the box is left empty — it is not stored as 0. Two dark bubbles, or a mark too close to call, is flagged for the captain to fix.
 4. The team-total “100+” bubble is a flag, not a digit row. Blank means +0. Filled means +100. Shooter totals are two digits (0–99). Team totals can reach 199.
@@ -132,7 +132,7 @@ Names, the captain line, and the date are handwritten and are not scanned. The c
 
 The review form shows, for home and away, S1–S4 and the team total for each game, plus the winner marks. If the four shooter totals are all filled and they do not add up to the team total, that game gets a warning. The captain can edit any box. Saving uses the same `submitMatch` path as the typed score sheet: Games 1–3 become the match, and standings update immediately (localStorage until Google Sheets is connected). Beer frame and total points are kept on the local upload receipt (`rad.uploads.v1`) and are not league games. The photo is not stored. The confirmed shooter lines are on that receipt too; the match row itself stays `homeGamesWon`, `awayGamesWon`, and `gamesJson`, which is what standings read.
 
-Limits: the four corner squares have to be in the frame and on a flat sheet. A heavy glare, a crease through a square, or a very blurry photo can miss the corners or a bubble. The reader does not decode the small QR code (it is placeholder text). It does not read handwriting. A blank digit row must be filled in by hand on the form if that shooter did throw.
+Limits: at least three corner squares have to be in the frame, on a flat sheet. A heavy glare, a crease through a square, or a very blurry photo can miss the corners or a bubble, and the page then asks for a retake. The reader does not decode the small QR code (it is placeholder text) and does not read handwriting. A blank digit row must be filled in by hand on the form if that shooter did throw.
 
 Check the reader with `node test/read-v7.mjs`. That renders the v7 PDF, fills known bubbles, adds a small rotation, perspective shift, and blur, then checks that the browser reader recovers the values, including from the same photo turned 180°. It needs Python packages `pillow`, `pymupdf`, and `numpy`, plus Chrome. `puppeteer-core` is installed locally for the test (`npm install`) and is not part of the site.
 

@@ -245,16 +245,24 @@
     refreshChecks();
   }
 
+  function turnNote(result) {
+    if (result.rotation === 90 || result.rotation === 270) return " The photo was sideways, so it was turned upright.";
+    if (result.rotation === 180 || result.upsideDown) return " The photo was upside down, so it was turned upright.";
+    return "";
+  }
+
   function describeReading(result) {
     if (result.mode === "rejected") {
-      return "This photo did not line up with the scan sheet. The boxes below are empty so you can type the result.";
+      return (result.warnings && result.warnings[0]) ||
+        "Retake the photo so all four black corner squares are in the frame. Lay the sheet flat, and keep every corner visible.";
     }
     var counts = result.counts || { blank: 0, ambiguous: 0 };
-    var turned = result.upsideDown ? " The photo was upside down; the notched corner turned it upright." : "";
-    var notch = result.notch ? "" : " The top-left notch was not clear.";
+    var estimated = result.estimatedCorner
+      ? " One corner was cut off and estimated from the other three."
+      : "";
     return "Read the bubbles. " + result.homeGamesWon + "–" + result.awayGamesWon +
       " from the game-winner marks. " + counts.blank + " digit rows were blank and left empty. " +
-      counts.ambiguous + " rows need a look." + turned + notch;
+      counts.ambiguous + " rows need a look." + turnNote(result) + estimated;
   }
 
   function applyReading(result) {
@@ -268,8 +276,9 @@
       previewImg.src = result.previewUrl;
       previewFigure.hidden = false;
       previewNote.textContent = result.mode === "fiducial"
-        ? (result.upsideDown ? "Straightened, after turning an upside-down photo upright." : "Straightened with the four corner squares.")
-        : "This photo did not line up with the scan sheet.";
+        ? ("Straightened with the corner squares." + turnNote(result) +
+          (result.estimatedCorner ? " One corner was estimated." : ""))
+        : "Retake the photo so all four black corner squares are in the frame.";
     }
     if (!confirmSection.hidden && formDirty) {
       setStatus("The photo was read, and your edits were left as they are.");
@@ -298,7 +307,7 @@
     refreshChecks();
     showConfirm();
     setStatus(result.mode === "rejected"
-      ? "Type the date, the teams, and the score."
+      ? "Retake the photo so all four black corner squares are in the frame. You can still type the score below."
       : "Check the bubbles, the names, and the date, then save.");
   }
 
