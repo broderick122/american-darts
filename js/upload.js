@@ -260,9 +260,10 @@
     var estimated = result.estimatedCorner
       ? " One corner was cut off and estimated from the other three."
       : "";
+    var notch = result.notch ? "" : " The top-left notch was faint.";
     return "Read the bubbles. " + result.homeGamesWon + "–" + result.awayGamesWon +
       " from the game-winner marks. " + counts.blank + " digit rows were blank and left empty. " +
-      counts.ambiguous + " rows need a look." + turnNote(result) + estimated;
+      counts.ambiguous + " rows need a look." + turnNote(result) + estimated + notch;
   }
 
   function applyReading(result) {
@@ -278,7 +279,14 @@
       previewNote.textContent = result.mode === "fiducial"
         ? ("Straightened with the corner squares." + turnNote(result) +
           (result.estimatedCorner ? " One corner was estimated." : ""))
-        : "Retake the photo so all four black corner squares are in the frame.";
+        : "This photo was not lined up with the scan sheet.";
+    }
+    if (result.mode === "rejected") {
+      var reason = (result.warnings && result.warnings[0]) ||
+        "The corner squares were not found, so this photo was not lined up.";
+      showError(errorEl, reason);
+    } else {
+      showError(errorEl, "");
     }
     if (!confirmSection.hidden && formDirty) {
       setStatus("The photo was read, and your edits were left as they are.");

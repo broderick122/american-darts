@@ -17,14 +17,42 @@
     }
 
     function rotate180(src) {
+      return rotateTurns(src, 2);
+    }
+
+    function rotateTurns(src, turns) {
+      turns = ((turns % 4) + 4) % 4;
+      if (!turns) return src;
       var canvas = document.createElement("canvas");
-      canvas.width = src.width;
-      canvas.height = src.height;
       var ctx = canvas.getContext("2d");
-      ctx.translate(canvas.width, canvas.height);
-      ctx.rotate(Math.PI);
+      if (turns === 2) {
+        canvas.width = src.width;
+        canvas.height = src.height;
+        ctx.translate(canvas.width, canvas.height);
+        ctx.rotate(Math.PI);
+      } else if (turns === 1) {
+        canvas.width = src.height;
+        canvas.height = src.width;
+        ctx.translate(canvas.width, 0);
+        ctx.rotate(Math.PI / 2);
+      } else {
+        canvas.width = src.height;
+        canvas.height = src.width;
+        ctx.translate(0, canvas.height);
+        ctx.rotate(-Math.PI / 2);
+      }
       ctx.drawImage(src, 0, 0);
       return canvas;
+    }
+
+    function downscale(canvas, maxDim) {
+      if (!maxDim || Math.max(canvas.width, canvas.height) <= maxDim) return canvas;
+      var scale = maxDim / Math.max(canvas.width, canvas.height);
+      var out = document.createElement("canvas");
+      out.width = Math.max(1, Math.round(canvas.width * scale));
+      out.height = Math.max(1, Math.round(canvas.height * scale));
+      out.getContext("2d").drawImage(canvas, 0, 0, out.width, out.height);
+      return out;
     }
 
     function slim(result) {
@@ -32,6 +60,7 @@
         mode: result.mode,
         notch: result.notch,
         upsideDown: result.upsideDown,
+        rotation: result.rotation || 0,
         warnings: result.warnings,
         teams: result.teams,
         winners: result.winners,
@@ -52,21 +81,39 @@
       });
     }
 
+    var params = new URLSearchParams(location.search);
+    var phone = params.get("photo") === "1";
+
     Promise.all([
       fetch("../scoresheet/scansheet_v7_layout_spec.json").then(function (response) { return response.json(); }),
-      loadImage("fixtures/filled-v7.jpg")
+      loadImage(phone ? "fixtures/phone-sheet.jpg" : "fixtures/filled-v7.jpg")
     ]).then(function (parts) {
       var spec = parts[0];
-      spec.debug = true;
-      var canvas = draw(parts[1]);
-      return RAD_OCR.readSheet(canvas, spec).then(function (upright) {
-        return RAD_OCR.readSheet(rotate180(canvas), spec).then(function (turned) {
-          document.getElementById("result").textContent = JSON.stringify({
-            upright: slim(upright),
-            turned: slim(turned)
+      spec.debug = !phone;
+      var canvas = downscale(draw(parts[1]), phone ? 1600 : 0);
+      if (!phone) {
+        return RAD_OCR.readSheet(canvas, spec).then(function (upright) {
+          return RAD_OCR.readSheet(rotate180(canvas), spec).then(function (turned) {
+            document.getElementById("result").textContent = JSON.stringify({
+              upright: slim(upright),
+              turned: slim(turned)
+            });
           });
         });
-      });
+      }
+      var turns = [0, 1, 2, 3];
+      var readings = [];
+      function next(index) {
+        if (index >= turns.length) {
+          document.getElementById("result").textContent = JSON.stringify({ phone: readings });
+          return Promise.resolve();
+        }
+        return RAD_OCR.readSheet(rotateTurns(canvas, turns[index]), spec).then(function (result) {
+          readings.push(slim(result));
+          return next(index + 1);
+        });
+      }
+      return next(0);
     }).catch(function (err) {
       document.getElementById("result").textContent = JSON.stringify({ error: String(err && err.message || err) });
     });
