@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
   <meta name="theme-color" content="#10241c">
-  <title>Upload score sheet · Roslyn American Darts</title>
-  <meta name="description" content="Experimental: photograph a filled Roslyn darts score sheet and check the reading before it updates the standings.">
+  <title>Upload scan sheet · Roslyn American Darts</title>
+  <meta name="description" content="Photograph a filled Roslyn darts results scan sheet. The browser reads the bubbles, and you confirm them before the standings update.">
   <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,7 +15,7 @@
 </head>
 <body class="page-upload">
   <a class="skip-link" href="#main">Skip to content</a>
-  <p class="experimental-banner">Experimental · handwriting reading is rough</p>
+  <p class="experimental-banner">Confirm the bubbles before they count</p>
   <header class="site-header">
     <div class="dart-stripe" aria-hidden="true"></div>
     <div class="header-bar wrap">
@@ -49,13 +49,14 @@
 
   <main id="main" class="wrap">
     <section>
-      <p class="eyebrow">Score sheet photo</p>
-      <h1>Upload a score sheet</h1>
+      <p class="eyebrow">Results scan sheet</p>
+      <h1>Upload a scan sheet</h1>
       <div class="security-note">
-        <p><strong>This is an experiment.</strong> A phone photo of handwriting is a hard thing for the browser to read. Digits get missed, names come out wrong, and a blank box can look like a mark. Nothing here is trusted until you look at it.</p>
-        <p>The reliable path is still the <a href="index.html#score">typed score sheet</a>. Use that when the reading is a mess. The photo is not saved. Only the score you confirm is stored, in this browser for now.</p>
+        <p><strong>You confirm before anything is saved.</strong> The page reads the filled bubbles in this browser. It does not send the photo anywhere, and it does not keep the photo. A blank row is left empty. It is not a zero.</p>
+        <p>Team names, the captain, and the date are handwritten, so they are not read. Type those below. The <a href="index.html#score">typed score sheet</a> is still there when you would rather not use a photo.</p>
       </div>
-      <p>At the end of the night, photograph the filled v2 sheet. Keep all four black corner squares in the frame, on a flat table, in even light. The page uses those marks to line the photo up with the printed boxes, then tries to read team names, the three game winners, and the inning digits.</p>
+      <p>Photograph the filled sheet flat, in even light, with all four black corner squares in the frame. The top-left square has a white notch, so an upside-down photo can still be turned upright. Fill one bubble per row, dark and solid.</p>
+      <p><a class="btn btn-primary" href="scoresheet/roslyn_scansheet_v7.pdf">Download the scan sheet</a></p>
       <form id="pick-form" class="sheet stack">
         <label class="field">Photo of the filled sheet
           <input id="sheet-file" name="photo" type="file" accept="image/*">
@@ -70,7 +71,7 @@
       <p id="ocr-summary" class="ocr-summary"></p>
       <ul id="ocr-warnings" class="warning-list"></ul>
       <figure id="align-figure" hidden>
-        <img id="align-preview" class="align-preview" alt="The score sheet after the page straightened it" width="960" height="720">
+        <img id="align-preview" class="align-preview" alt="The scan sheet after the page straightened it" width="1000" height="760">
         <figcaption id="align-note"></figcaption>
       </figure>
     </section>
@@ -80,11 +81,11 @@
         <p class="eyebrow">Confirm</p>
         <h2>Check the reading</h2>
       </div>
-      <p>Fix anything that is wrong, then save. Games won is the match score the standings use. The beer frame is not a league game. Inning totals are only a cross-check.</p>
+      <p>Fix anything that is wrong, then save. Games 1–3 decide the match. The beer frame and the total-points bubble are not league games. A red note means the shooters do not add up to that game’s team total.</p>
       <form id="confirm-form" class="sheet">
         <div class="form-grid cols-3">
           <label class="field">Match date
-            <input id="confirm-date" name="date" type="date">
+            <input id="confirm-date" name="date" type="date" required>
           </label>
           <label class="field">Home team, as written
             <input id="home-name" name="home-name" type="text" autocomplete="off" maxlength="80">
@@ -100,75 +101,44 @@
           </label>
         </div>
 
-        <div class="confirm-games">
-          <div class="confirm-game">
-            <h3>Game 1</h3>
-            <label class="field">Home points
-              <input id="g1-home-pts" type="number" min="0" max="400" inputmode="numeric">
-            </label>
-            <label class="field">Away points
-              <input id="g1-away-pts" type="number" min="0" max="400" inputmode="numeric">
-            </label>
-            <label class="field">Winner
-              <select id="g1-winner">
-                <option value="">Not sure</option>
-                <option value="home">Home</option>
-                <option value="away">Away</option>
-              </select>
-            </label>
-          </div>
-          <div class="confirm-game">
-            <h3>Game 2</h3>
-            <label class="field">Home points
-              <input id="g2-home-pts" type="number" min="0" max="400" inputmode="numeric">
-            </label>
-            <label class="field">Away points
-              <input id="g2-away-pts" type="number" min="0" max="400" inputmode="numeric">
-            </label>
-            <label class="field">Winner
-              <select id="g2-winner">
-                <option value="">Not sure</option>
-                <option value="home">Home</option>
-                <option value="away">Away</option>
-              </select>
-            </label>
-          </div>
-          <div class="confirm-game">
-            <h3>Game 3</h3>
-            <label class="field">Home points
-              <input id="g3-home-pts" type="number" min="0" max="400" inputmode="numeric">
-            </label>
-            <label class="field">Away points
-              <input id="g3-away-pts" type="number" min="0" max="400" inputmode="numeric">
-            </label>
-            <label class="field">Winner
-              <select id="g3-winner">
-                <option value="">Not sure</option>
-                <option value="home">Home</option>
-                <option value="away">Away</option>
-              </select>
-            </label>
-          </div>
+        <div id="home-block" class="side-block"></div>
+        <div id="away-block" class="side-block"></div>
+
+        <h3 class="winners-heading">Winners</h3>
+        <div class="form-grid cols-3 winner-grid">
+          <label class="field">Game 1
+            <select id="win-g1"></select>
+            <span id="win-g1-flag" class="bubble-flag"></span>
+          </label>
+          <label class="field">Game 2
+            <select id="win-g2"></select>
+            <span id="win-g2-flag" class="bubble-flag"></span>
+          </label>
+          <label class="field">Game 3
+            <select id="win-g3"></select>
+            <span id="win-g3-flag" class="bubble-flag"></span>
+          </label>
+          <label class="field">Beer frame (not counted)
+            <select id="win-beer"></select>
+            <span id="win-beer-flag" class="bubble-flag"></span>
+          </label>
+          <label class="field">Total points (not a league game)
+            <select id="win-points"></select>
+            <span id="win-points-flag" class="bubble-flag"></span>
+          </label>
         </div>
 
         <div class="form-grid cols-3">
-          <label class="field">Beer frame (not counted)
-            <select id="beer-winner">
-              <option value="">Not marked</option>
-              <option value="home">Home</option>
-              <option value="away">Away</option>
-            </select>
-          </label>
           <label class="field">Home games won
-            <input id="home-won" type="number" min="0" max="30" inputmode="numeric" value="0">
+            <input id="home-won" type="number" min="0" max="3" inputmode="numeric" value="0">
           </label>
           <label class="field">Away games won
-            <input id="away-won" type="number" min="0" max="30" inputmode="numeric" value="0">
+            <input id="away-won" type="number" min="0" max="3" inputmode="numeric" value="0">
           </label>
         </div>
         <p class="eyebrow">Final score</p>
         <p id="final-score" class="final-score" aria-live="polite">0–0</p>
-        <p id="sheet-points" class="status">Inning totals show up here after a photo is read. They do not decide the match.</p>
+        <p id="sheet-points" class="status"></p>
         <p id="confirm-error" class="alert" role="alert" hidden></p>
         <div class="form-actions">
           <button class="btn btn-primary" id="confirm-submit" type="submit">Save and update standings</button>
@@ -198,20 +168,19 @@
             <small>American Darts</small>
           </span>
         </a>
-        <p>Experimental photo reading for the v2 paper score sheet. SAMPLE marks invented names, numbers, and dates.</p>
+        <p>Photo reading for the v7 results scan sheet. SAMPLE marks invented names, numbers, and dates.</p>
       </div>
       <address class="address">
         <p>1140 Easton Rd<br>Abington, PA 19001</p>
         <p>VFW phone: <a href="tel:+12155769349">(215) 576-9349</a></p>
       </address>
-      <p><a href="index.html#score">Typed score sheet</a><br><a href="admin.html">Admin</a></p>
+      <p><a href="scoresheet/roslyn_scansheet_v7.pdf">Download the scan sheet</a><br><a href="index.html#score">Typed score sheet</a><br><a href="admin.html">Admin</a></p>
     </div>
   </footer>
 
   <script src="config.js"></script>
   <script src="js/data.js"></script>
   <script src="js/sheet-ocr.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
   <script src="js/upload.js"></script>
 </body>
 </html>

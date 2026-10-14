@@ -2,6 +2,10 @@
   "use strict";
 
   var UPLOAD_KEY = "rad.uploads.v1";
+  var SIDES = [
+    { id: "home", label: "Home" },
+    { id: "away", label: "Away" }
+  ];
   var snap = null;
   var scoresTouched = false;
   var formDirty = false;
@@ -22,6 +26,7 @@
   var confirmError = document.getElementById("confirm-error");
   var savedNote = document.getElementById("saved-note");
   var finalScoreEl = document.getElementById("final-score");
+  var sheetPointsEl = document.getElementById("sheet-points");
 
   function esc(value) {
     return String(value == null ? "" : value)
@@ -45,6 +50,39 @@
     el.hidden = false;
     el.textContent = message;
   }
+
+  function winnerOptions(optionalBlank) {
+    return '<option value="">' + (optionalBlank ? "Not marked" : "Not marked") + "</option>" +
+      '<option value="home">Home</option><option value="away">Away</option>';
+  }
+
+  function buildSide(side) {
+    var rows = ["S1", "S2", "S3", "S4", "Team"].map(function (label, index) {
+      var cells = [1, 2, 3].map(function (game) {
+        var who = index < 4 ? "s" + (index + 1) : "team";
+        var id = side.id + "-g" + game + "-" + who;
+        var max = who === "team" ? 199 : 99;
+        return '<td><input id="' + id + '" type="number" min="0" max="' + max + '" inputmode="numeric" placeholder="—" aria-label="' +
+          esc(side.label + " game " + game + " " + label) + '"><span id="' + id + '-flag" class="bubble-flag"></span></td>';
+      }).join("");
+      return "<tr><th scope=\"row\">" + label + "</th>" + cells + "</tr>";
+    }).join("");
+    var checks = [1, 2, 3].map(function (game) {
+      return '<p id="' + side.id + "-g" + game + '-check" class="cross-check"></p>';
+    }).join("");
+    document.getElementById(side.id + "-block").innerHTML =
+      '<h3>' + side.label + "</h3>" +
+      '<div class="table-scroll"><table class="bubble-table"><caption>' + side.label +
+      " shooter totals and the team total for each game. An empty box was not read as zero.</caption><thead><tr><th scope=\"col\"></th>" +
+      "<th scope=\"col\">Game 1</th><th scope=\"col\">Game 2</th><th scope=\"col\">Game 3</th></tr></thead><tbody>" +
+      rows + "</tbody></table></div><div class=\"cross-checks\">" + checks + "</div>";
+  }
+
+  SIDES.forEach(buildSide);
+  ["win-g1", "win-g2", "win-g3", "win-points"].forEach(function (id) {
+    document.getElementById(id).innerHTML = winnerOptions(false);
+  });
+  document.getElementById("win-beer").innerHTML = winnerOptions(true);
 
   function activeTeams() {
     return ((snap && snap.teams) || []).filter(function (team) { return team.active !== false; })
@@ -80,34 +118,11 @@
     select.value = matched ? matched.id : "new";
   }
 
-  function parseUsDate(raw) {
-    var text = String(raw || "");
-    var match = text.match(/(\d{1,2})\s*[\/.\-]\s*(\d{1,2})\s*[\/.\-]\s*(\d{2,4})/);
-    var month;
-    var day;
-    var year;
-    if (match) {
-      month = Number(match[1]);
-      day = Number(match[2]);
-      year = Number(match[3]);
-    } else {
-      var digits = text.replace(/\D/g, "");
-      if (digits.length !== 6 && digits.length !== 8) return "";
-      month = Number(digits.slice(0, 2));
-      day = Number(digits.slice(2, 4));
-      year = Number(digits.slice(4));
-    }
-    if (year < 100) year += year >= 70 ? 1900 : 2000;
-    if (month < 1 || month > 12 || day < 1 || day > 31 || year < 1970) return "";
-    function pad(n) { return (n < 10 ? "0" : "") + n; }
-    return year + "-" + pad(month) + "-" + pad(day);
-  }
-
   function winnerCount() {
     var home = 0;
     var away = 0;
     [1, 2, 3].forEach(function (n) {
-      var value = document.getElementById("g" + n + "-winner").value;
+      var value = document.getElementById("win-g" + n).value;
       if (value === "home") home += 1;
       else if (value === "away") away += 1;
     });
@@ -123,10 +138,10 @@
   }
 
   function applyWinnerCounts() {
+    if (scoresTouched) return;
     var counts = winnerCount();
     document.getElementById("home-won").value = String(counts.home);
     document.getElementById("away-won").value = String(counts.away);
-    scoresTouched = false;
     updateFinalScore();
   }
 
@@ -135,78 +150,162 @@
     confirmSection.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  function pointsText(value) {
-    return value == null ? "" : String(value);
+  function numberOrNull(input) {
+    if (String(input.value).trim() === "") return null;
+    var value = Number(input.value);
+    if (!isFinite(value)) return null;
+    return value;
+  }
+
+  function scoreInput(side, game, who) {
+    return document.getElementById(side + "-g" + game + "-" + who);
+  }
+
+  function setBubble(id, cell, blankNote) {
+    var input = document.getElementById(id);
+    var flag = document.getElementById(id + "-flag");
+    input.classList.remove("is-blank", "is-ambiguous");
+    if (!cell || cell.value == null || cell.status === "blank" || cell.status === "ambiguous") {
+      input.value = "";
+      if (cell && cell.status === "ambiguous") {
+        input.classList.add("is-ambiguous");
+        flag.textContent = "Check — two marks";
+      } else {
+        input.classList.add("is-blank");
+        flag.textContent = blankNote || "Blank — not zero";
+      }
+      return;
+    }
+    input.value = String(cell.value);
+    flag.textContent = "";
+  }
+
+  function setWinner(id, cell) {
+    var select = document.getElementById(id);
+    var flag = document.getElementById(id + "-flag");
+    select.value = cell && (cell.value === "home" || cell.value === "away") ? cell.value : "";
+    if (cell && cell.status === "ambiguous") flag.textContent = "Check — both bubbles";
+    else if (!select.value && id !== "win-beer") flag.textContent = "Not marked";
+    else flag.textContent = "";
+  }
+
+  function refreshChecks() {
+    var notes = [];
+    SIDES.forEach(function (side) {
+      [1, 2, 3].forEach(function (game) {
+        var shooters = [1, 2, 3, 4].map(function (n) { return numberOrNull(scoreInput(side.id, game, "s" + n)); });
+        var team = numberOrNull(scoreInput(side.id, game, "team"));
+        var el = document.getElementById(side.id + "-g" + game + "-check");
+        var filled = shooters.filter(function (value) { return value != null; }).length + (team != null ? 1 : 0);
+        el.classList.remove("is-bad");
+        if (!filled) {
+          el.textContent = "";
+          return;
+        }
+        if (shooters.some(function (value) { return value == null; }) || team == null) {
+          el.textContent = side.label + " Game " + game + ": fill every shooter and the team total to check the sum.";
+          return;
+        }
+        var sum = shooters.reduce(function (total, value) { return total + value; }, 0);
+        if (sum !== team) {
+          el.textContent = side.label + " Game " + game + ": shooters add up to " + sum + ", team total is " + team + ".";
+          el.classList.add("is-bad");
+          notes.push(el.textContent);
+        } else {
+          el.textContent = side.label + " Game " + game + ": shooters add up to the team total (" + sum + ").";
+        }
+      });
+    });
+    var homePoints = [1, 2, 3].map(function (game) { return numberOrNull(scoreInput("home", game, "team")); });
+    var awayPoints = [1, 2, 3].map(function (game) { return numberOrNull(scoreInput("away", game, "team")); });
+    function show(values) {
+      return values.map(function (value) { return value == null ? "—" : value; }).join(" + ");
+    }
+    sheetPointsEl.textContent = "Team totals on the sheet: home " + show(homePoints) + ", away " + show(awayPoints) +
+      ". Standings use the game winners, not these point totals.";
+    return notes;
+  }
+
+  function clearSheet() {
+    SIDES.forEach(function (side) {
+      [1, 2, 3].forEach(function (game) {
+        [1, 2, 3, 4].forEach(function (n) { setBubble(side.id + "-g" + game + "-s" + n, null, ""); });
+        setBubble(side.id + "-g" + game + "-team", null, "");
+        document.getElementById(side.id + "-g" + game + "-s1").classList.remove("is-blank");
+      });
+    });
+    document.querySelectorAll(".bubble-table input").forEach(function (input) {
+      input.value = "";
+      input.classList.remove("is-blank", "is-ambiguous");
+    });
+    document.querySelectorAll(".bubble-flag").forEach(function (flag) { flag.textContent = ""; });
+    ["win-g1", "win-g2", "win-g3", "win-beer", "win-points"].forEach(function (id) {
+      document.getElementById(id).value = "";
+    });
+    refreshChecks();
   }
 
   function describeReading(result) {
     if (result.mode === "rejected") {
-      return "This photo does not look like the v2 score sheet. The form below is empty so you can type the result.";
+      return "This photo did not line up with the scan sheet. The boxes below are empty so you can type the result.";
     }
-    var games = (result.games || []).map(function (game, index) {
-      var home = game.homePoints == null ? "—" : game.homePoints;
-      var away = game.awayPoints == null ? "—" : game.awayPoints;
-      var who = game.winner === "home" ? "home" : game.winner === "away" ? "away" : "no winner";
-      return "Game " + (index + 1) + " " + home + "–" + away + " (" + who + ")";
-    }).join("; ");
-    var sheet = "Sheet points " +
-      (result.homeSheetPoints == null ? "—" : result.homeSheetPoints) + "–" +
-      (result.awaySheetPoints == null ? "—" : result.awaySheetPoints) + ".";
-    return "Read " + result.boxesRead + " written number boxes and skipped " + result.blanksSkipped +
-      " blank ones. " + games + ". " + sheet + " Games won " + result.homeGamesWon + "–" + result.awayGamesWon +
-      ". Corner marks: " + (result.mode === "fiducial" ? "found" : "not found") +
-      (result.notch ? ", notch seen." : ".");
+    var counts = result.counts || { blank: 0, ambiguous: 0 };
+    var turned = result.upsideDown ? " The photo was upside down; the notched corner turned it upright." : "";
+    var notch = result.notch ? "" : " The top-left notch was not clear.";
+    return "Read the bubbles. " + result.homeGamesWon + "–" + result.awayGamesWon +
+      " from the game-winner marks. " + counts.blank + " digit rows were blank and left empty. " +
+      counts.ambiguous + " rows need a look." + turned + notch;
   }
 
   function applyReading(result) {
     window.RAD_UPLOAD_LAST = result;
     summaryEl.textContent = describeReading(result);
-    var shown = result.warnings.slice(0, 6);
-    var extra = result.warnings.length - shown.length;
+    var shown = (result.warnings || []).slice(0, 8);
+    var extra = (result.warnings || []).length - shown.length;
     warningEl.innerHTML = shown.map(function (item) { return "<li>" + esc(item) + "</li>"; }).join("") +
-      (extra ? "<li>And " + extra + " more notes. Check the totals before saving.</li>" : "");
+      (extra ? "<li>And " + extra + " more notes. Check the boxes before saving.</li>" : "");
     if (result.previewUrl) {
       previewImg.src = result.previewUrl;
       previewFigure.hidden = false;
       previewNote.textContent = result.mode === "fiducial"
-        ? "Straightened with the four corner marks."
-        : result.mode === "rejected"
-          ? "This photo did not line up with the printed sheet."
-          : "Corner marks were missed, so this is the whole photo. The numbers below need a careful look.";
+        ? (result.upsideDown ? "Straightened, after turning an upside-down photo upright." : "Straightened with the four corner squares.")
+        : "This photo did not line up with the scan sheet.";
     }
     if (!confirmSection.hidden && formDirty) {
       setStatus("The photo was read, and your edits were left as they are.");
       return;
     }
-    document.getElementById("confirm-date").value = parseUsDate(result.dateText);
-    document.getElementById("home-name").value = result.homeName || "";
-    document.getElementById("away-name").value = result.awayName || "";
-    fillTeamSelect(document.getElementById("home-team"), result.homeName);
-    fillTeamSelect(document.getElementById("away-team"), result.awayName);
-    (result.games || []).forEach(function (game, index) {
-      var n = index + 1;
-      document.getElementById("g" + n + "-home-pts").value = pointsText(game.homePoints);
-      document.getElementById("g" + n + "-away-pts").value = pointsText(game.awayPoints);
-      document.getElementById("g" + n + "-winner").value = game.winner || "";
-    });
-    document.getElementById("beer-winner").value = result.beerWinner || "";
-    document.getElementById("sheet-points").textContent =
-      "Inning totals on the sheet (not the match score): home " +
-      (result.homeSheetPoints == null ? "—" : result.homeSheetPoints) +
-      ", away " + (result.awaySheetPoints == null ? "—" : result.awaySheetPoints) + ".";
-    document.getElementById("home-won").value = String(result.homeGamesWon || 0);
-    document.getElementById("away-won").value = String(result.awayGamesWon || 0);
+    if (result.mode !== "rejected" && result.teams) {
+      SIDES.forEach(function (side) {
+        result.teams[side.id].games.forEach(function (game, index) {
+          game.shooters.forEach(function (shooter, shooterIndex) {
+            setBubble(side.id + "-g" + (index + 1) + "-s" + (shooterIndex + 1), shooter);
+          });
+          setBubble(side.id + "-g" + (index + 1) + "-team", game.team);
+        });
+      });
+      setWinner("win-g1", result.winners.game1);
+      setWinner("win-g2", result.winners.game2);
+      setWinner("win-g3", result.winners.game3);
+      setWinner("win-beer", result.winners.beer);
+      setWinner("win-points", result.winners.points);
+    } else {
+      clearSheet();
+    }
     scoresTouched = false;
     formDirty = false;
-    updateFinalScore();
+    applyWinnerCounts();
+    refreshChecks();
     showConfirm();
-    setStatus("Check the names and the score. Handwriting recognition misses digits.");
+    setStatus(result.mode === "rejected"
+      ? "Type the date, the teams, and the score."
+      : "Check the bubbles, the names, and the date, then save.");
   }
 
   function readPhoto() {
     var file = fileInput.files && fileInput.files[0];
     if (!file) {
-      showError(errorEl, "Choose a photo of the filled-in score sheet first.");
+      showError(errorEl, "Choose a photo of the filled scan sheet first.");
       return;
     }
     if (reading) return;
@@ -215,11 +314,11 @@
     showError(errorEl, "");
     setStatus("Opening the photo…");
     RAD_OCR.loadImageFile(file).then(function (canvas) {
-      if (canvas.width < 400 || canvas.height < 300) {
-        throw new Error("That photo is too small to read. Move closer and include all four corner marks.");
+      if (canvas.width < 500 || canvas.height < 360) {
+        throw new Error("That photo is too small to read. Move closer and include all four corner squares.");
       }
-      return fetch("scoresheet/layout_spec.json").then(function (response) {
-        if (!response.ok) throw new Error("The score sheet layout could not be loaded.");
+      return fetch("scoresheet/scansheet_v7_layout_spec.json").then(function (response) {
+        if (!response.ok) throw new Error("The scan sheet layout could not be loaded.");
         return response.json();
       }).then(function (spec) {
         return RAD_OCR.readSheet(canvas, spec, setStatus);
@@ -241,7 +340,7 @@
     if (!scoresTouched && fromSelect.home === homeWon && fromSelect.away === awayWon) {
       var labeled = [];
       [1, 2, 3].forEach(function (n) {
-        var winner = document.getElementById("g" + n + "-winner").value;
+        var winner = document.getElementById("win-g" + n).value;
         if (winner !== "home" && winner !== "away") return;
         labeled.push({ label: "Game " + n, winner: winner });
       });
@@ -252,6 +351,28 @@
     for (i = 0; i < homeWon; i += 1) games.push({ label: "Game " + (games.length + 1), winner: "home" });
     for (i = 0; i < awayWon; i += 1) games.push({ label: "Game " + (games.length + 1), winner: "away" });
     return games;
+  }
+
+  function sheetSnapshot() {
+    function side(id) {
+      return [1, 2, 3].map(function (game) {
+        return {
+          shooters: [1, 2, 3, 4].map(function (n) { return numberOrNull(scoreInput(id, game, "s" + n)); }),
+          team: numberOrNull(scoreInput(id, game, "team"))
+        };
+      });
+    }
+    return {
+      home: side("home"),
+      away: side("away"),
+      winners: {
+        game1: document.getElementById("win-g1").value,
+        game2: document.getElementById("win-g2").value,
+        game3: document.getElementById("win-g3").value,
+        beer: document.getElementById("win-beer").value,
+        points: document.getElementById("win-points").value
+      }
+    };
   }
 
   function ensureTeam(selectValue, typedName) {
@@ -319,9 +440,10 @@
       return;
     }
     if (!isFinite(homeWon) || !isFinite(awayWon) || homeWon < 0 || awayWon < 0 || homeWon + awayWon < 1) {
-      showError(confirmError, "Enter the games won. A match needs at least one game.");
+      showError(confirmError, "Mark a winner for at least one of games 1–3.");
       return;
     }
+    refreshChecks();
     var homeSelect = document.getElementById("home-team").value;
     var awaySelect = document.getElementById("away-team").value;
     var homeTyped = document.getElementById("home-name").value.trim();
@@ -330,6 +452,7 @@
       showError(confirmError, "Home and away need to be two different teams.");
       return;
     }
+    var sheet = sheetSnapshot();
     var submitButton = document.getElementById("confirm-submit");
     submitButton.disabled = true;
     ensureTeam(homeSelect, homeTyped).then(function (homeId) {
@@ -352,7 +475,8 @@
         awayGamesWon: match.awayGamesWon,
         homeName: homeTyped,
         awayName: awayTyped,
-        photoStored: false
+        photoStored: false,
+        sheet: sheet
       });
       savedNote.hidden = false;
       savedNote.textContent = "Saved in this browser. Final score " + match.homeGamesWon + "–" + match.awayGamesWon +
@@ -390,13 +514,30 @@
   });
   typeButton.addEventListener("click", function () {
     showError(errorEl, "");
-    setStatus("Type the date, the two teams, and the games won. The photo reader is optional.");
+    setStatus("Type the date, the two teams, the shooter totals, and the game winners.");
+    clearSheet();
+    scoresTouched = false;
+    formDirty = false;
+    applyWinnerCounts();
     showConfirm();
   });
   confirmForm.addEventListener("submit", onSubmit);
-  confirmForm.addEventListener("input", function () { formDirty = true; });
+  confirmForm.addEventListener("input", function (event) {
+    formDirty = true;
+    var target = event.target;
+    if (target && target.classList) {
+      target.classList.remove("is-blank", "is-ambiguous");
+      var flag = document.getElementById(target.id + "-flag");
+      if (flag && target.type === "number") flag.textContent = target.value === "" ? "Blank — not zero" : "";
+    }
+    refreshChecks();
+  });
   [1, 2, 3].forEach(function (n) {
-    document.getElementById("g" + n + "-winner").addEventListener("change", applyWinnerCounts);
+    document.getElementById("win-g" + n).addEventListener("change", function () {
+      var flag = document.getElementById("win-g" + n + "-flag");
+      if (flag) flag.textContent = "";
+      applyWinnerCounts();
+    });
   });
   document.getElementById("home-won").addEventListener("input", function () {
     scoresTouched = true;
@@ -410,6 +551,7 @@
   fillTeamSelect(document.getElementById("home-team"), "");
   fillTeamSelect(document.getElementById("away-team"), "");
   updateFinalScore();
+  refreshChecks();
 
   RAD.load().then(function (data) {
     snap = data;

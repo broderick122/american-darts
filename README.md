@@ -12,7 +12,7 @@ There is no build step. Edit the files and refresh. Paths are relative (`images/
 | --- | --- |
 | Home, About, Schedule, News, Join | Copy in `index.html` |
 | Standings, Teams, Score sheet | Don’t hard-code these. They come from the data module. |
-| Upload score sheet | `upload.html`. Experimental photo reading. |
+| Upload scan sheet | `upload.html`. Photo of the v7 bubble sheet. |
 | Photos | Files in `images/`. Captions in `index.html`. |
 | Admin | `admin.html` |
 
@@ -116,15 +116,25 @@ Admin, secret required: `saveTeam`, `deleteTeam`, `savePlayer`, `deletePlayer`, 
 
 A team that is on a match cannot be deleted. Delete the matches first, or rename the team. Deleting a team also removes its players.
 
-## Upload a photo of the paper sheet (experimental)
+## Upload a photo of the scan sheet
 
-`upload.html` is for the end of the night: a captain photographs the filled v2 score sheet and the browser tries to read it. There is no server. [Tesseract.js 5.1.1](https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js) runs in the phone, and `scoresheet/layout_spec.json` is the map of the printed boxes (the same spec the sheet generator writes).
+`upload.html` is for the end of the night. The printable sheet is `scoresheet/roslyn_scansheet_v7.pdf` (landscape letter, one page). The same file is linked from the home page and the upload page as “Download the scan sheet.” `scoresheet/scansheet_v7_layout_spec.json` is the map: every bubble center is normalized from 0 to 1 between the corner-marker centers.
 
-The page looks for the four black corner squares, straightens the photo, and crops known fields. Filled winner bubbles are counted as ink. Blank digit boxes are skipped so they are not read as 0. Inning digits and the team names then go through Tesseract. Games 1–3 (innings 1–18) become the match score. The beer frame is shown and is not a league game. Extra innings 19–20 count only toward the sheet’s point total.
+There is no server and no handwriting recognition. `js/sheet-ocr.js` runs in the browser:
 
-The reading lands in an editable form: team names, games won, and the final score. The captain fixes mistakes and saves. The save uses the same data module as the typed score sheet, so standings update immediately. Until Google Sheets is connected, that save stays in `localStorage`. A short receipt is also kept under `rad.uploads.v1`. The photo itself is not stored.
+1. It finds the four solid black corner squares. The top-left square has a white notch. If that notch is the only one, it is treated as the sheet’s top-left, which turns an upside-down photo upright.
+2. A perspective warp straightens the page so those four centers sit on a rectangle.
+3. Each bubble is sampled in a ring inside the printed circle (away from the gray digit and the navy outline). On a row of 0–9, the bubble that is clearly darker than the others in that same row is the mark. No mark means the row is blank, and the box is left empty — it is not stored as 0. Two dark bubbles, or a mark too close to call, is flagged for the captain to fix.
+4. The team-total “100+” bubble is a flag, not a digit row. Blank means +0. Filled means +100. Shooter totals are two digits (0–99). Team totals can reach 199.
+5. Winners are one Home or Away bubble for Game 1, Game 2, Game 3, Beer frame, and Total points. A blank beer frame is allowed. The other winner groups are flagged when they are blank or doubled.
 
-Handwriting OCR on a static page is rough. The typed score sheet on the home page is the reliable path. A later version could send the photo to a hosted vision API (Google Cloud Vision document text is about $1.50 per 1,000 images, with the first 1,000 a month free, so a small league stays at $0) or to Amazon Textract (about $1.50 per 1,000 pages for plain detection). That needs a small backend, because a browser should not hold a cloud API key. The typed form remains the $0 option that does not depend on a vendor.
+Names, the captain line, and the date are handwritten and are not scanned. The captain types those on the review form.
+
+The review form shows, for home and away, S1–S4 and the team total for each game, plus the winner marks. If the four shooter totals are all filled and they do not add up to the team total, that game gets a warning. The captain can edit any box. Saving uses the same `submitMatch` path as the typed score sheet: Games 1–3 become the match, and standings update immediately (localStorage until Google Sheets is connected). Beer frame and total points are kept on the local upload receipt (`rad.uploads.v1`) and are not league games. The photo is not stored. The confirmed shooter lines are on that receipt too; the match row itself stays `homeGamesWon`, `awayGamesWon`, and `gamesJson`, which is what standings read.
+
+Limits: the four corner squares have to be in the frame and on a flat sheet. A heavy glare, a crease through a square, or a very blurry photo can miss the corners or a bubble. The reader does not decode the small QR code (it is placeholder text). It does not read handwriting. A blank digit row must be filled in by hand on the form if that shooter did throw.
+
+Check the reader with `node test/read-v7.mjs`. That renders the v7 PDF, fills known bubbles, adds a small rotation, perspective shift, and blur, then checks that the browser reader recovers the values, including from the same photo turned 180°. It needs Python packages `pillow`, `pymupdf`, and `numpy`, plus Chrome. `puppeteer-core` is installed locally for the test (`npm install`) and is not part of the site.
 
 ## GitHub Pages
 

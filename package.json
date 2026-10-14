@@ -1,0 +1,10 @@
+{
+  "name": "roslyn-american-darts",
+  "private": true,
+  "scripts": {
+    "test": "node test/read-v7.mjs"
+  },
+  "devDependencies": {
+    "puppeteer-core": "^24.15.0"
+  }
+}
