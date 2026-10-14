@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>v7 reader harness</title>
+</head>
+<body>
+  <pre id="result">reading</pre>
+  <script src="../js/sheet-ocr.js"></script>
+  <script>
+    function draw(img) {
+      var canvas = document.createElement("canvas");
+      canvas.width = img.naturalWidth || img.width;
+      canvas.height = img.naturalHeight || img.height;
+      canvas.getContext("2d").drawImage(img, 0, 0);
+      return canvas;
+    }
+
+    function rotate180(src) {
+      var canvas = document.createElement("canvas");
+      canvas.width = src.width;
+      canvas.height = src.height;
+      var ctx = canvas.getContext("2d");
+      ctx.translate(canvas.width, canvas.height);
+      ctx.rotate(Math.PI);
+      ctx.drawImage(src, 0, 0);
+      return canvas;
+    }
+
+    function slim(result) {
+      return {
+        mode: result.mode,
+        notch: result.notch,
+        upsideDown: result.upsideDown,
+        warnings: result.warnings,
+        teams: result.teams,
+        winners: result.winners,
+        homeGamesWon: result.homeGamesWon,
+        awayGamesWon: result.awayGamesWon,
+        counts: result.counts,
+        calibration: result.calibration,
+        trace: result.trace
+      };
+    }
+
+    function loadImage(src) {
+      return new Promise(function (resolve, reject) {
+        var img = new Image();
+        img.onload = function () { resolve(img); };
+        img.onerror = function () { reject(new Error("Could not load " + src)); };
+        img.src = src;
+      });
+    }
+
+    Promise.all([
+      fetch("../scoresheet/scansheet_v7_layout_spec.json").then(function (response) { return response.json(); }),
+      loadImage("fixtures/filled-v7.jpg")
+    ]).then(function (parts) {
+      var spec = parts[0];
+      spec.debug = true;
+      var canvas = draw(parts[1]);
+      return RAD_OCR.readSheet(canvas, spec).then(function (upright) {
+        return RAD_OCR.readSheet(rotate180(canvas), spec).then(function (turned) {
+          document.getElementById("result").textContent = JSON.stringify({
+            upright: slim(upright),
+            turned: slim(turned)
+          });
+        });
+      });
+    }).catch(function (err) {
+      document.getElementById("result").textContent = JSON.stringify({ error: String(err && err.message || err) });
+    });
+  </script>
+</body>
+</html>

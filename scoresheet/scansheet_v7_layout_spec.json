@@ -1,0 +1,5046 @@
+{
+ "sheet": "Roslyn VFW Dart League Results Scan Sheet",
+ "version": "v7",
+ "page": {
+  "size_pt": [
+   792.0,
+   612.0
+  ],
+  "orientation": "landscape letter",
+  "pages": 1
+ },
+ "coordinate_system": "Normalized to corner-marker centres: (0,0)=TL, (1,0)=TR, (0,1)=BL; y down.",
+ "fiducials": {
+  "TL": {
+   "center_pt_topleft": [
+    27.0,
+    27.0
+   ],
+   "size_pt": 22
+  },
+  "TR": {
+   "center_pt_topleft": [
+    765.0,
+    27.0
+   ],
+   "size_pt": 22
+  },
+  "BL": {
+   "center_pt_topleft": [
+    27.0,
+    585.0
+   ],
+   "size_pt": 22
+  },
+  "BR": {
+   "center_pt_topleft": [
+    765.0,
+    585.0
+   ],
+   "size_pt": 22
+  }
+ },
+ "fiducial_note": "Solid black squares; TL has white notch for orientation.",
+ "bubble_diameter_pt": 18.67,
+ "bubble_pitch_pt": 21.17,
+ "bubble_radius": {
+  "pt": 9.336,
+  "norm_x": 0.01265,
+  "norm_y": 0.01673
+ },
+ "winner_bubble_radius": {
+  "pt": 9.336,
+  "norm_x": 0.01265,
+  "norm_y": 0.01673
+ },
+ "qr": {
+  "payload_placeholder": "ROSLYN|2026|WK01|HOME-AWAY",
+  "bbox_norm": [
+   0.93631,
+   -0.0233,
+   0.03794,
+   0.05018
+  ]
+ },
+ "reading_rules": "Each tens/ones row: exactly one bubble filled. Team total hundreds = single flag bubble (filled=100); shooter max 99, team max 199. Winners: one of home/away per group. Digits printed medium gray; threshold fill darkness above digit ink.",
+ "number_fields": {
+  "home_g1_s1": {
+   "type": "shooter_game_total",
+   "max": 99,
+   "digits": [
+    {
+     "place": "tens",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.08887,
+        0.09783
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.11756,
+        0.09783
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.14625,
+        0.09783
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.17494,
+        0.09783
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.20363,
+        0.09783
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.23232,
+        0.09783
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.26101,
+        0.09783
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.2897,
+        0.09783
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.31839,
+        0.09783
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.34707,
+        0.09783
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.08887,
+        0.13577
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.11756,
+        0.13577
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.14625,
+        0.13577
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.17494,
+        0.13577
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.20363,
+        0.13577
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.23232,
+        0.13577
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.26101,
+        0.13577
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.2897,
+        0.13577
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.31839,
+        0.13577
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.34707,
+        0.13577
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "home_g2_s1": {
+   "type": "shooter_game_total",
+   "max": 99,
+   "digits": [
+    {
+     "place": "tens",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.38796,
+        0.09783
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.41665,
+        0.09783
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.44534,
+        0.09783
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.47403,
+        0.09783
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.50272,
+        0.09783
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.53141,
+        0.09783
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.56009,
+        0.09783
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.58878,
+        0.09783
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.61747,
+        0.09783
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.64616,
+        0.09783
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.38796,
+        0.13577
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.41665,
+        0.13577
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.44534,
+        0.13577
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.47403,
+        0.13577
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.50272,
+        0.13577
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.53141,
+        0.13577
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.56009,
+        0.13577
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.58878,
+        0.13577
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.61747,
+        0.13577
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.64616,
+        0.13577
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "home_g3_s1": {
+   "type": "shooter_game_total",
+   "max": 99,
+   "digits": [
+    {
+     "place": "tens",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.68705,
+        0.09783
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.71574,
+        0.09783
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.74443,
+        0.09783
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.77312,
+        0.09783
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.8018,
+        0.09783
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.83049,
+        0.09783
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.85918,
+        0.09783
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.88787,
+        0.09783
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.91656,
+        0.09783
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.94525,
+        0.09783
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.68705,
+        0.13577
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.71574,
+        0.13577
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.74443,
+        0.13577
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.77312,
+        0.13577
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.8018,
+        0.13577
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.83049,
+        0.13577
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.85918,
+        0.13577
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.88787,
+        0.13577
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.91656,
+        0.13577
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.94525,
+        0.13577
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "home_g1_s2": {
+   "type": "shooter_game_total",
+   "max": 99,
+   "digits": [
+    {
+     "place": "tens",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.08887,
+        0.17712
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.11756,
+        0.17712
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.14625,
+        0.17712
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.17494,
+        0.17712
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.20363,
+        0.17712
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.23232,
+        0.17712
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.26101,
+        0.17712
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.2897,
+        0.17712
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.31839,
+        0.17712
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.34707,
+        0.17712
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.08887,
+        0.21506
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.11756,
+        0.21506
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.14625,
+        0.21506
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.17494,
+        0.21506
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.20363,
+        0.21506
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.23232,
+        0.21506
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.26101,
+        0.21506
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.2897,
+        0.21506
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.31839,
+        0.21506
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.34707,
+        0.21506
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "home_g2_s2": {
+   "type": "shooter_game_total",
+   "max": 99,
+   "digits": [
+    {
+     "place": "tens",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.38796,
+        0.17712
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.41665,
+        0.17712
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.44534,
+        0.17712
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.47403,
+        0.17712
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.50272,
+        0.17712
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.53141,
+        0.17712
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.56009,
+        0.17712
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.58878,
+        0.17712
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.61747,
+        0.17712
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.64616,
+        0.17712
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.38796,
+        0.21506
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.41665,
+        0.21506
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.44534,
+        0.21506
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.47403,
+        0.21506
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.50272,
+        0.21506
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.53141,
+        0.21506
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.56009,
+        0.21506
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.58878,
+        0.21506
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.61747,
+        0.21506
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.64616,
+        0.21506
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "home_g3_s2": {
+   "type": "shooter_game_total",
+   "max": 99,
+   "digits": [
+    {
+     "place": "tens",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.68705,
+        0.17712
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.71574,
+        0.17712
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.74443,
+        0.17712
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.77312,
+        0.17712
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.8018,
+        0.17712
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.83049,
+        0.17712
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.85918,
+        0.17712
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.88787,
+        0.17712
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.91656,
+        0.17712
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.94525,
+        0.17712
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.68705,
+        0.21506
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.71574,
+        0.21506
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.74443,
+        0.21506
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.77312,
+        0.21506
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.8018,
+        0.21506
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.83049,
+        0.21506
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.85918,
+        0.21506
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.88787,
+        0.21506
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.91656,
+        0.21506
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.94525,
+        0.21506
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "home_g1_s3": {
+   "type": "shooter_game_total",
+   "max": 99,
+   "digits": [
+    {
+     "place": "tens",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.08887,
+        0.25641
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.11756,
+        0.25641
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.14625,
+        0.25641
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.17494,
+        0.25641
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.20363,
+        0.25641
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.23232,
+        0.25641
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.26101,
+        0.25641
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.2897,
+        0.25641
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.31839,
+        0.25641
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.34707,
+        0.25641
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.08887,
+        0.29435
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.11756,
+        0.29435
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.14625,
+        0.29435
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.17494,
+        0.29435
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.20363,
+        0.29435
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.23232,
+        0.29435
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.26101,
+        0.29435
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.2897,
+        0.29435
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.31839,
+        0.29435
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.34707,
+        0.29435
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "home_g2_s3": {
+   "type": "shooter_game_total",
+   "max": 99,
+   "digits": [
+    {
+     "place": "tens",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.38796,
+        0.25641
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.41665,
+        0.25641
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.44534,
+        0.25641
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.47403,
+        0.25641
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.50272,
+        0.25641
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.53141,
+        0.25641
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.56009,
+        0.25641
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.58878,
+        0.25641
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.61747,
+        0.25641
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.64616,
+        0.25641
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.38796,
+        0.29435
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.41665,
+        0.29435
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.44534,
+        0.29435
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.47403,
+        0.29435
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.50272,
+        0.29435
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.53141,
+        0.29435
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.56009,
+        0.29435
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.58878,
+        0.29435
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.61747,
+        0.29435
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.64616,
+        0.29435
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "home_g3_s3": {
+   "type": "shooter_game_total",
+   "max": 99,
+   "digits": [
+    {
+     "place": "tens",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.68705,
+        0.25641
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.71574,
+        0.25641
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.74443,
+        0.25641
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.77312,
+        0.25641
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.8018,
+        0.25641
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.83049,
+        0.25641
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.85918,
+        0.25641
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.88787,
+        0.25641
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.91656,
+        0.25641
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.94525,
+        0.25641
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.68705,
+        0.29435
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.71574,
+        0.29435
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.74443,
+        0.29435
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.77312,
+        0.29435
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.8018,
+        0.29435
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.83049,
+        0.29435
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.85918,
+        0.29435
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.88787,
+        0.29435
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.91656,
+        0.29435
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.94525,
+        0.29435
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "home_g1_s4": {
+   "type": "shooter_game_total",
+   "max": 99,
+   "digits": [
+    {
+     "place": "tens",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.08887,
+        0.3357
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.11756,
+        0.3357
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.14625,
+        0.3357
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.17494,
+        0.3357
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.20363,
+        0.3357
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.23232,
+        0.3357
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.26101,
+        0.3357
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.2897,
+        0.3357
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.31839,
+        0.3357
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.34707,
+        0.3357
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.08887,
+        0.37365
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.11756,
+        0.37365
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.14625,
+        0.37365
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.17494,
+        0.37365
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.20363,
+        0.37365
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.23232,
+        0.37365
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.26101,
+        0.37365
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.2897,
+        0.37365
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.31839,
+        0.37365
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.34707,
+        0.37365
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "home_g2_s4": {
+   "type": "shooter_game_total",
+   "max": 99,
+   "digits": [
+    {
+     "place": "tens",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.38796,
+        0.3357
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.41665,
+        0.3357
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.44534,
+        0.3357
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.47403,
+        0.3357
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.50272,
+        0.3357
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.53141,
+        0.3357
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.56009,
+        0.3357
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.58878,
+        0.3357
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.61747,
+        0.3357
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.64616,
+        0.3357
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.38796,
+        0.37365
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.41665,
+        0.37365
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.44534,
+        0.37365
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.47403,
+        0.37365
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.50272,
+        0.37365
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.53141,
+        0.37365
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.56009,
+        0.37365
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.58878,
+        0.37365
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.61747,
+        0.37365
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.64616,
+        0.37365
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "home_g3_s4": {
+   "type": "shooter_game_total",
+   "max": 99,
+   "digits": [
+    {
+     "place": "tens",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.68705,
+        0.3357
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.71574,
+        0.3357
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.74443,
+        0.3357
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.77312,
+        0.3357
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.8018,
+        0.3357
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.83049,
+        0.3357
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.85918,
+        0.3357
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.88787,
+        0.3357
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.91656,
+        0.3357
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.94525,
+        0.3357
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.68705,
+        0.37365
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.71574,
+        0.37365
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.74443,
+        0.37365
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.77312,
+        0.37365
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.8018,
+        0.37365
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.83049,
+        0.37365
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.85918,
+        0.37365
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.88787,
+        0.37365
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.91656,
+        0.37365
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.94525,
+        0.37365
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "home_g1_team": {
+   "type": "team_game_total",
+   "max": 199,
+   "digits": [
+    {
+     "place": "hundreds",
+     "type": "flag",
+     "meaning": "filled = +100, blank = 0",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.11756,
+        0.415
+       ]
+      }
+     ]
+    },
+    {
+     "place": "tens",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.08887,
+        0.45294
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.11756,
+        0.45294
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.14625,
+        0.45294
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.17494,
+        0.45294
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.20363,
+        0.45294
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.23232,
+        0.45294
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.26101,
+        0.45294
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.2897,
+        0.45294
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.31839,
+        0.45294
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.34707,
+        0.45294
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.08887,
+        0.49088
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.11756,
+        0.49088
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.14625,
+        0.49088
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.17494,
+        0.49088
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.20363,
+        0.49088
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.23232,
+        0.49088
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.26101,
+        0.49088
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.2897,
+        0.49088
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.31839,
+        0.49088
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.34707,
+        0.49088
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "home_g2_team": {
+   "type": "team_game_total",
+   "max": 199,
+   "digits": [
+    {
+     "place": "hundreds",
+     "type": "flag",
+     "meaning": "filled = +100, blank = 0",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.41665,
+        0.415
+       ]
+      }
+     ]
+    },
+    {
+     "place": "tens",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.38796,
+        0.45294
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.41665,
+        0.45294
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.44534,
+        0.45294
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.47403,
+        0.45294
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.50272,
+        0.45294
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.53141,
+        0.45294
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.56009,
+        0.45294
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.58878,
+        0.45294
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.61747,
+        0.45294
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.64616,
+        0.45294
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.38796,
+        0.49088
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.41665,
+        0.49088
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.44534,
+        0.49088
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.47403,
+        0.49088
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.50272,
+        0.49088
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.53141,
+        0.49088
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.56009,
+        0.49088
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.58878,
+        0.49088
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.61747,
+        0.49088
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.64616,
+        0.49088
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "home_g3_team": {
+   "type": "team_game_total",
+   "max": 199,
+   "digits": [
+    {
+     "place": "hundreds",
+     "type": "flag",
+     "meaning": "filled = +100, blank = 0",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.71574,
+        0.415
+       ]
+      }
+     ]
+    },
+    {
+     "place": "tens",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.68705,
+        0.45294
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.71574,
+        0.45294
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.74443,
+        0.45294
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.77312,
+        0.45294
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.8018,
+        0.45294
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.83049,
+        0.45294
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.85918,
+        0.45294
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.88787,
+        0.45294
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.91656,
+        0.45294
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.94525,
+        0.45294
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.68705,
+        0.49088
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.71574,
+        0.49088
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.74443,
+        0.49088
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.77312,
+        0.49088
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.8018,
+        0.49088
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.83049,
+        0.49088
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.85918,
+        0.49088
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.88787,
+        0.49088
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.91656,
+        0.49088
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.94525,
+        0.49088
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "away_g1_s1": {
+   "type": "shooter_game_total",
+   "max": 99,
+   "digits": [
+    {
+     "place": "tens",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.08887,
+        0.56109
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.11756,
+        0.56109
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.14625,
+        0.56109
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.17494,
+        0.56109
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.20363,
+        0.56109
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.23232,
+        0.56109
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.26101,
+        0.56109
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.2897,
+        0.56109
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.31839,
+        0.56109
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.34707,
+        0.56109
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.08887,
+        0.59903
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.11756,
+        0.59903
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.14625,
+        0.59903
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.17494,
+        0.59903
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.20363,
+        0.59903
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.23232,
+        0.59903
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.26101,
+        0.59903
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.2897,
+        0.59903
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.31839,
+        0.59903
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.34707,
+        0.59903
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "away_g2_s1": {
+   "type": "shooter_game_total",
+   "max": 99,
+   "digits": [
+    {
+     "place": "tens",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.38796,
+        0.56109
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.41665,
+        0.56109
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.44534,
+        0.56109
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.47403,
+        0.56109
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.50272,
+        0.56109
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.53141,
+        0.56109
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.56009,
+        0.56109
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.58878,
+        0.56109
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.61747,
+        0.56109
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.64616,
+        0.56109
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.38796,
+        0.59903
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.41665,
+        0.59903
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.44534,
+        0.59903
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.47403,
+        0.59903
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.50272,
+        0.59903
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.53141,
+        0.59903
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.56009,
+        0.59903
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.58878,
+        0.59903
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.61747,
+        0.59903
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.64616,
+        0.59903
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "away_g3_s1": {
+   "type": "shooter_game_total",
+   "max": 99,
+   "digits": [
+    {
+     "place": "tens",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.68705,
+        0.56109
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.71574,
+        0.56109
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.74443,
+        0.56109
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.77312,
+        0.56109
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.8018,
+        0.56109
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.83049,
+        0.56109
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.85918,
+        0.56109
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.88787,
+        0.56109
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.91656,
+        0.56109
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.94525,
+        0.56109
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.68705,
+        0.59903
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.71574,
+        0.59903
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.74443,
+        0.59903
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.77312,
+        0.59903
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.8018,
+        0.59903
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.83049,
+        0.59903
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.85918,
+        0.59903
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.88787,
+        0.59903
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.91656,
+        0.59903
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.94525,
+        0.59903
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "away_g1_s2": {
+   "type": "shooter_game_total",
+   "max": 99,
+   "digits": [
+    {
+     "place": "tens",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.08887,
+        0.64038
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.11756,
+        0.64038
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.14625,
+        0.64038
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.17494,
+        0.64038
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.20363,
+        0.64038
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.23232,
+        0.64038
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.26101,
+        0.64038
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.2897,
+        0.64038
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.31839,
+        0.64038
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.34707,
+        0.64038
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.08887,
+        0.67832
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.11756,
+        0.67832
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.14625,
+        0.67832
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.17494,
+        0.67832
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.20363,
+        0.67832
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.23232,
+        0.67832
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.26101,
+        0.67832
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.2897,
+        0.67832
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.31839,
+        0.67832
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.34707,
+        0.67832
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "away_g2_s2": {
+   "type": "shooter_game_total",
+   "max": 99,
+   "digits": [
+    {
+     "place": "tens",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.38796,
+        0.64038
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.41665,
+        0.64038
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.44534,
+        0.64038
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.47403,
+        0.64038
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.50272,
+        0.64038
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.53141,
+        0.64038
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.56009,
+        0.64038
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.58878,
+        0.64038
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.61747,
+        0.64038
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.64616,
+        0.64038
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.38796,
+        0.67832
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.41665,
+        0.67832
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.44534,
+        0.67832
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.47403,
+        0.67832
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.50272,
+        0.67832
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.53141,
+        0.67832
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.56009,
+        0.67832
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.58878,
+        0.67832
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.61747,
+        0.67832
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.64616,
+        0.67832
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "away_g3_s2": {
+   "type": "shooter_game_total",
+   "max": 99,
+   "digits": [
+    {
+     "place": "tens",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.68705,
+        0.64038
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.71574,
+        0.64038
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.74443,
+        0.64038
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.77312,
+        0.64038
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.8018,
+        0.64038
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.83049,
+        0.64038
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.85918,
+        0.64038
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.88787,
+        0.64038
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.91656,
+        0.64038
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.94525,
+        0.64038
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.68705,
+        0.67832
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.71574,
+        0.67832
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.74443,
+        0.67832
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.77312,
+        0.67832
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.8018,
+        0.67832
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.83049,
+        0.67832
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.85918,
+        0.67832
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.88787,
+        0.67832
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.91656,
+        0.67832
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.94525,
+        0.67832
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "away_g1_s3": {
+   "type": "shooter_game_total",
+   "max": 99,
+   "digits": [
+    {
+     "place": "tens",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.08887,
+        0.71967
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.11756,
+        0.71967
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.14625,
+        0.71967
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.17494,
+        0.71967
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.20363,
+        0.71967
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.23232,
+        0.71967
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.26101,
+        0.71967
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.2897,
+        0.71967
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.31839,
+        0.71967
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.34707,
+        0.71967
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.08887,
+        0.75762
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.11756,
+        0.75762
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.14625,
+        0.75762
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.17494,
+        0.75762
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.20363,
+        0.75762
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.23232,
+        0.75762
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.26101,
+        0.75762
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.2897,
+        0.75762
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.31839,
+        0.75762
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.34707,
+        0.75762
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "away_g2_s3": {
+   "type": "shooter_game_total",
+   "max": 99,
+   "digits": [
+    {
+     "place": "tens",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.38796,
+        0.71967
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.41665,
+        0.71967
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.44534,
+        0.71967
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.47403,
+        0.71967
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.50272,
+        0.71967
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.53141,
+        0.71967
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.56009,
+        0.71967
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.58878,
+        0.71967
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.61747,
+        0.71967
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.64616,
+        0.71967
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.38796,
+        0.75762
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.41665,
+        0.75762
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.44534,
+        0.75762
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.47403,
+        0.75762
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.50272,
+        0.75762
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.53141,
+        0.75762
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.56009,
+        0.75762
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.58878,
+        0.75762
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.61747,
+        0.75762
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.64616,
+        0.75762
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "away_g3_s3": {
+   "type": "shooter_game_total",
+   "max": 99,
+   "digits": [
+    {
+     "place": "tens",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.68705,
+        0.71967
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.71574,
+        0.71967
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.74443,
+        0.71967
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.77312,
+        0.71967
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.8018,
+        0.71967
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.83049,
+        0.71967
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.85918,
+        0.71967
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.88787,
+        0.71967
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.91656,
+        0.71967
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.94525,
+        0.71967
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.68705,
+        0.75762
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.71574,
+        0.75762
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.74443,
+        0.75762
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.77312,
+        0.75762
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.8018,
+        0.75762
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.83049,
+        0.75762
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.85918,
+        0.75762
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.88787,
+        0.75762
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.91656,
+        0.75762
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.94525,
+        0.75762
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "away_g1_s4": {
+   "type": "shooter_game_total",
+   "max": 99,
+   "digits": [
+    {
+     "place": "tens",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.08887,
+        0.79897
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.11756,
+        0.79897
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.14625,
+        0.79897
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.17494,
+        0.79897
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.20363,
+        0.79897
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.23232,
+        0.79897
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.26101,
+        0.79897
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.2897,
+        0.79897
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.31839,
+        0.79897
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.34707,
+        0.79897
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.08887,
+        0.83691
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.11756,
+        0.83691
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.14625,
+        0.83691
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.17494,
+        0.83691
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.20363,
+        0.83691
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.23232,
+        0.83691
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.26101,
+        0.83691
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.2897,
+        0.83691
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.31839,
+        0.83691
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.34707,
+        0.83691
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "away_g2_s4": {
+   "type": "shooter_game_total",
+   "max": 99,
+   "digits": [
+    {
+     "place": "tens",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.38796,
+        0.79897
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.41665,
+        0.79897
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.44534,
+        0.79897
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.47403,
+        0.79897
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.50272,
+        0.79897
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.53141,
+        0.79897
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.56009,
+        0.79897
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.58878,
+        0.79897
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.61747,
+        0.79897
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.64616,
+        0.79897
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.38796,
+        0.83691
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.41665,
+        0.83691
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.44534,
+        0.83691
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.47403,
+        0.83691
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.50272,
+        0.83691
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.53141,
+        0.83691
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.56009,
+        0.83691
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.58878,
+        0.83691
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.61747,
+        0.83691
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.64616,
+        0.83691
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "away_g3_s4": {
+   "type": "shooter_game_total",
+   "max": 99,
+   "digits": [
+    {
+     "place": "tens",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.68705,
+        0.79897
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.71574,
+        0.79897
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.74443,
+        0.79897
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.77312,
+        0.79897
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.8018,
+        0.79897
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.83049,
+        0.79897
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.85918,
+        0.79897
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.88787,
+        0.79897
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.91656,
+        0.79897
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.94525,
+        0.79897
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.68705,
+        0.83691
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.71574,
+        0.83691
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.74443,
+        0.83691
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.77312,
+        0.83691
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.8018,
+        0.83691
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.83049,
+        0.83691
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.85918,
+        0.83691
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.88787,
+        0.83691
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.91656,
+        0.83691
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.94525,
+        0.83691
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "away_g1_team": {
+   "type": "team_game_total",
+   "max": 199,
+   "digits": [
+    {
+     "place": "hundreds",
+     "type": "flag",
+     "meaning": "filled = +100, blank = 0",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.11756,
+        0.87826
+       ]
+      }
+     ]
+    },
+    {
+     "place": "tens",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.08887,
+        0.9162
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.11756,
+        0.9162
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.14625,
+        0.9162
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.17494,
+        0.9162
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.20363,
+        0.9162
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.23232,
+        0.9162
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.26101,
+        0.9162
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.2897,
+        0.9162
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.31839,
+        0.9162
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.34707,
+        0.9162
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.08887,
+        0.95415
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.11756,
+        0.95415
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.14625,
+        0.95415
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.17494,
+        0.95415
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.20363,
+        0.95415
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.23232,
+        0.95415
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.26101,
+        0.95415
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.2897,
+        0.95415
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.31839,
+        0.95415
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.34707,
+        0.95415
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "away_g2_team": {
+   "type": "team_game_total",
+   "max": 199,
+   "digits": [
+    {
+     "place": "hundreds",
+     "type": "flag",
+     "meaning": "filled = +100, blank = 0",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.41665,
+        0.87826
+       ]
+      }
+     ]
+    },
+    {
+     "place": "tens",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.38796,
+        0.9162
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.41665,
+        0.9162
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.44534,
+        0.9162
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.47403,
+        0.9162
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.50272,
+        0.9162
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.53141,
+        0.9162
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.56009,
+        0.9162
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.58878,
+        0.9162
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.61747,
+        0.9162
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.64616,
+        0.9162
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.38796,
+        0.95415
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.41665,
+        0.95415
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.44534,
+        0.95415
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.47403,
+        0.95415
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.50272,
+        0.95415
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.53141,
+        0.95415
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.56009,
+        0.95415
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.58878,
+        0.95415
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.61747,
+        0.95415
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.64616,
+        0.95415
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "away_g3_team": {
+   "type": "team_game_total",
+   "max": 199,
+   "digits": [
+    {
+     "place": "hundreds",
+     "type": "flag",
+     "meaning": "filled = +100, blank = 0",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.71574,
+        0.87826
+       ]
+      }
+     ]
+    },
+    {
+     "place": "tens",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.68705,
+        0.9162
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.71574,
+        0.9162
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.74443,
+        0.9162
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.77312,
+        0.9162
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.8018,
+        0.9162
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.83049,
+        0.9162
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.85918,
+        0.9162
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.88787,
+        0.9162
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.91656,
+        0.9162
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.94525,
+        0.9162
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "bubbles": [
+      {
+       "value": 0,
+       "center_norm": [
+        0.68705,
+        0.95415
+       ]
+      },
+      {
+       "value": 1,
+       "center_norm": [
+        0.71574,
+        0.95415
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.74443,
+        0.95415
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.77312,
+        0.95415
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.8018,
+        0.95415
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.83049,
+        0.95415
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.85918,
+        0.95415
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.88787,
+        0.95415
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.91656,
+        0.95415
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.94525,
+        0.95415
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "winner_fields": {
+  "game1_winner": [
+   {
+    "value": "home",
+    "center_norm": [
+     0.20091,
+     1.0
+    ]
+   },
+   {
+    "value": "away",
+    "center_norm": [
+     0.23163,
+     1.0
+    ]
+   }
+  ],
+  "game2_winner": [
+   {
+    "value": "home",
+    "center_norm": [
+     0.36948,
+     1.0
+    ]
+   },
+   {
+    "value": "away",
+    "center_norm": [
+     0.4002,
+     1.0
+    ]
+   }
+  ],
+  "game3_winner": [
+   {
+    "value": "home",
+    "center_norm": [
+     0.53804,
+     1.0
+    ]
+   },
+   {
+    "value": "away",
+    "center_norm": [
+     0.56876,
+     1.0
+    ]
+   }
+  ],
+  "beer_frame_winner": [
+   {
+    "value": "home",
+    "center_norm": [
+     0.72952,
+     1.0
+    ]
+   },
+   {
+    "value": "away",
+    "center_norm": [
+     0.76025,
+     1.0
+    ]
+   }
+  ],
+  "total_points_winner": [
+   {
+    "value": "home",
+    "center_norm": [
+     0.88305,
+     1.0
+    ]
+   },
+   {
+    "value": "away",
+    "center_norm": [
+     0.91377,
+     1.0
+    ]
+   }
+  ]
+ },
+ "handwritten_lines": [
+  {
+   "name": "date",
+   "type": "handwritten_not_scanned",
+   "bbox_norm": [
+    0.41057,
+    -0.01254,
+    0.1355,
+    0.02509
+   ]
+  },
+  {
+   "name": "home_team_name",
+   "type": "handwritten_not_scanned",
+   "bbox_norm": [
+    0.11518,
+    0.04839,
+    0.33875,
+    0.02509
+   ]
+  },
+  {
+   "name": "home_captain",
+   "type": "handwritten_not_scanned",
+   "bbox_norm": [
+    0.54065,
+    0.04839,
+    0.2981,
+    0.02509
+   ]
+  },
+  {
+   "name": "home_s1_name",
+   "type": "handwritten_not_scanned",
+   "bbox_norm": [
+    -0.01355,
+    0.12248,
+    0.07859,
+    0.02509
+   ]
+  },
+  {
+   "name": "home_s2_name",
+   "type": "handwritten_not_scanned",
+   "bbox_norm": [
+    -0.01355,
+    0.20178,
+    0.07859,
+    0.02509
+   ]
+  },
+  {
+   "name": "home_s3_name",
+   "type": "handwritten_not_scanned",
+   "bbox_norm": [
+    -0.01355,
+    0.28107,
+    0.07859,
+    0.02509
+   ]
+  },
+  {
+   "name": "home_s4_name",
+   "type": "handwritten_not_scanned",
+   "bbox_norm": [
+    -0.01355,
+    0.36036,
+    0.07859,
+    0.02509
+   ]
+  },
+  {
+   "name": "away_team_name",
+   "type": "handwritten_not_scanned",
+   "bbox_norm": [
+    0.11518,
+    0.51165,
+    0.33875,
+    0.02509
+   ]
+  },
+  {
+   "name": "away_captain",
+   "type": "handwritten_not_scanned",
+   "bbox_norm": [
+    0.54065,
+    0.51165,
+    0.2981,
+    0.02509
+   ]
+  },
+  {
+   "name": "away_s1_name",
+   "type": "handwritten_not_scanned",
+   "bbox_norm": [
+    -0.01355,
+    0.58574,
+    0.07859,
+    0.02509
+   ]
+  },
+  {
+   "name": "away_s2_name",
+   "type": "handwritten_not_scanned",
+   "bbox_norm": [
+    -0.01355,
+    0.66504,
+    0.07859,
+    0.02509
+   ]
+  },
+  {
+   "name": "away_s3_name",
+   "type": "handwritten_not_scanned",
+   "bbox_norm": [
+    -0.01355,
+    0.74433,
+    0.07859,
+    0.02509
+   ]
+  },
+  {
+   "name": "away_s4_name",
+   "type": "handwritten_not_scanned",
+   "bbox_norm": [
+    -0.01355,
+    0.82362,
+    0.07859,
+    0.02509
+   ]
+  }
+ ]
+}

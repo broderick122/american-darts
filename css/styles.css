@@ -950,20 +950,6 @@ tr.is-fresh td { animation: fresh 2.6s ease; }
   background: white;
 }
 
-.confirm-games { display: grid; gap: 0.35rem; margin: 1rem 0; }
-
-.confirm-game {
-  display: grid;
-  gap: 0.65rem;
-  padding-top: 0.8rem;
-  border-top: 1px solid var(--line);
-}
-
-.confirm-game h3 {
-  margin: 0;
-  font-size: 1rem;
-}
-
 .final-score {
   margin: 0.15rem 0 0.7rem;
   font-family: var(--display);
@@ -972,9 +958,60 @@ tr.is-fresh td { animation: fresh 2.6s ease; }
   line-height: 0.9;
 }
 
-@media (min-width: 800px) {
-  .confirm-game {
-    grid-template-columns: 5.5rem 1fr 1fr 1fr;
-    align-items: end;
-  }
+.side-block { margin-top: 1.35rem; }
+
+.side-block h3,
+.winners-heading {
+  margin: 0 0 0.55rem;
+  font-size: 1.15rem;
 }
+
+.bubble-table th,
+.bubble-table td {
+  padding: 0.45rem 0.5rem;
+  vertical-align: top;
+}
+
+.bubble-table input {
+  width: 100%;
+  min-width: 4.2rem;
+  min-height: 44px;
+  padding: 0.35rem 0.45rem;
+}
+
+.bubble-table input.is-blank {
+  border-style: dashed;
+  border-color: var(--brass);
+}
+
+.bubble-table input.is-ambiguous {
+  border-color: var(--red);
+  background: #fff1ee;
+}
+
+.bubble-flag {
+  display: block;
+  min-height: 1rem;
+  margin-top: 0.2rem;
+  color: var(--red-deep);
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.cross-checks { margin: 0.55rem 0 0.2rem; }
+
+.cross-check {
+  margin: 0.15rem 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.cross-check.is-bad {
+  color: var(--red-deep);
+  font-weight: 700;
+}
+
+.winner-grid { margin-top: 0.35rem; }
+
+.page-upload .stack { margin-top: 1rem; }
