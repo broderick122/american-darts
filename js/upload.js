@@ -203,6 +203,8 @@
     else flag.textContent = "";
   }
 
+  var teamTotalAuto = { 1: true, 2: true, 3: true };
+
   function wonCount() {
     var won = 0;
     GAMES.forEach(function (game) {
@@ -216,42 +218,97 @@
     finalScoreEl.textContent = won + (won === 1 ? " game won" : " games won");
   }
 
-  function refreshChecks() {
+  function fieldFlag(input) {
+    return document.getElementById(input.id + "-flag");
+  }
+
+  function ambiguousField(input) {
+    var flag = fieldFlag(input);
+    var text = flag ? String(flag.textContent || "") : "";
+    return input.classList.contains("is-ambiguous") || /two marks/i.test(text);
+  }
+
+  function shooterScores(game) {
+    return SHOOTERS.map(function (n) {
+      return numberOrNull(document.getElementById("g" + game + "-s" + n + "-score"));
+    });
+  }
+
+  function sumScores(scores) {
+    var any = false;
+    var sum = 0;
+    scores.forEach(function (value) {
+      if (value == null) return;
+      any = true;
+      sum += value;
+    });
+    return any ? sum : null;
+  }
+
+  function setTeamValue(teamInput, value) {
+    var flag = fieldFlag(teamInput);
+    if (value == null) {
+      teamInput.value = "";
+      teamInput.classList.add("is-blank");
+      teamInput.classList.remove("is-ambiguous");
+      if (flag) flag.textContent = "Blank — not zero";
+      return;
+    }
+    teamInput.value = String(value);
+    teamInput.classList.remove("is-blank", "is-ambiguous");
+    if (flag) flag.textContent = "";
+  }
+
+  function markTeamTotalModes() {
     GAMES.forEach(function (game) {
-      var scores = SHOOTERS.map(function (n) { return numberOrNull(document.getElementById("g" + game + "-s" + n + "-score")); });
-      var team = numberOrNull(document.getElementById("g" + game + "-team"));
+      var teamInput = document.getElementById("g" + game + "-team");
+      var team = numberOrNull(teamInput);
+      var scores = shooterScores(game);
+      var complete = scores.every(function (value) { return value != null; });
+      var sum = sumScores(scores);
+      if (ambiguousField(teamInput)) teamTotalAuto[game] = false;
+      else if (team == null) teamTotalAuto[game] = true;
+      else if (complete && sum != null && team === sum) teamTotalAuto[game] = true;
+      else teamTotalAuto[game] = false;
+    });
+  }
+
+  function refreshChecks(editedId) {
+    var shown = [];
+    GAMES.forEach(function (game) {
+      var scores = shooterScores(game);
+      var complete = scores.every(function (value) { return value != null; });
+      var sum = sumScores(scores);
+      var teamInput = document.getElementById("g" + game + "-team");
+      var editedTeam = editedId === teamInput.id;
+      var editedScore = typeof editedId === "string" && editedId.indexOf("g" + game + "-s") === 0 && /-score$/.test(editedId);
+      if (editedTeam) {
+        var typed = numberOrNull(teamInput);
+        teamTotalAuto[game] = !ambiguousField(teamInput) && (typed == null || (complete && sum != null && typed === sum));
+      } else if (editedScore && teamTotalAuto[game] && !ambiguousField(teamInput)) {
+        setTeamValue(teamInput, complete ? sum : null);
+      } else if (!editedId && teamTotalAuto[game] && !ambiguousField(teamInput) && complete && sum != null && numberOrNull(teamInput) == null) {
+        setTeamValue(teamInput, sum);
+      }
+      var team = numberOrNull(teamInput);
       var el = document.getElementById("g" + game + "-check");
       el.classList.remove("is-bad");
       if (scores.every(function (value) { return value == null; }) && team == null) {
         el.textContent = "";
-        return;
-      }
-      if (scores.some(function (value) { return value == null; }) || team == null) {
+      } else if (!complete || team == null) {
         el.textContent = "Game " + game + ": fill every shooter and the team total to check the sum.";
-        return;
-      }
-      var sum = scores.reduce(function (total, value) { return total + value; }, 0);
-      if (sum !== team) {
+      } else if (sum !== team) {
         el.textContent = "Game " + game + ": shooters add up to " + sum + ", team total is " + team + ".";
         el.classList.add("is-bad");
       } else {
         el.textContent = "Game " + game + ": shooters add up to the team total (" + sum + ").";
       }
+      var display = ambiguousField(teamInput) ? team : ((teamTotalAuto[game] || team == null) ? sum : team);
+      document.getElementById("save-total-" + game).textContent = display == null ? "—" : String(display);
+      shown.push(display);
     });
-    var sum = 0;
-    var complete = true;
-    GAMES.forEach(function (game) {
-      var value = numberOrNull(document.getElementById("g" + game + "-team"));
-      var cell = document.getElementById("save-total-" + game);
-      if (value == null) {
-        cell.textContent = "—";
-        complete = false;
-      } else {
-        cell.textContent = String(value);
-        sum += value;
-      }
-    });
-    document.getElementById("save-total-sum").textContent = complete ? String(sum) : "—";
+    var allShown = shown.every(function (value) { return value != null; });
+    document.getElementById("save-total-sum").textContent = allShown ? String(shown.reduce(function (total, value) { return total + value; }, 0)) : "—";
     updateFinalScore();
   }
 
@@ -269,6 +326,7 @@
     });
     setChoice("beer-result", "", "blank", "Blank is allowed");
     setChoice("points-result", "", "blank");
+    GAMES.forEach(function (game) { teamTotalAuto[game] = true; });
     refreshChecks();
     syncSaveButton();
   }
@@ -339,6 +397,7 @@
       clearSheet();
     }
     formDirty = false;
+    markTeamTotalModes();
     refreshChecks();
     showConfirm();
     if (result.mode === "rejected") {
@@ -353,7 +412,7 @@
   }
 
   function loadSpec() {
-    var version = window.RAD_ASSET_VERSION || "20261015h";
+    var version = window.RAD_ASSET_VERSION || "20261015i";
     return fetch("scoresheet/scansheet_v16_layout_spec.json?v=" + encodeURIComponent(version), { cache: "no-store" }).then(function (response) {
       if (!response.ok) throw new Error("The scan sheet layout could not be loaded (" + response.status + "). Reload the page and try again.");
       return response.json();
@@ -1166,12 +1225,18 @@
         else flag.textContent = target.value ? "" : "Not marked";
       }
     }
-    refreshChecks();
+    refreshChecks(target && target.id);
     if (reviewInvalid) paintMissing(collectMissing());
     else syncSaveButton();
   }
   confirmForm.addEventListener("input", onReviewEdit);
   confirmForm.addEventListener("change", onReviewEdit);
+  confirmForm.addEventListener("keyup", function (event) {
+    var key = event.key || "";
+    if (key.length !== 1 && key !== "Backspace" && key !== "Delete") return;
+    if (!event.target || event.target.tagName !== "INPUT") return;
+    onReviewEdit(event);
+  });
   document.getElementById("games-block").addEventListener("click", function (event) {
     var button = event.target.closest(".game-toggle");
     if (!button) return;
