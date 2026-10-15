@@ -67,6 +67,9 @@
         winners: result.winners,
         homeGamesWon: result.homeGamesWon,
         awayGamesWon: result.awayGamesWon,
+        side: result.side,
+        roster: result.roster,
+        games: result.games,
         counts: result.counts,
         calibration: result.calibration,
         trace: result.trace
@@ -90,7 +93,30 @@
       return fetch("../scoresheet/" + name).then(function (response) { return response.json(); });
     }
 
-    if (sheet === "v8") {
+    if (sheet === "v16") {
+      Promise.all([
+        specJson("scansheet_v16_layout_spec.json"),
+        loadImage("fixtures/filled-v16.jpg")
+      ]).then(function (parts) {
+        var spec = parts[0];
+        var canvas = downscale(draw(parts[1]), 1600);
+        var turns = [0, 1, 2, 3];
+        var readings = [];
+        function next(index) {
+          if (index >= turns.length) {
+            document.getElementById("result").textContent = JSON.stringify({ v16: readings });
+            return Promise.resolve();
+          }
+          return RAD_OCR.readSheet(rotateTurns(canvas, turns[index]), spec).then(function (result) {
+            readings.push(slim(result));
+            return next(index + 1);
+          });
+        }
+        return next(0);
+      }).catch(function (err) {
+        document.getElementById("result").textContent = JSON.stringify({ error: String(err && err.message || err) });
+      });
+    } else if (sheet === "v8") {
       Promise.all([
         specJson("scansheet_v8_layout_spec.json"),
         specJson("scansheet_v7_layout_spec.json"),

@@ -55,9 +55,21 @@
         <p><strong>You confirm before anything is saved.</strong> The page reads the filled bubbles in this browser. It does not send the photo anywhere, and it does not keep the photo. A blank row is left empty. It is not a zero.</p>
         <p>Team names, the captain, and the date are handwritten, so they are not read. Type those below. The <a href="index.html#score">typed score sheet</a> is still there when you would rather not use a photo.</p>
       </div>
-      <p>Photograph the filled sheet flat, in even light, with all four black corner squares in the frame. A sideways or upside-down photo is turned upright from those squares. If one corner is cut off, that corner is estimated from the other three. The legal sheet uses phone-keypad keys: fill one key in TENS and one in ONES. The letter sheet uses one bubble per row. The written score boxes between the keys are for people, and the page does not read them. If the corner squares cannot be found, retake the photo.</p>
-      <p><a class="btn btn-primary" href="scoresheet/roslyn_scansheet_v8.pdf">Download the scan sheet (v8, legal)</a> <a class="btn btn-ink" href="scoresheet/roslyn_scansheet_v7.pdf">Letter sheet (v7)</a></p>
+      <p>Each team fills its own letter sheet. Photograph it flat, in even light, with all four black corner squares in the frame. You can scan it with the camera or choose a photo you already took. A sideways or upside-down photo is turned upright from those squares. The written names, the date, the opponent, and the small score boxes are not read.</p>
+      <p><a class="btn btn-primary" href="scoresheet/roslyn_scansheet_v16.pdf">Download the scan sheet (v16)</a></p>
       <form id="pick-form" class="sheet stack">
+        <button class="btn btn-primary btn-xl" id="scan-camera" type="button">Scan with camera</button>
+        <div id="camera-panel" class="camera-panel" hidden>
+          <div class="camera-stage">
+            <video id="camera-video" playsinline muted autoplay></video>
+            <canvas id="camera-guide" aria-hidden="true"></canvas>
+          </div>
+          <p id="camera-status" class="camera-status" role="status">Fit all 4 corners</p>
+          <div class="camera-actions">
+            <button class="btn btn-primary btn-xl" id="camera-snap" type="button">Snap</button>
+            <button class="btn btn-xl btn-cancel" id="camera-cancel" type="button">Cancel</button>
+          </div>
+        </div>
         <label class="field">Photo of the filled sheet
           <input id="sheet-file" name="photo" type="file" accept="image/*">
         </label>
@@ -81,63 +93,39 @@
         <p class="eyebrow">Confirm</p>
         <h2>Check the reading</h2>
       </div>
-      <p>Fix anything that is wrong, then save. Games 1–3 decide the match. The beer frame and the total-points bubble are not league games. A red note means the shooters do not add up to that game’s team total.</p>
+      <p>Fix anything that is wrong, then save this team’s sheet. A red note means the four shooter scores do not add up to that game’s team total. Standings update when the other team’s sheet for the same date is saved too.</p>
       <form id="confirm-form" class="sheet">
         <div class="form-grid cols-3">
           <label class="field">Match date
             <input id="confirm-date" name="date" type="date" required>
           </label>
-          <label class="field">Home team, as written
-            <input id="home-name" name="home-name" type="text" autocomplete="off" maxlength="80">
+          <label class="field">This sheet is
+            <select id="sheet-side" name="side">
+              <option value="">Not marked</option>
+              <option value="home">Home</option>
+              <option value="away">Away</option>
+            </select>
+            <span id="sheet-side-flag" class="bubble-flag"></span>
           </label>
-          <label class="field">Home team on the list
-            <select id="home-team" name="home-team"></select>
+          <label class="field">This team, as written
+            <input id="team-name" name="team-name" type="text" autocomplete="off" maxlength="80">
           </label>
-          <label class="field">Away team, as written
-            <input id="away-name" name="away-name" type="text" autocomplete="off" maxlength="80">
+          <label class="field">This team on the list
+            <select id="team-select" name="team"></select>
           </label>
-          <label class="field">Away team on the list
-            <select id="away-team" name="away-team"></select>
+          <label class="field">Opponent, as written
+            <input id="opponent-name" name="opponent-name" type="text" autocomplete="off" maxlength="80">
           </label>
-        </div>
-
-        <div id="home-block" class="side-block"></div>
-        <div id="away-block" class="side-block"></div>
-
-        <h3 class="winners-heading">Winners</h3>
-        <div class="form-grid cols-3 winner-grid">
-          <label class="field">Game 1
-            <select id="win-g1"></select>
-            <span id="win-g1-flag" class="bubble-flag"></span>
-          </label>
-          <label class="field">Game 2
-            <select id="win-g2"></select>
-            <span id="win-g2-flag" class="bubble-flag"></span>
-          </label>
-          <label class="field">Game 3
-            <select id="win-g3"></select>
-            <span id="win-g3-flag" class="bubble-flag"></span>
-          </label>
-          <label class="field">Beer frame (not counted)
-            <select id="win-beer"></select>
-            <span id="win-beer-flag" class="bubble-flag"></span>
-          </label>
-          <label class="field">Total points (not a league game)
-            <select id="win-points"></select>
-            <span id="win-points-flag" class="bubble-flag"></span>
+          <label class="field">Opponent on the list
+            <select id="opponent-select" name="opponent"></select>
           </label>
         </div>
 
-        <div class="form-grid cols-3">
-          <label class="field">Home games won
-            <input id="home-won" type="number" min="0" max="3" inputmode="numeric" value="0">
-          </label>
-          <label class="field">Away games won
-            <input id="away-won" type="number" min="0" max="3" inputmode="numeric" value="0">
-          </label>
-        </div>
-        <p class="eyebrow">Final score</p>
-        <p id="final-score" class="final-score" aria-live="polite">0–0</p>
+        <h3 class="winners-heading">Roster ids</h3>
+        <div id="roster-block" class="side-block"></div>
+        <div id="games-block" class="side-block"></div>
+        <p class="eyebrow">This team</p>
+        <p id="final-score" class="final-score" aria-live="polite">0 games won</p>
         <p id="sheet-points" class="status"></p>
         <p id="confirm-error" class="alert" role="alert" hidden></p>
         <div class="form-actions">
@@ -168,13 +156,13 @@
             <small>American Darts</small>
           </span>
         </a>
-        <p>Photo reading for the v8 legal scan sheet and the v7 letter sheet. SAMPLE marks invented names, numbers, and dates.</p>
+        <p>Photo reading for the v16 one-team scan sheet. SAMPLE marks invented names, numbers, and dates.</p>
       </div>
       <address class="address">
         <p>1140 Easton Rd<br>Abington, PA 19001</p>
         <p>VFW phone: <a href="tel:+12155769349">(215) 576-9349</a></p>
       </address>
-      <p><a href="scoresheet/roslyn_scansheet_v8.pdf">Scan sheet (v8, legal)</a><br><a href="scoresheet/roslyn_scansheet_v7.pdf">Letter sheet (v7)</a><br><a href="index.html#score">Typed score sheet</a><br><a href="admin.html">Admin</a></p>
+      <p><a href="scoresheet/roslyn_scansheet_v16.pdf">Scan sheet (v16)</a><br><a href="index.html#score">Typed score sheet</a><br><a href="admin.html">Admin</a></p>
     </div>
   </footer>
 
