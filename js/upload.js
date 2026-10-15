@@ -28,7 +28,6 @@
   var confirmError = document.getElementById("confirm-error");
   var savedNote = document.getElementById("saved-note");
   var finalScoreEl = document.getElementById("final-score");
-  var sheetPointsEl = document.getElementById("sheet-points");
   var scanButton = document.getElementById("scan-camera");
   var cameraPanel = document.getElementById("camera-panel");
   var cameraVideo = document.getElementById("camera-video");
@@ -239,11 +238,20 @@
         el.textContent = "Game " + game + ": shooters add up to the team total (" + sum + ").";
       }
     });
-    var totals = GAMES.map(function (game) {
+    var sum = 0;
+    var complete = true;
+    GAMES.forEach(function (game) {
       var value = numberOrNull(document.getElementById("g" + game + "-team"));
-      return value == null ? "—" : value;
+      var cell = document.getElementById("save-total-" + game);
+      if (value == null) {
+        cell.textContent = "—";
+        complete = false;
+      } else {
+        cell.textContent = String(value);
+        sum += value;
+      }
     });
-    sheetPointsEl.textContent = totals.length ? "Team totals " + totals.join(", ") : "";
+    document.getElementById("save-total-sum").textContent = complete ? String(sum) : "—";
     updateFinalScore();
   }
 
@@ -345,7 +353,7 @@
   }
 
   function loadSpec() {
-    var version = window.RAD_ASSET_VERSION || "20261015g";
+    var version = window.RAD_ASSET_VERSION || "20261015h";
     return fetch("scoresheet/scansheet_v16_layout_spec.json?v=" + encodeURIComponent(version), { cache: "no-store" }).then(function (response) {
       if (!response.ok) throw new Error("The scan sheet layout could not be loaded (" + response.status + "). Reload the page and try again.");
       return response.json();

@@ -219,6 +219,8 @@ async function main() {
         beer: val("beer-result"),
         points: val("points-result"),
         finalScore: document.getElementById("final-score").textContent,
+        finalSize: getComputedStyle(document.getElementById("final-score")).fontSize,
+        totals: ["save-total-1", "save-total-2", "save-total-3", "save-total-sum"].map((id) => document.getElementById(id).textContent),
         summary: document.getElementById("ocr-summary").textContent
       };
     });
@@ -237,6 +239,8 @@ async function main() {
     if (form.beer !== "") formProblems.push("beer " + form.beer);
     if (form.points !== "won") formProblems.push("points " + form.points);
     if (!/2 games won/.test(form.finalScore)) formProblems.push("final " + form.finalScore);
+    if (parseFloat(form.finalSize) > 22) formProblems.push("final size " + form.finalSize);
+    if (form.totals.join(",") !== "63,50,149,262") formProblems.push("sticky totals " + form.totals.join(","));
     if (!/home/i.test(form.summary) || !/2 games won/.test(form.summary)) formProblems.push("summary " + form.summary);
     if (formProblems.length) {
       console.error(form);
@@ -250,6 +254,16 @@ async function main() {
     if (edited !== "99") throw new Error("roster edit did not stick");
     await upload.$eval("#roster-A", (el) => {
       el.value = "12";
+      el.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    await upload.$eval("#g1-team", (el) => {
+      el.value = "80";
+      el.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    const liveTotals = await upload.evaluate(() => ["save-total-1", "save-total-2", "save-total-3", "save-total-sum"].map((id) => document.getElementById(id).textContent).join(","));
+    if (liveTotals !== "80,50,149,279") throw new Error("live totals " + liveTotals);
+    await upload.$eval("#g1-team", (el) => {
+      el.value = "63";
       el.dispatchEvent(new Event("input", { bubbles: true }));
     });
     console.log("upload review shows the v16 reading and accepts edits");
