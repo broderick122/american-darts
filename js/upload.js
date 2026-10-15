@@ -297,9 +297,14 @@
   }
 
   function loadSpec() {
-    return fetch("scoresheet/scansheet_v16_layout_spec.json").then(function (response) {
-      if (!response.ok) throw new Error("The scan sheet layout could not be loaded.");
+    var version = window.RAD_ASSET_VERSION || "20261015c";
+    return fetch("scoresheet/scansheet_v16_layout_spec.json?v=" + encodeURIComponent(version), { cache: "no-store" }).then(function (response) {
+      if (!response.ok) throw new Error("The scan sheet layout could not be loaded (" + response.status + "). Reload the page and try again.");
       return response.json();
+    }).then(function (spec) {
+      var problem = RAD_OCR.specProblem(spec);
+      if (problem) throw new Error(problem);
+      return spec;
     });
   }
 
@@ -560,18 +565,43 @@
     if (cameraVideo) cameraVideo.srcObject = null;
   }
 
-  function drawBrackets(ctx, width, height) {
-    var inset = Math.round(Math.min(width, height) * 0.12);
-    var arm = Math.round(Math.min(width, height) * 0.12);
+  function containedRect(boxW, boxH, mediaW, mediaH) {
+    if (!boxW || !boxH || !mediaW || !mediaH) return { x: 0, y: 0, width: boxW || 0, height: boxH || 0 };
+    var scale = Math.min(boxW / mediaW, boxH / mediaH);
+    var width = mediaW * scale;
+    var height = mediaH * scale;
+    return { x: (boxW - width) / 2, y: (boxH - height) / 2, width: width, height: height };
+  }
+
+  function sheetAspect() {
+    var size = camera.spec && camera.spec.page && camera.spec.page.size_pt;
+    if (size && size[0] && size[1]) return size[0] / size[1];
+    return 612 / 792;
+  }
+
+  function drawPortraitGuide(ctx, rect) {
+    var aspect = sheetAspect();
+    var maxW = rect.width * 0.9;
+    var maxH = rect.height * 0.9;
+    var w = maxW;
+    var h = w / aspect;
+    if (h > maxH) {
+      h = maxH;
+      w = h * aspect;
+    }
+    var x = rect.x + (rect.width - w) / 2;
+    var y = rect.y + (rect.height - h) / 2;
+    var arm = Math.max(16, Math.round(Math.min(w, h) * 0.08));
     var corners = [
-      [inset, inset, 1, 1],
-      [width - inset, inset, -1, 1],
-      [width - inset, height - inset, -1, -1],
-      [inset, height - inset, 1, -1]
+      [x, y, 1, 1],
+      [x + w, y, -1, 1],
+      [x + w, y + h, -1, -1],
+      [x, y + h, 1, -1]
     ];
     ctx.strokeStyle = "#ffe14a";
-    ctx.lineWidth = 8;
+    ctx.lineWidth = 6;
     ctx.lineCap = "square";
+    ctx.strokeRect(x, y, w, h);
     corners.forEach(function (corner) {
       ctx.beginPath();
       ctx.moveTo(corner[0], corner[1] + corner[3] * arm);
@@ -589,20 +619,21 @@
     cameraGuide.height = height;
     var ctx = cameraGuide.getContext("2d");
     ctx.clearRect(0, 0, width, height);
+    var rect = containedRect(width, height, cameraVideo.videoWidth || width, cameraVideo.videoHeight || height);
     if (!hit || !hit.found || !hit.corners) {
-      drawBrackets(ctx, width, height);
+      drawPortraitGuide(ctx, rect);
       return;
     }
-    var sx = width / hit.width;
-    var sy = height / hit.height;
+    var sx = rect.width / hit.width;
+    var sy = rect.height / hit.height;
     var order = ["TL", "TR", "BR", "BL"];
     ctx.strokeStyle = "#ffe14a";
     ctx.lineWidth = 6;
     ctx.beginPath();
     order.forEach(function (name, index) {
       var point = hit.corners[name];
-      var x = point.x * sx;
-      var y = point.y * sy;
+      var x = rect.x + point.x * sx;
+      var y = rect.y + point.y * sy;
       if (index) ctx.lineTo(x, y);
       else ctx.moveTo(x, y);
     });
@@ -621,18 +652,31 @@
   }
 
   function captureFrame() {
-    if (camera.capturing || reading) return;
+    if (camera.capturing) return;
     var width = cameraVideo.videoWidth;
     var height = cameraVideo.videoHeight;
     if (!width || !height) {
-      setCameraStatus("The camera has no picture yet.");
+      var waiting = "The camera has no picture yet. Wait until you see the sheet, then tap Snap.";
+      setCameraStatus(waiting);
+      showError(errorEl, waiting);
+      return;
+    }
+    if (reading) {
+      setCameraStatus("Still reading the last photo…");
       return;
     }
     camera.capturing = true;
     var canvas = document.createElement("canvas");
     canvas.width = width;
     canvas.height = height;
-    canvas.getContext("2d").drawImage(cameraVideo, 0, 0, width, height);
+    try {
+      canvas.getContext("2d").drawImage(cameraVideo, 0, 0, width, height);
+    } catch (err) {
+      camera.capturing = false;
+      showError(errorEl, "The camera picture could not be captured. Tap Snap again.");
+      setCameraStatus("Tap Snap again.");
+      return;
+    }
     stopCamera();
     cameraPanel.hidden = true;
     scanButton.hidden = false;
@@ -640,8 +684,10 @@
     reading = true;
     readButton.disabled = true;
     readCanvas(canvas).catch(function (err) {
-      showError(errorEl, err && err.message ? err.message : "The photo could not be read.");
-      setStatus("");
+      var message = err && err.message ? err.message : "The photo could not be read. Reload the page and try again.";
+      showError(errorEl, message);
+      setStatus(message);
+      showConfirm();
     }).then(finishRead);
   }
 
@@ -654,7 +700,7 @@
       return;
     }
     var canvas = document.createElement("canvas");
-    var scale = Math.min(1, 640 / Math.max(width, height));
+    var scale = Math.min(1, 1100 / Math.max(width, height));
     canvas.width = Math.max(1, Math.round(width * scale));
     canvas.height = Math.max(1, Math.round(height * scale));
     canvas.getContext("2d").drawImage(cameraVideo, 0, 0, canvas.width, canvas.height);

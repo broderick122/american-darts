@@ -2,6 +2,8 @@ node_modules/
 test/fixtures/filled-v7.jpg
 test/fixtures/filled-v8.jpg
 test/fixtures/filled-v16.jpg
+test/fixtures/phone-land.jpg
+test/fixtures/phone-port.jpg
 test/fixtures/expected.json
 test/fixtures/expected-v8.json
 test/fixtures/expected-v16.json

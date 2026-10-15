@@ -294,7 +294,7 @@
     var bottom = dist(ordered.BL, ordered.BR);
     var left = dist(ordered.TL, ordered.BL);
     var right = dist(ordered.TR, ordered.BR);
-    if (top < 40 || left < 40) return -1;
+    if (top < 22 || left < 22) return -1;
     var sideMismatch = Math.abs(top - bottom) / Math.max(top, bottom) + Math.abs(left - right) / Math.max(left, right);
     if (sideMismatch > 0.45) return -1;
     var aspect = ((top + bottom) / 2) / ((left + right) / 2);
@@ -504,6 +504,31 @@
     return 0;
   }
 
+  function bandDark(data, width, height, H, ny) {
+    if (!H) return 0;
+    var dark = 0;
+    var total = 0;
+    var ix, point, xi, yi;
+    for (ix = 0; ix < 14; ix += 1) {
+      point = applyNorm(H, 0.06 + ix * 0.04, ny);
+      xi = Math.round(point.x);
+      yi = Math.round(point.y);
+      if (xi < 1 || yi < 1 || xi >= width - 1 || yi >= height - 1) continue;
+      total += 1;
+      if (luminance(data, (yi * width + xi) * 4) < 140) dark += 1;
+    }
+    return total ? dark / total : 0;
+  }
+
+  /* v16 has no QR. The title sits near the top, so a dark band there and a
+     lighter band at the bottom means this rotation is upright. */
+  function uprightCue(data, width, height, H) {
+    var top = Math.max(bandDark(data, width, height, H, 0.012), bandDark(data, width, height, H, 0.028));
+    var bottom = bandDark(data, width, height, H, 0.97);
+    if (top > 0.1 && top > bottom + 0.06) return 1;
+    return 0;
+  }
+
   function eachTrio(list, fn) {
     var i, j, k;
     for (i = 0; i < list.length; i += 1) {
@@ -520,9 +545,10 @@
     if (!H) return -1;
     var qr = qrScore(data, width, height, H, spec.qr && spec.qr.bbox_norm);
     var header = headerScore(data, width, height, H);
-    if (qr < 2 && !ordered.TL.notch) return -1;
+    var upright = spec.qr ? 0 : uprightCue(data, width, height, H);
+    if (qr < 2 && !ordered.TL.notch && upright < 1) return -1;
     var estimated = ordered.TL.estimated || ordered.TR.estimated || ordered.BL.estimated || ordered.BR.estimated;
-    return geom / 100000 + qr * 4 + header + (ordered.TL.notch ? 6 : 0) + (estimated ? -1 : 2);
+    return geom / 100000 + qr * 4 + header + upright * 3 + (ordered.TL.notch ? 6 : 0) + (estimated ? -1 : 2);
   }
 
   function pickSeparated(comps, canvas) {
@@ -673,9 +699,29 @@
     return { ordered: bestOrdered, align: bestScore };
   }
 
+  /* The strict notch test needs a sharp white square. On a small or blurry
+     frame the notched corner is still the brightest center, so mark that one. */
+  function promoteNotch(list) {
+    var i, best, gap, nextGap;
+    if (!list || list.length < 2) return;
+    best = list[0];
+    for (i = 1; i < list.length; i += 1) {
+      if ((list[i].inner - list[i].edge) > (best.inner - best.edge)) best = list[i];
+    }
+    if (best.notch) return;
+    nextGap = -999;
+    for (i = 0; i < list.length; i += 1) {
+      if (list[i] === best) continue;
+      gap = list[i].inner - list[i].edge;
+      if (gap > nextGap) nextGap = gap;
+    }
+    gap = best.inner - best.edge;
+    if (gap >= 14 && gap >= nextGap + 8 && best.inner >= 35) best.notch = true;
+  }
+
   function locateMarks(canvas, specOrSpecs) {
     var specs = Array.isArray(specOrSpecs) ? specOrSpecs : [specOrSpecs];
-    var maxDim = 960;
+    var maxDim = 1280;
     var scaleDown = Math.min(1, maxDim / Math.max(canvas.width, canvas.height));
     var sw = Math.max(1, Math.round(canvas.width * scaleDown));
     var sh = Math.max(1, Math.round(canvas.height * scaleDown));
@@ -719,6 +765,7 @@
     if (comps.length > 16) comps = comps.slice(0, 16);
     var pool = pickSeparated(comps, canvas);
     if (pool.length < 3) pool = comps.slice(0, 8);
+    promoteNotch(pool);
 
     var best = null;
     function consider(ordered) {
@@ -1166,10 +1213,11 @@
     return sum2 / n - mean * mean;
   }
 
-  /* Downscaled corner check for the live camera. Does not read bubbles. */
+  /* Downscaled corner check for the live camera. Does not read bubbles.
+     1100 keeps the white notch visible on a 1080p frame; 640 washed it out. */
   function previewCorners(canvas, spec) {
     var specs = specsOf(spec);
-    var small = limitCanvas(canvas, 640);
+    var small = limitCanvas(canvas, 1100);
     var sharp = sharpnessOf(small);
     if (!specs) return { found: false, count: 0, sharpness: sharp, corners: null, width: small.width, height: small.height };
     var located = locateMarks(small, specs);
@@ -1655,15 +1703,33 @@
     return result;
   }
 
+  function specProblem(spec) {
+    var missing;
+    if (!spec || typeof spec !== "object") {
+      return "The scan sheet layout did not load. Reload the page and try again.";
+    }
+    if (!spec.fiducials) {
+      return "The scan sheet layout has no corner markers. Reload the page so the latest sheet file is used.";
+    }
+    if (spec.version === "v16") {
+      missing = ["number_fields", "roster_fields", "who_fields", "side_field", "result_fields"].filter(function (key) {
+        return !spec[key];
+      });
+      if (missing.length) {
+        return "This page is mixing an old reader with the new sheet (missing " + missing.join(", ") + "). Reload the page, then take the photo again.";
+      }
+    } else if (!spec.number_fields) {
+      return "The scan sheet layout is not the v16 sheet. Reload the page and try again.";
+    }
+    return "";
+  }
+
   function specsOf(spec) {
     var list = Array.isArray(spec) ? spec : [spec];
     var i;
     if (!list.length) return null;
     for (i = 0; i < list.length; i += 1) {
-      if (!list[i] || !list[i].fiducials) return null;
-      if (list[i].version === "v16") {
-        if (!list[i].number_fields || !list[i].roster_fields || !list[i].who_fields || !list[i].side_field || !list[i].result_fields) return null;
-      } else if (!list[i].number_fields) return null;
+      if (specProblem(list[i])) return null;
     }
     return list;
   }
@@ -1671,7 +1737,7 @@
   function readSheet(sourceCanvas, spec, onProgress) {
     var specs = specsOf(spec);
     if (!specs) {
-      return Promise.reject(new Error("The scan sheet layout is missing."));
+      return Promise.reject(new Error(specProblem(Array.isArray(spec) ? spec[0] : spec) || "The scan sheet layout could not be used. Reload the page and try again."));
     }
     say(onProgress, "Looking for the corner squares…");
     var canvas = limitCanvas(sourceCanvas, 1700);
@@ -1823,6 +1889,7 @@
   root.RAD_OCR = {
     readSheet: readSheet,
     loadImageFile: loadImageFile,
-    previewCorners: previewCorners
+    previewCorners: previewCorners,
+    specProblem: specProblem
   };
 })(typeof window !== "undefined" ? window : globalThis);
