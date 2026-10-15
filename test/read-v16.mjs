@@ -259,6 +259,7 @@ async function main() {
 
     await upload.select("#team-select", "t_red");
     await upload.select("#opponent-select", "t_green");
+    await upload.select("#g2-s2-who", "F");
     await upload.$eval("#confirm-date", (el) => { el.value = "2026-11-04"; });
     await upload.click("#confirm-submit");
     await upload.waitForFunction(() => /opponent's sheet/i.test(document.getElementById("saved-note").textContent || ""));
@@ -275,6 +276,61 @@ async function main() {
     const stored = await upload.evaluate(() => JSON.parse(localStorage.getItem("rad.sheets.v1") || "[]"));
     if (stored.length !== 2) throw new Error("stored sheets " + stored.length);
     console.log("paired two team sheets: " + paired.trim());
+
+    await upload.setViewport({ width: 390, height: 844, deviceScaleFactor: 1 });
+    await upload.evaluate(() => {
+      document.getElementById("confirm-date").value = "";
+      document.getElementById("g2-s3-who").value = "";
+      var card = document.querySelector('[data-game="2"]');
+      card.classList.add("is-collapsed");
+      card.querySelector(".game-toggle").setAttribute("aria-expanded", "false");
+      card.querySelector(".game-toggle-state").textContent = "Show";
+    });
+    await upload.click("#confirm-submit");
+    await upload.waitForFunction(() => {
+      const date = document.getElementById("confirm-date");
+      if (document.activeElement !== date) return false;
+      const field = date.closest(".field").getBoundingClientRect();
+      const save = document.querySelector(".save-bar").getBoundingClientRect();
+      const header = document.querySelector(".site-header").getBoundingClientRect();
+      const nav = document.querySelector(".thumb-nav").getBoundingClientRect();
+      const limit = Math.min(save.top, nav.top);
+      return field.top >= header.bottom - 4 && field.bottom <= limit + 4;
+    }, { timeout: 5000 });
+    const missing = await upload.evaluate(() => {
+      const who = document.getElementById("g2-s3-who");
+      const card = who.closest(".game-card");
+      return {
+        count: document.getElementById("missing-count").textContent,
+        dateMsg: document.getElementById("confirm-date").closest(".field").querySelector(".missing-note").textContent,
+        whoMsg: who.closest(".field").querySelector(".missing-note").textContent,
+        expanded: !card.classList.contains("is-collapsed"),
+        labels: Array.from(document.querySelectorAll("#missing-list button")).map((button) => button.textContent)
+      };
+    });
+    if (missing.count !== "2 items missing") throw new Error("missing count " + missing.count);
+    if (missing.dateMsg !== "Add the match date.") throw new Error("date message " + missing.dateMsg);
+    if (missing.whoMsg !== "Pick who shot Game 2, S3.") throw new Error("who message " + missing.whoMsg);
+    if (!missing.expanded) throw new Error("game 2 stayed collapsed");
+    if (!missing.labels.some((text) => text.indexOf("Match date") === 0) || !missing.labels.some((text) => text.indexOf("Game 2, shooter 3, who") === 0)) {
+      throw new Error("summary labels " + missing.labels.join(" | "));
+    }
+    await upload.evaluate(() => document.querySelector('#missing-list button[data-goto="g2-s3-who"]').click());
+    await upload.waitForFunction(() => {
+      const who = document.getElementById("g2-s3-who");
+      if (document.activeElement !== who) return false;
+      const field = who.closest(".field").getBoundingClientRect();
+      const save = document.querySelector(".save-bar").getBoundingClientRect();
+      const header = document.querySelector(".site-header").getBoundingClientRect();
+      return field.top >= header.bottom - 4 && field.bottom <= save.top + 4;
+    }, { timeout: 5000 });
+    await upload.select("#g2-s3-who", "A");
+    await upload.waitForFunction(() => {
+      const who = document.getElementById("g2-s3-who");
+      return !who.closest(".field").classList.contains("is-missing") &&
+        document.getElementById("missing-count").textContent === "1 item missing";
+    });
+    console.log("save scrolls to the first missing field and clears a fix");
 
     const denied = await browser.newPage();
     await installCamera(denied, "denied", origin + "/test/fixtures/filled-v16.jpg");

@@ -11,8 +11,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script>window.RAD_ASSET_VERSION = "20261015d";</script>
-  <link rel="stylesheet" href="css/styles.css?v=20261015d">
+  <script>window.RAD_ASSET_VERSION = "20261015e";</script>
+  <link rel="stylesheet" href="css/styles.css?v=20261015e">
 </head>
 <body class="page-upload">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -97,10 +97,14 @@
         <h2>Check the reading</h2>
       </div>
       <p>Fix anything that is wrong, then save this team’s sheet. A red note means the four shooter scores do not add up to that game’s team total. Standings use Won and Lost, not the point totals. They update when the other team’s sheet for the same date is saved too.</p>
-      <form id="confirm-form" class="sheet">
+      <form id="confirm-form" class="sheet" novalidate>
+        <div id="missing-summary" class="missing-summary" hidden>
+          <p id="missing-count"></p>
+          <ul id="missing-list"></ul>
+        </div>
         <div class="form-grid cols-3">
           <label class="field">Match date
-            <input id="confirm-date" name="date" type="date" required>
+            <input id="confirm-date" name="date" type="date">
           </label>
           <label class="field">This sheet is
             <select id="sheet-side" name="side">
@@ -177,9 +181,9 @@
     <a href="upload.html" aria-current="page">Scan</a>
     <a href="scoresheet/roslyn_scansheet_v16.pdf">Sheet</a>
   </nav>
-  <script src="config.js?v=20261015d"></script>
-  <script src="js/data.js?v=20261015d"></script>
-  <script src="js/sheet-ocr.js?v=20261015d"></script>
-  <script src="js/upload.js?v=20261015d"></script>
+  <script src="config.js?v=20261015e"></script>
+  <script src="js/data.js?v=20261015e"></script>
+  <script src="js/sheet-ocr.js?v=20261015e"></script>
+  <script src="js/upload.js?v=20261015e"></script>
 </body>
 </html>

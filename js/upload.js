@@ -81,32 +81,56 @@
     return html;
   }
 
+  function fieldBox(label, control) {
+    return '<label class="field">' + label + control + '<span class="missing-note"></span></label>';
+  }
+
+  function gameSection(id, title, body) {
+    return '<section class="game-card" data-game="' + id + '">' +
+      '<h3><button type="button" class="game-toggle" aria-expanded="true" aria-controls="game-body-' + id + '">' +
+      "<span>" + title + '</span><span class="game-toggle-state">Hide</span></button></h3>' +
+      '<div class="game-body" id="game-body-' + id + '">' + body + "</div></section>";
+  }
+
   function buildReview() {
     document.getElementById("roster-block").innerHTML =
       '<p class="roster-note">Roster ids A through H. An empty id was not read as zero.</p>' +
       '<div class="roster-grid">' +
       SLOTS.map(function (slot) {
-        return '<label class="field">' + slot +
+        return fieldBox(slot,
           '<input id="roster-' + slot + '" type="number" min="0" max="99" inputmode="numeric" placeholder="—" aria-label="Roster ' + slot + ' id">' +
-          '<span id="roster-' + slot + '-flag" class="bubble-flag"></span></label>';
+          '<span id="roster-' + slot + '-flag" class="bubble-flag"></span>');
       }).join("") +
       "</div>";
 
     document.getElementById("games-block").innerHTML = GAMES.map(function (game) {
       var rows = SHOOTERS.map(function (n) {
         return '<div class="shooter"><p class="shooter-label">Shooter ' + n + "</p>" +
-          '<label class="field">Who<select id="g' + game + "-s" + n + '-who" aria-label="Game ' + game + " shooter " + n + ' who">' +
-          slotOptions("") + '</select><span id="g' + game + "-s" + n + '-who-flag" class="bubble-flag"></span></label>' +
-          '<label class="field">Score<input id="g' + game + "-s" + n + '-score" type="number" min="0" max="49" inputmode="numeric" placeholder="—" aria-label="Game ' + game + " shooter " + n + ' score">' +
-          '<span id="g' + game + "-s" + n + '-score-flag" class="bubble-flag"></span></label></div>';
+          fieldBox("Who",
+            '<select id="g' + game + "-s" + n + '-who" aria-label="Game ' + game + " shooter " + n + ' who">' +
+            slotOptions("") + '</select><span id="g' + game + "-s" + n + '-who-flag" class="bubble-flag"></span>') +
+          fieldBox("Score",
+            '<input id="g' + game + "-s" + n + '-score" type="number" min="0" max="49" inputmode="numeric" placeholder="—" aria-label="Game ' + game + " shooter " + n + ' score">' +
+            '<span id="g' + game + "-s" + n + '-score-flag" class="bubble-flag"></span>') +
+          "</div>";
       }).join("");
-      return '<section class="game-card"><h3>Game ' + game + "</h3>" + rows +
-        '<div class="game-totals"><label class="field">Team total<input id="g' + game + '-team" type="number" min="0" max="199" inputmode="numeric" placeholder="—"><span id="g' + game + '-team-flag" class="bubble-flag"></span></label>' +
-        '<label class="field">Result<select id="g' + game + '-result"><option value="">Not marked</option><option value="won">Won</option><option value="lost">Lost</option></select><span id="g' + game + '-result-flag" class="bubble-flag"></span></label></div>' +
-        '<p id="g' + game + '-check" class="cross-check"></p></section>';
+      var totals =
+        '<div class="game-totals">' +
+        fieldBox("Team total",
+          '<input id="g' + game + '-team" type="number" min="0" max="199" inputmode="numeric" placeholder="—"><span id="g' + game + '-team-flag" class="bubble-flag"></span>') +
+        fieldBox("Result",
+          '<select id="g' + game + '-result"><option value="">Not marked</option><option value="won">Won</option><option value="lost">Lost</option></select><span id="g' + game + '-result-flag" class="bubble-flag"></span>') +
+        "</div>" +
+        '<p id="g' + game + '-check" class="cross-check"></p>';
+      return gameSection(String(game), "Game " + game, rows + totals);
     }).join("") +
-      '<section class="game-card"><h3>Frames</h3><div class="game-totals"><label class="field">Beer frame<select id="beer-result"><option value="">Not marked</option><option value="won">Won</option><option value="lost">Lost</option></select><span id="beer-result-flag" class="bubble-flag"></span></label>' +
-      '<label class="field">Total points<select id="points-result"><option value="">Not marked</option><option value="won">Won</option><option value="lost">Lost</option></select><span id="points-result-flag" class="bubble-flag"></span></label></div></section>';
+      gameSection("frames", "Frames",
+        '<div class="game-totals">' +
+        fieldBox("Beer frame",
+          '<select id="beer-result"><option value="">Not marked</option><option value="won">Won</option><option value="lost">Lost</option></select><span id="beer-result-flag" class="bubble-flag"></span>') +
+        fieldBox("Total points",
+          '<select id="points-result"><option value="">Not marked</option><option value="won">Won</option><option value="lost">Lost</option></select><span id="points-result-flag" class="bubble-flag"></span>') +
+        "</div>");
   }
 
   buildReview();
@@ -224,6 +248,7 @@
   }
 
   function clearSheet() {
+    clearMissing();
     setChoice("sheet-side", "", "blank");
     SLOTS.forEach(function (slot) { setNumber("roster-" + slot, { status: "blank" }); });
     GAMES.forEach(function (game) {
@@ -260,6 +285,7 @@
   }
 
   function applyReading(result) {
+    clearMissing();
     window.RAD_UPLOAD_LAST = result;
     summaryEl.textContent = describeReading(result);
     var shown = (result.warnings || []).slice(0, 8);
@@ -316,7 +342,7 @@
   }
 
   function loadSpec() {
-    var version = window.RAD_ASSET_VERSION || "20261015d";
+    var version = window.RAD_ASSET_VERSION || "20261015e";
     return fetch("scoresheet/scansheet_v16_layout_spec.json?v=" + encodeURIComponent(version), { cache: "no-store" }).then(function (response) {
       if (!response.ok) throw new Error("The scan sheet layout could not be loaded (" + response.status + "). Reload the page and try again.");
       return response.json();
@@ -456,27 +482,235 @@
     });
   }
 
+  var reviewInvalid = false;
+
+  function blankValue(input) {
+    return !input || String(input.value).trim() === "";
+  }
+
+  function inRange(input, min, max) {
+    var raw = String(input.value).trim();
+    if (raw === "") return false;
+    var value = Number(raw);
+    return isFinite(value) && value >= min && value <= max;
+  }
+
+  function collectMissing() {
+    var items = [];
+    function add(id, label, message) {
+      items.push({ id: id, label: label, message: message });
+    }
+    var date = document.getElementById("confirm-date");
+    if (blankValue(date)) add("confirm-date", "Match date", "Add the match date.");
+    var side = document.getElementById("sheet-side");
+    if (side.value !== "home" && side.value !== "away") add("sheet-side", "This sheet is", "Mark this sheet Home or Away.");
+    var teamSelect = document.getElementById("team-select");
+    var teamName = document.getElementById("team-name");
+    var opponentSelect = document.getElementById("opponent-select");
+    var opponentName = document.getElementById("opponent-name");
+    if (!teamSelect.value) add("team-select", "This team on the list", "Pick this team.");
+    else if (teamSelect.value === "new" && blankValue(teamName)) add("team-name", "This team, as written", "Type this team's name.");
+    if (!opponentSelect.value) add("opponent-select", "Opponent on the list", "Pick the opponent.");
+    else if (opponentSelect.value === "new" && blankValue(opponentName)) add("opponent-name", "Opponent, as written", "Type the opponent's name.");
+    if (teamSelect.value && opponentSelect.value && teamSelect.value === opponentSelect.value && teamSelect.value !== "new") {
+      add("opponent-select", "Opponent on the list", "Pick a different opponent.");
+    }
+    if (teamSelect.value === "new" && opponentSelect.value === "new" && !blankValue(teamName) && !blankValue(opponentName) && norm(teamName.value) === norm(opponentName.value)) {
+      add("opponent-name", "Opponent, as written", "Type a different opponent.");
+    }
+    GAMES.forEach(function (game) {
+      SHOOTERS.forEach(function (n) {
+        var whoId = "g" + game + "-s" + n + "-who";
+        var scoreId = "g" + game + "-s" + n + "-score";
+        var whoLabel = "Game " + game + ", shooter " + n + ", who";
+        var scoreLabel = "Game " + game + ", shooter " + n + ", score";
+        if (blankValue(document.getElementById(whoId))) add(whoId, whoLabel, "Pick who shot Game " + game + ", S" + n + ".");
+        if (!inRange(document.getElementById(scoreId), 0, 49)) add(scoreId, scoreLabel, "Enter the score for Game " + game + ", S" + n + ".");
+      });
+      var totalId = "g" + game + "-team";
+      if (!inRange(document.getElementById(totalId), 0, 199)) add(totalId, "Game " + game + " team total", "Enter the team total for Game " + game + ".");
+      var resultId = "g" + game + "-result";
+      if (document.getElementById(resultId).value !== "won" && document.getElementById(resultId).value !== "lost") {
+        add(resultId, "Game " + game + " result", "Mark Game " + game + " won or lost.");
+      }
+    });
+    var points = document.getElementById("points-result");
+    if (points.value !== "won" && points.value !== "lost") add("points-result", "Total points", "Mark total points won or lost.");
+    return items;
+  }
+
+  function missingNote(field) {
+    var note = field.querySelector(".missing-note");
+    if (!note) {
+      note = document.createElement("span");
+      note.className = "missing-note";
+      field.appendChild(note);
+    }
+    return note;
+  }
+
+  function paintMissing(items) {
+    var byId = {};
+    items.forEach(function (item) { byId[item.id] = item; });
+    confirmForm.querySelectorAll(".field").forEach(function (field) {
+      var input = field.querySelector("input, select, textarea");
+      if (!input || !input.id) return;
+      var item = byId[input.id];
+      var note = missingNote(field);
+      if (item) {
+        field.classList.add("is-missing");
+        input.setAttribute("aria-invalid", "true");
+        note.textContent = item.message;
+      } else {
+        field.classList.remove("is-missing");
+        input.removeAttribute("aria-invalid");
+        note.textContent = "";
+      }
+    });
+    var summary = document.getElementById("missing-summary");
+    var countEl = document.getElementById("missing-count");
+    var list = document.getElementById("missing-list");
+    if (!items.length) {
+      summary.hidden = true;
+      countEl.textContent = "";
+      list.innerHTML = "";
+      showError(confirmError, "");
+      reviewInvalid = false;
+      return;
+    }
+    reviewInvalid = true;
+    var heading = items.length === 1 ? "1 item missing" : items.length + " items missing";
+    summary.hidden = false;
+    countEl.textContent = heading;
+    list.innerHTML = items.map(function (item) {
+      return '<li><button type="button" data-goto="' + esc(item.id) + '">' + esc(item.label) + ". " + esc(item.message) + "</button></li>";
+    }).join("");
+    showError(confirmError, heading + ".");
+  }
+
+  function clearMissing() {
+    paintMissing([]);
+  }
+
+  function expandCard(card) {
+    if (!card) return;
+    card.classList.remove("is-collapsed");
+    var button = card.querySelector(".game-toggle");
+    if (!button) return;
+    button.setAttribute("aria-expanded", "true");
+    var state = button.querySelector(".game-toggle-state");
+    if (state) state.textContent = "Hide";
+  }
+
+  function obstruction() {
+    var header = document.querySelector(".site-header");
+    var save = document.querySelector(".save-bar");
+    var thumb = document.querySelector(".thumb-nav");
+    var top = 0;
+    var bottom = 0;
+    if (header) top = Math.max(top, header.getBoundingClientRect().bottom);
+    if (save && getComputedStyle(save).display !== "none") {
+      bottom = Math.max(bottom, window.innerHeight - save.getBoundingClientRect().top);
+    }
+    if (thumb && getComputedStyle(thumb).display !== "none" && getComputedStyle(thumb).position === "fixed") {
+      bottom = Math.max(bottom, window.innerHeight - thumb.getBoundingClientRect().top);
+    }
+    return { top: top, bottom: bottom };
+  }
+
+  function fieldDelta(el) {
+    var field = el.closest(".field") || el;
+    var bars = obstruction();
+    var margin = 16;
+    var rect = field.getBoundingClientRect();
+    var visibleTop = bars.top + margin;
+    var visibleBottom = window.innerHeight - bars.bottom - margin;
+    var delta = 0;
+    if (rect.bottom > visibleBottom) delta = rect.bottom - visibleBottom;
+    if (rect.top - delta < visibleTop) delta = rect.top - visibleTop;
+    return delta;
+  }
+
+  function scrollFieldIntoView(el) {
+    return new Promise(function (resolve) {
+      var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var started = Date.now();
+      function step() {
+        var delta = fieldDelta(el);
+        if (Math.abs(delta) < 2 || Date.now() - started > 1800) {
+          resolve();
+          return;
+        }
+        window.scrollBy({ top: delta, left: 0, behavior: reduce ? "auto" : "smooth" });
+        setTimeout(step, reduce ? 40 : 280);
+      }
+      step();
+    });
+  }
+
+  function focusField(el) {
+    var tag = el.tagName;
+    var type = String(el.type || "").toLowerCase();
+    var textLike = tag === "INPUT" && (type === "text" || type === "search" || type === "email" || type === "tel" || type === "url" || type === "password");
+    function focusNow() {
+      try { el.focus({ preventScroll: true }); } catch (err) { el.focus(); }
+    }
+    if (textLike) {
+      focusNow();
+      if (window.visualViewport) {
+        var nudged = false;
+        function nudge() {
+          if (nudged) return;
+          nudged = true;
+          window.visualViewport.removeEventListener("resize", nudge);
+          scrollFieldIntoView(el);
+        }
+        window.visualViewport.addEventListener("resize", nudge);
+        setTimeout(function () { window.visualViewport.removeEventListener("resize", nudge); }, 900);
+      }
+      return;
+    }
+    if (tag === "INPUT") {
+      var previousMode = el.getAttribute("inputmode");
+      var previousReadOnly = el.readOnly;
+      el.readOnly = true;
+      el.setAttribute("inputmode", "none");
+      focusNow();
+      setTimeout(function () {
+        el.readOnly = previousReadOnly;
+        if (previousMode == null) el.removeAttribute("inputmode");
+        else el.setAttribute("inputmode", previousMode);
+      }, 120);
+      return;
+    }
+    focusNow();
+  }
+
+  function goToField(el) {
+    if (!el) return;
+    expandCard(el.closest(".game-card"));
+    scrollFieldIntoView(el).then(function () { focusField(el); });
+  }
+
   function onSubmit(event) {
     event.preventDefault();
-    showError(confirmError, "");
+    var items = collectMissing();
+    if (items.length) {
+      items.forEach(function (item) {
+        var input = document.getElementById(item.id);
+        if (input) expandCard(input.closest(".game-card"));
+      });
+      paintMissing(items);
+      goToField(document.getElementById(items[0].id));
+      return;
+    }
+    clearMissing();
     var date = document.getElementById("confirm-date").value;
     var side = document.getElementById("sheet-side").value;
-    if (!date) {
-      showError(confirmError, "Add the match date.");
-      return;
-    }
-    if (side !== "home" && side !== "away") {
-      showError(confirmError, "Mark this sheet as Home or Away.");
-      return;
-    }
     var teamSelect = document.getElementById("team-select").value;
     var opponentSelect = document.getElementById("opponent-select").value;
     var teamTyped = document.getElementById("team-name").value.trim();
     var opponentTyped = document.getElementById("opponent-name").value.trim();
-    if (teamSelect !== "new" && opponentSelect !== "new" && teamSelect === opponentSelect) {
-      showError(confirmError, "This team and the opponent need to be two different teams.");
-      return;
-    }
     var submitButton = document.getElementById("confirm-submit");
     submitButton.disabled = true;
     var record = sheetRecord();
@@ -848,7 +1082,7 @@
     setStep(1, "Step 1 of 3. Camera off. Scan again, or upload a photo.");
   });
   confirmForm.addEventListener("submit", onSubmit);
-  confirmForm.addEventListener("input", function (event) {
+  function onReviewEdit(event) {
     formDirty = true;
     var target = event.target;
     if (target && target.classList && target.type === "number") {
@@ -857,6 +1091,24 @@
       if (flag) flag.textContent = target.value === "" ? "Blank — not zero" : "";
     }
     refreshChecks();
+    if (reviewInvalid) paintMissing(collectMissing());
+  }
+  confirmForm.addEventListener("input", onReviewEdit);
+  confirmForm.addEventListener("change", onReviewEdit);
+  document.getElementById("games-block").addEventListener("click", function (event) {
+    var button = event.target.closest(".game-toggle");
+    if (!button) return;
+    var card = button.closest(".game-card");
+    var collapsed = !card.classList.contains("is-collapsed");
+    card.classList.toggle("is-collapsed", collapsed);
+    button.setAttribute("aria-expanded", collapsed ? "false" : "true");
+    var state = button.querySelector(".game-toggle-state");
+    if (state) state.textContent = collapsed ? "Show" : "Hide";
+  });
+  document.getElementById("missing-list").addEventListener("click", function (event) {
+    var button = event.target.closest("button[data-goto]");
+    if (!button) return;
+    goToField(document.getElementById(button.getAttribute("data-goto")));
   });
 
   fillTeamSelect(document.getElementById("team-select"), "");
