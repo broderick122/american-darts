@@ -170,7 +170,7 @@
       host.innerHTML = '<p class="empty">No teams yet. Add them on the <a href="admin.html">Admin page</a>.</p>';
     } else {
       host.innerHTML =
-        '<div class="table-scroll"><table><caption>' + esc(standingsNote(data)) + "</caption><thead><tr>" +
+        '<div class="table-scroll standings-fit"><table><caption>' + esc(standingsNote(data)) + "</caption><thead><tr>" +
         "<th scope=\"col\">Rank</th><th scope=\"col\">Team</th><th scope=\"col\">W</th><th scope=\"col\">L</th><th scope=\"col\">Ties</th><th scope=\"col\">Games won</th><th scope=\"col\">Points</th>" +
         "</tr></thead><tbody>" +
         rows.map(function (row) {
@@ -178,13 +178,13 @@
           var tag = sampleTag(row.teamName, row.sample);
           var inactive = row.active === false ? " (inactive)" : "";
           return '<tr class="' + fresh + '" data-team="' + esc(row.teamId) + '">' +
-            '<td class="num">' + row.rank + "</td>" +
+            '<td class="num" data-label="Rank">' + row.rank + "</td>" +
             '<th scope="row">' + tag + esc(row.teamName) + esc(inactive) + "</th>" +
-            '<td class="num">' + row.wins + "</td>" +
-            '<td class="num">' + row.losses + "</td>" +
-            '<td class="num">' + row.ties + "</td>" +
-            '<td class="num">' + row.gamesWon + "</td>" +
-            '<td class="num">' + row.points + "</td></tr>";
+            '<td class="num" data-label="Wins">' + row.wins + "</td>" +
+            '<td class="num" data-label="Losses">' + row.losses + "</td>" +
+            '<td class="num" data-label="Ties">' + row.ties + "</td>" +
+            '<td class="num" data-label="Games won">' + row.gamesWon + "</td>" +
+            '<td class="num" data-label="Points">' + row.points + "</td></tr>";
         }).join("") +
         "</tbody></table></div>";
     }
@@ -322,20 +322,22 @@
     });
   }
 
-  navButton.addEventListener("click", function () {
-    var open = nav.classList.toggle("is-open");
-    navButton.setAttribute("aria-expanded", open ? "true" : "false");
-    navButton.querySelector(".nav-label").textContent = open ? "Close" : "Menu";
-    document.body.classList.toggle("nav-open", open);
-  });
-  nav.addEventListener("click", function (event) {
-    if (event.target.closest("a")) {
-      nav.classList.remove("is-open");
-      navButton.setAttribute("aria-expanded", "false");
-      navButton.querySelector(".nav-label").textContent = "Menu";
-      document.body.classList.remove("nav-open");
-    }
-  });
+  if (navButton && nav) {
+    navButton.addEventListener("click", function () {
+      var open = nav.classList.toggle("is-open");
+      navButton.setAttribute("aria-expanded", open ? "true" : "false");
+      navButton.querySelector(".nav-label").textContent = open ? "Close" : "Menu";
+      document.body.classList.toggle("nav-open", open);
+    });
+    nav.addEventListener("click", function (event) {
+      if (event.target.closest("a")) {
+        nav.classList.remove("is-open");
+        navButton.setAttribute("aria-expanded", "false");
+        navButton.querySelector(".nav-label").textContent = "Menu";
+        document.body.classList.remove("nav-open");
+      }
+    });
+  }
   document.addEventListener("keydown", function (event) {
     if (event.key === "Escape" && nav.classList.contains("is-open")) {
       nav.classList.remove("is-open");

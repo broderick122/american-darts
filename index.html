@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css?v=20261015c">
+  <link rel="stylesheet" href="css/styles.css?v=20261015d">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -30,10 +30,6 @@
           <small>American Darts</small>
         </span>
       </a>
-      <button class="nav-button" type="button" aria-expanded="false" aria-controls="site-nav">
-        <span class="nav-bars" aria-hidden="true"></span>
-        <span class="nav-label">Menu</span>
-      </button>
       <nav id="site-nav" aria-label="Sections">
         <ul>
           <li><a href="#about">About</a></li>
@@ -62,12 +58,13 @@
             <span class="line-big">American darts</span>
             <span class="line-place">at the Roslyn VFW</span>
           </h1>
-          <p class="lede">League night lives at 1140 Easton Road. Put a score on the sheet and the standings on this page update immediately.</p>
           <div class="hero-actions">
-            <a class="btn btn-primary" href="#score">Enter a score sheet</a>
-            <a class="btn btn-ghost" href="#standings">See the standings</a>
-            <a class="btn btn-ghost" href="scoresheet/roslyn_scansheet_v16.pdf">Download the scan sheet</a>
+            <a class="btn btn-primary btn-xl" href="upload.html#scan-camera">Scan with camera</a>
+            <a class="btn btn-primary btn-xl" href="upload.html#upload-photo">Upload photo</a>
+            <a class="btn btn-ghost btn-xl" href="#standings">Standings</a>
+            <a class="btn btn-ghost btn-xl" href="scoresheet/roslyn_scansheet_v16.pdf">Download score sheet</a>
           </div>
+          <p class="lede">League night lives at 1140 Easton Road. Scan a sheet, or <a href="#score">type a score</a>, and the standings on this page update immediately.</p>
           <ul class="hero-facts">
             <li><span>Post</span> 3498</li>
             <li><span>Town</span> Abington, PA</li>
@@ -115,8 +112,7 @@
         </div>
         <p class="sample-banner">SAMPLE — invented nights and times, not the real schedule</p>
         <p>The weekly board is still a placeholder layout. Recording a result does not change this table. Real scores go on the score sheet, and the standings pick them up.</p>
-        <p class="swipe-hint">Swipe sideways to read the whole table.</p>
-        <div class="table-scroll">
+        <div class="table-scroll fit-table">
           <table>
             <caption>Every night, time, and note in this table is SAMPLE.</caption>
             <thead>
@@ -160,7 +156,7 @@
         </div>
         <p id="standings-live" role="status">Loading standings…</p>
         <p id="standings-note"></p>
-        <p class="swipe-hint">Swipe sideways to read rank, wins, losses, games won, and points.</p>
+        <p class="swipe-hint">Each team shows wins, losses, ties, games won, and points.</p>
         <div id="standings-table"></div>
         <p class="formula" id="standings-rule"></p>
         <h3>Recent results</h3>
@@ -366,8 +362,26 @@
         <p>VFW phone: <a href="tel:+12155769349">(215) 576-9349</a></p>
       </address>
       <p><a href="scoresheet/roslyn_scansheet_v16.pdf">Scan sheet (v16)</a><br><a href="upload.html">Upload scan sheet</a><br><a href="admin.html">Admin</a></p>
+      <nav class="footer-links" aria-label="On this page">
+        <a href="#about">About</a>
+        <a href="#schedule">Schedule</a>
+        <a href="#standings">Standings</a>
+        <a href="#score">Score sheet</a>
+        <a href="upload.html">Scan</a>
+        <a href="#teams">Teams</a>
+        <a href="#location">Location</a>
+        <a href="#photos">Photos</a>
+        <a href="#news">News</a>
+        <a href="#join">Join</a>
+      </nav>
     </div>
   </footer>
+  <nav class="thumb-nav" aria-label="Main">
+    <a href="#top" aria-current="page">Home</a>
+    <a href="#standings">Standings</a>
+    <a href="upload.html">Scan</a>
+    <a href="scoresheet/roslyn_scansheet_v16.pdf">Sheet</a>
+  </nav>
 
   <dialog id="lightbox">
     <form method="dialog">
@@ -377,8 +391,8 @@
     <p id="lightbox-caption"></p>
   </dialog>
   <noscript><style>#site-nav{display:block !important;position:static !important;box-shadow:none}</style></noscript>
-  <script src="config.js?v=20261015c"></script>
-  <script src="js/data.js?v=20261015c"></script>
-  <script src="js/main.js?v=20261015c"></script>
+  <script src="config.js?v=20261015d"></script>
+  <script src="js/data.js?v=20261015d"></script>
+  <script src="js/main.js?v=20261015d"></script>
 </body>
 </html>

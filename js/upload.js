@@ -50,6 +50,19 @@
     statusEl.classList.toggle("is-error", !!isError);
   }
 
+  function setStep(n, message) {
+    var list = document.getElementById("scan-steps");
+    if (list) {
+      list.querySelectorAll("[data-step]").forEach(function (li) {
+        var step = Number(li.getAttribute("data-step"));
+        li.classList.toggle("is-current", step === n);
+        li.classList.toggle("is-done", step < n);
+      });
+    }
+    var stepEl = document.getElementById("step-status");
+    if (stepEl && message) stepEl.textContent = message;
+  }
+
   function showError(el, message) {
     if (!message) {
       el.hidden = true;
@@ -70,30 +83,30 @@
 
   function buildReview() {
     document.getElementById("roster-block").innerHTML =
-      '<div class="table-scroll"><table class="bubble-table roster-table"><caption>Roster ids A through H. An empty id was not read as zero.</caption><thead><tr>' +
-      SLOTS.map(function (slot) { return "<th scope=\"col\">" + slot + "</th>"; }).join("") +
-      "</tr></thead><tbody><tr>" +
+      '<p class="roster-note">Roster ids A through H. An empty id was not read as zero.</p>' +
+      '<div class="roster-grid">' +
       SLOTS.map(function (slot) {
-        return '<td><input id="roster-' + slot + '" type="number" min="0" max="99" inputmode="numeric" placeholder="—" aria-label="Roster ' + slot + ' id"><span id="roster-' + slot + '-flag" class="bubble-flag"></span></td>';
+        return '<label class="field">' + slot +
+          '<input id="roster-' + slot + '" type="number" min="0" max="99" inputmode="numeric" placeholder="—" aria-label="Roster ' + slot + ' id">' +
+          '<span id="roster-' + slot + '-flag" class="bubble-flag"></span></label>';
       }).join("") +
-      "</tr></tbody></table></div>";
+      "</div>";
 
     document.getElementById("games-block").innerHTML = GAMES.map(function (game) {
       var rows = SHOOTERS.map(function (n) {
-        return "<tr><th scope=\"row\">" + n + "</th><td><select id=\"g" + game + "-s" + n + "-who\" aria-label=\"Game " + game + " shooter " + n + " who\">" +
-          slotOptions("") + "</select><span id=\"g" + game + "-s" + n + "-who-flag\" class=\"bubble-flag\"></span></td>" +
-          "<td><input id=\"g" + game + "-s" + n + "-score\" type=\"number\" min=\"0\" max=\"49\" inputmode=\"numeric\" placeholder=\"—\" aria-label=\"Game " + game + " shooter " + n + " score\">" +
-          "<span id=\"g" + game + "-s" + n + "-score-flag\" class=\"bubble-flag\"></span></td></tr>";
+        return '<div class="shooter"><p class="shooter-label">Shooter ' + n + "</p>" +
+          '<label class="field">Who<select id="g' + game + "-s" + n + '-who" aria-label="Game ' + game + " shooter " + n + ' who">' +
+          slotOptions("") + '</select><span id="g' + game + "-s" + n + '-who-flag" class="bubble-flag"></span></label>' +
+          '<label class="field">Score<input id="g' + game + "-s" + n + '-score" type="number" min="0" max="49" inputmode="numeric" placeholder="—" aria-label="Game ' + game + " shooter " + n + ' score">' +
+          '<span id="g' + game + "-s" + n + '-score-flag" class="bubble-flag"></span></label></div>';
       }).join("");
-      return '<section class="game-card"><h3>Game ' + game + "</h3>" +
-        '<div class="table-scroll"><table class="bubble-table"><caption>Who threw, and the score. Tens is a column of 1 through 4. A score under 10 leaves tens blank.</caption><thead><tr><th scope="col"></th><th scope="col">Who</th><th scope="col">Score</th></tr></thead><tbody>' +
-        rows + "</tbody></table></div>" +
-        '<div class="form-grid cols-3"><label class="field">Team total<input id="g' + game + '-team" type="number" min="0" max="199" inputmode="numeric" placeholder="—"><span id="g' + game + '-team-flag" class="bubble-flag"></span></label>' +
+      return '<section class="game-card"><h3>Game ' + game + "</h3>" + rows +
+        '<div class="game-totals"><label class="field">Team total<input id="g' + game + '-team" type="number" min="0" max="199" inputmode="numeric" placeholder="—"><span id="g' + game + '-team-flag" class="bubble-flag"></span></label>' +
         '<label class="field">Result<select id="g' + game + '-result"><option value="">Not marked</option><option value="won">Won</option><option value="lost">Lost</option></select><span id="g' + game + '-result-flag" class="bubble-flag"></span></label></div>' +
         '<p id="g' + game + '-check" class="cross-check"></p></section>';
     }).join("") +
-      '<div class="form-grid cols-2"><label class="field">Beer frame<select id="beer-result"><option value="">Not marked</option><option value="won">Won</option><option value="lost">Lost</option></select><span id="beer-result-flag" class="bubble-flag"></span></label>' +
-      '<label class="field">Total points<select id="points-result"><option value="">Not marked</option><option value="won">Won</option><option value="lost">Lost</option></select><span id="points-result-flag" class="bubble-flag"></span></label></div>';
+      '<section class="game-card"><h3>Frames</h3><div class="game-totals"><label class="field">Beer frame<select id="beer-result"><option value="">Not marked</option><option value="won">Won</option><option value="lost">Lost</option></select><span id="beer-result-flag" class="bubble-flag"></span></label>' +
+      '<label class="field">Total points<select id="points-result"><option value="">Not marked</option><option value="won">Won</option><option value="lost">Lost</option></select><span id="points-result-flag" class="bubble-flag"></span></label></div></section>';
   }
 
   buildReview();
@@ -206,7 +219,7 @@
       var value = numberOrNull(document.getElementById("g" + game + "-team"));
       return value == null ? "—" : value;
     });
-    sheetPointsEl.textContent = "Team totals on this sheet: " + totals.join(" + ") + ". Standings use WON and LOST, not these point totals.";
+    sheetPointsEl.textContent = totals.length ? "Team totals " + totals.join(", ") : "";
     updateFinalScore();
   }
 
@@ -267,6 +280,7 @@
     }
     if (!confirmSection.hidden && formDirty) {
       setStatus("The photo was read, and your edits were left as they are.");
+      setStep(2, "Step 2 of 3. The photo was read. Your edits were left as they are.");
       return;
     }
     if (result.mode !== "rejected" && result.games) {
@@ -291,13 +305,18 @@
     formDirty = false;
     refreshChecks();
     showConfirm();
-    setStatus(result.mode === "rejected"
-      ? "Retake the photo so all four black corner squares are in the frame. You can still type the score below."
-      : "Check the roster, the scores, and the date, then save.");
+    if (result.mode === "rejected") {
+      setStatus("Retake the photo so all four black corner squares are in the frame. You can still type the score below.");
+      setStep(1, "Step 1 of 3. The corners were not found. Retake the photo, or type the score.");
+    } else {
+      setStatus("Check the roster, the scores, and the date, then save.");
+      setStep(2, "Step 2 of 3. Check each game. Fix anything that is wrong, then save.");
+      confirmSection.scrollIntoView({ block: "start" });
+    }
   }
 
   function loadSpec() {
-    var version = window.RAD_ASSET_VERSION || "20261015c";
+    var version = window.RAD_ASSET_VERSION || "20261015d";
     return fetch("scoresheet/scansheet_v16_layout_spec.json?v=" + encodeURIComponent(version), { cache: "no-store" }).then(function (response) {
       if (!response.ok) throw new Error("The scan sheet layout could not be loaded (" + response.status + "). Reload the page and try again.");
       return response.json();
@@ -313,6 +332,7 @@
       return Promise.reject(new Error("That photo is too small to read. Move closer and include all four corner squares."));
     }
     setStatus("Opening the sheet…");
+    setStep(2, "Step 2 of 3. Reading the sheet…");
     return loadSpec().then(function (spec) {
       return RAD_OCR.readSheet(canvas, spec, setStatus);
     }).then(function (result) {
@@ -489,6 +509,7 @@
           rememberUpload(entry);
           savedNote.hidden = false;
           savedNote.textContent = "Saved this team's sheet for " + date + ". Standings update when the opponent's sheet for the same date is saved on this phone. The photo was not stored.";
+          setStep(3, "Step 3 of 3. Saved. Standings update when the other team’s sheet for the same date is saved too.");
           return null;
         }
         var sides = orderSides(entry, pair);
@@ -508,6 +529,7 @@
           savedNote.hidden = false;
           savedNote.textContent = "Paired the two sheets. Match score " + match.homeGamesWon + "–" + match.awayGamesWon +
             ". The photos were not stored. Standings below include this match.";
+          setStep(3, "Step 3 of 3. Saved. The standings below include this match.");
           renderStandings(result.snapshot);
           document.getElementById("live-standings").scrollIntoView({ behavior: "smooth", block: "start" });
         });
@@ -535,15 +557,15 @@
       return;
     }
     host.innerHTML =
-      '<div class="table-scroll"><table><caption>SAMPLE marks starter teams. A paired upload changes this table immediately.</caption><thead><tr>' +
+      '<div class="table-scroll standings-fit"><table><caption>SAMPLE marks starter teams. A paired upload changes this table immediately.</caption><thead><tr>' +
       '<th scope="col">Rank</th><th scope="col">Team</th><th scope="col">W</th><th scope="col">L</th><th scope="col">Ties</th><th scope="col">Games won</th><th scope="col">Points</th>' +
       "</tr></thead><tbody>" +
       rows.map(function (row) {
         var fresh = data.lastTouched && data.lastTouched.indexOf(row.teamId) >= 0 ? "is-fresh" : "";
-        return '<tr class="' + fresh + '"><td class="num">' + row.rank + "</td><th scope=\"row\">" +
+        return '<tr class="' + fresh + '"><td class="num" data-label="Rank">' + row.rank + "</td><th scope=\"row\">" +
           sampleTag(row.teamName, row.sample) + esc(row.teamName) + "</th>" +
-          '<td class="num">' + row.wins + "</td><td class=\"num\">" + row.losses + "</td><td class=\"num\">" + row.ties +
-          "</td><td class=\"num\">" + row.gamesWon + "</td><td class=\"num\">" + row.points + "</td></tr>";
+          '<td class="num" data-label="Wins">' + row.wins + '</td><td class="num" data-label="Losses">' + row.losses + '</td><td class="num" data-label="Ties">' + row.ties +
+          '</td><td class="num" data-label="Games won">' + row.gamesWon + '</td><td class="num" data-label="Points">' + row.points + "</td></tr>";
       }).join("") +
       "</tbody></table></div>";
   }
@@ -739,8 +761,10 @@
     }
     showError(errorEl, "");
     setCameraStatus("Starting the camera…");
+    setStep(1, "Step 1 of 3. Fit all four black corners in the frame. Hold still, or tap Snap.");
     cameraPanel.hidden = false;
     scanButton.hidden = true;
+    cameraPanel.scrollIntoView({ block: "start" });
     cameraVideo.setAttribute("playsinline", "true");
     cameraVideo.setAttribute("webkit-playsinline", "true");
     cameraVideo.muted = true;
@@ -805,6 +829,7 @@
   typeButton.addEventListener("click", function () {
     showError(errorEl, "");
     setStatus("Type the date, the two teams, the roster ids, and each game.");
+    setStep(2, "Step 2 of 3. Type the date, the teams, the roster ids, and each game. Then save.");
     clearSheet();
     formDirty = false;
     showConfirm();
@@ -820,6 +845,7 @@
     scanButton.hidden = false;
     setCameraStatus("Fit all 4 corners");
     setStatus("Camera off. You can still choose a photo.");
+    setStep(1, "Step 1 of 3. Camera off. Scan again, or upload a photo.");
   });
   confirmForm.addEventListener("submit", onSubmit);
   confirmForm.addEventListener("input", function (event) {

@@ -115,15 +115,15 @@
       return;
     }
     host.innerHTML =
-      '<div class="table-scroll"><table><thead><tr>' +
+      '<div class="table-scroll standings-fit"><table><thead><tr>' +
       "<th>Rank</th><th>Team</th><th>W</th><th>L</th><th>Ties</th><th>Games won</th><th>Points</th>" +
       "</tr></thead><tbody>" + rows.map(function (row) {
         var fresh = snap.lastTouched && snap.lastTouched.indexOf(row.teamId) >= 0 ? "is-fresh" : "";
         var tag = sampleTag(row.teamName, row.sample);
-        return '<tr class="' + fresh + '" data-team="' + esc(row.teamId) + '"><td class="num">' + row.rank +
-          '</td><th scope="row">' + tag + esc(row.teamName) + "</th><td class=\"num\">" + row.wins +
-          '</td><td class="num">' + row.losses + '</td><td class="num">' + row.ties +
-          '</td><td class="num">' + row.gamesWon + '</td><td class="num">' + row.points + "</td></tr>";
+        return '<tr class="' + fresh + '" data-team="' + esc(row.teamId) + '"><td class="num" data-label="Rank">' + row.rank +
+          '</td><th scope="row">' + tag + esc(row.teamName) + '</th><td class="num" data-label="Wins">' + row.wins +
+          '</td><td class="num" data-label="Losses">' + row.losses + '</td><td class="num" data-label="Ties">' + row.ties +
+          '</td><td class="num" data-label="Games won">' + row.gamesWon + '</td><td class="num" data-label="Points">' + row.points + "</td></tr>";
       }).join("") + "</tbody></table></div>";
   }
 

@@ -11,8 +11,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script>window.RAD_ASSET_VERSION = "20261015c";</script>
-  <link rel="stylesheet" href="css/styles.css?v=20261015c">
+  <script>window.RAD_ASSET_VERSION = "20261015d";</script>
+  <link rel="stylesheet" href="css/styles.css?v=20261015d">
 </head>
 <body class="page-upload">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -27,10 +27,6 @@
           <small>American Darts</small>
         </span>
       </a>
-      <button class="nav-button" type="button" aria-expanded="false" aria-controls="site-nav">
-        <span class="nav-bars" aria-hidden="true"></span>
-        <span class="nav-label">Menu</span>
-      </button>
       <nav id="site-nav" aria-label="Sections">
         <ul>
           <li><a href="index.html#about">About</a></li>
@@ -50,19 +46,24 @@
 
   <main id="main" class="wrap">
     <section>
-      <p class="eyebrow">Results scan sheet</p>
-      <h1>Upload a scan sheet</h1>
-      <div class="security-note">
-        <p><strong>You confirm before anything is saved.</strong> The page reads the filled bubbles in this browser. It does not send the photo anywhere, and it does not keep the photo. A blank row is left empty. It is not a zero.</p>
-        <p>Team names, the captain, and the date are handwritten, so they are not read. Type those below. The <a href="index.html#score">typed score sheet</a> is still there when you would rather not use a photo.</p>
-      </div>
-      <p>Each team fills its own letter sheet. Photograph it flat, in even light, with all four black corner squares in the frame. You can scan it with the camera or choose a photo you already took. A sideways or upside-down photo is turned upright from those squares. The written names, the date, the opponent, and the small score boxes are not read.</p>
-      <p><a class="btn btn-primary" href="scoresheet/roslyn_scansheet_v16.pdf">Download the scan sheet (v16)</a></p>
+      <p class="eyebrow">Score sheet</p>
+      <h1>Scan a score sheet</h1>
+      <ol class="scan-steps" id="scan-steps">
+        <li class="is-current" data-step="1"><span>1</span> Scan</li>
+        <li data-step="2"><span>2</span> Check</li>
+        <li data-step="3"><span>3</span> Save</li>
+      </ol>
+      <p id="step-status" class="step-status" role="status">Step 1 of 3. Scan with the camera, or upload a photo.</p>
       <form id="pick-form" class="sheet stack">
-        <button class="btn btn-primary btn-xl" id="scan-camera" type="button">Scan with camera</button>
+        <div class="scan-actions">
+          <button class="btn btn-primary btn-xl" id="scan-camera" type="button">Scan with camera</button>
+          <label class="btn btn-primary btn-xl file-cta" id="upload-photo" for="sheet-file">Upload photo
+            <input id="sheet-file" name="photo" type="file" accept="image/*" class="visually-hidden">
+          </label>
+        </div>
         <div id="camera-panel" class="camera-panel" hidden>
           <div class="camera-stage">
-            <video id="camera-video" playsinline muted autoplay style="width:100%;max-width:100%;max-height:70vh;height:auto;object-fit:contain;background:#000;display:block"></video>
+            <video id="camera-video" playsinline muted autoplay style="width:100%;max-width:100%;height:auto;object-fit:contain;background:#000;display:block"></video>
             <canvas id="camera-guide" aria-hidden="true"></canvas>
           </div>
           <p id="camera-status" class="camera-status" role="status">Fit all 4 corners</p>
@@ -71,16 +72,17 @@
             <button class="btn btn-xl btn-cancel" id="camera-cancel" type="button">Cancel</button>
           </div>
         </div>
-        <label class="field">Photo of the filled sheet
-          <input id="sheet-file" name="photo" type="file" accept="image/*">
-        </label>
         <div class="form-actions">
-          <button class="btn btn-primary" id="read-photo" type="submit">Read this photo</button>
-          <button class="btn btn-ink" id="type-instead" type="button">Type the result instead</button>
+          <button class="btn btn-ink" id="read-photo" type="submit">Read this photo</button>
+          <button class="btn btn-ink" id="type-instead" type="button">Type instead</button>
         </div>
         <p id="ocr-status" class="status" role="status" aria-live="polite"></p>
         <p id="ocr-error" class="alert" role="alert" hidden></p>
       </form>
+      <div class="security-note">
+        <p><strong>You confirm before anything is saved.</strong> The page reads the filled bubbles in this browser. It does not send the photo anywhere, and it does not keep the photo. A blank row is left empty. It is not a zero.</p>
+        <p>Lay the sheet flat, in even light, with all four black corner squares in the frame. Handwritten names and the date are typed on the next step. The <a href="index.html#score">typed score sheet</a> is there if you would rather not use a photo. <a href="scoresheet/roslyn_scansheet_v16.pdf">Download the scan sheet (v16)</a>.</p>
+      </div>
       <p id="ocr-summary" class="ocr-summary"></p>
       <ul id="ocr-warnings" class="warning-list"></ul>
       <figure id="align-figure" hidden>
@@ -94,7 +96,7 @@
         <p class="eyebrow">Confirm</p>
         <h2>Check the reading</h2>
       </div>
-      <p>Fix anything that is wrong, then save this team’s sheet. A red note means the four shooter scores do not add up to that game’s team total. Standings update when the other team’s sheet for the same date is saved too.</p>
+      <p>Fix anything that is wrong, then save this team’s sheet. A red note means the four shooter scores do not add up to that game’s team total. Standings use Won and Lost, not the point totals. They update when the other team’s sheet for the same date is saved too.</p>
       <form id="confirm-form" class="sheet">
         <div class="form-grid cols-3">
           <label class="field">Match date
@@ -125,12 +127,14 @@
         <h3 class="winners-heading">Roster ids</h3>
         <div id="roster-block" class="side-block"></div>
         <div id="games-block" class="side-block"></div>
-        <p class="eyebrow">This team</p>
-        <p id="final-score" class="final-score" aria-live="polite">0 games won</p>
-        <p id="sheet-points" class="status"></p>
-        <p id="confirm-error" class="alert" role="alert" hidden></p>
-        <div class="form-actions">
-          <button class="btn btn-primary" id="confirm-submit" type="submit">Save and update standings</button>
+        <div class="save-bar">
+          <div class="save-totals">
+            <p class="eyebrow">This team</p>
+            <p id="final-score" class="final-score" aria-live="polite">0 games won</p>
+            <p id="sheet-points" class="status"></p>
+          </div>
+          <p id="confirm-error" class="alert" role="alert" hidden></p>
+          <button class="btn btn-primary btn-xl" id="confirm-submit" type="submit">Save</button>
         </div>
       </form>
       <p id="saved-note" class="status" role="status" hidden></p>
@@ -167,9 +171,15 @@
     </div>
   </footer>
 
-  <script src="config.js?v=20261015c"></script>
-  <script src="js/data.js?v=20261015c"></script>
-  <script src="js/sheet-ocr.js?v=20261015c"></script>
-  <script src="js/upload.js?v=20261015c"></script>
+  <nav class="thumb-nav" aria-label="Main">
+    <a href="index.html">Home</a>
+    <a href="index.html#standings">Standings</a>
+    <a href="upload.html" aria-current="page">Scan</a>
+    <a href="scoresheet/roslyn_scansheet_v16.pdf">Sheet</a>
+  </nav>
+  <script src="config.js?v=20261015d"></script>
+  <script src="js/data.js?v=20261015d"></script>
+  <script src="js/sheet-ocr.js?v=20261015d"></script>
+  <script src="js/upload.js?v=20261015d"></script>
 </body>
 </html>
