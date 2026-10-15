@@ -340,6 +340,13 @@ h1, h2, h3 { line-height: 0.95; }
 .btn-primary { background: var(--red); color: white; }
 .btn-primary:hover { background: var(--red-deep); color: white; }
 
+.btn-fix {
+  background: #f0b429;
+  color: #1c1916;
+  border-color: #6b4a00;
+}
+.btn-fix:hover { background: #d99a12; color: #1c1916; }
+
 .btn-ghost { border-color: var(--brass-2); color: var(--cream); }
 .btn-ghost:hover { background: rgba(228, 199, 138, 0.12); color: white; }
 

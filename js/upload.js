@@ -262,6 +262,7 @@
     setChoice("beer-result", "", "blank", "Blank is allowed");
     setChoice("points-result", "", "blank");
     refreshChecks();
+    syncSaveButton();
   }
 
   function turnNote(result) {
@@ -307,6 +308,7 @@
     if (!confirmSection.hidden && formDirty) {
       setStatus("The photo was read, and your edits were left as they are.");
       setStep(2, "Step 2 of 3. The photo was read. Your edits were left as they are.");
+      syncSaveButton();
       return;
     }
     if (result.mode !== "rejected" && result.games) {
@@ -339,10 +341,11 @@
       setStep(2, "Step 2 of 3. Check each game. Fix anything that is wrong, then save.");
       confirmSection.scrollIntoView({ block: "start" });
     }
+    syncSaveButton();
   }
 
   function loadSpec() {
-    var version = window.RAD_ASSET_VERSION || "20261015f";
+    var version = window.RAD_ASSET_VERSION || "20261015g";
     return fetch("scoresheet/scansheet_v16_layout_spec.json?v=" + encodeURIComponent(version), { cache: "no-store" }).then(function (response) {
       if (!response.ok) throw new Error("The scan sheet layout could not be loaded (" + response.status + "). Reload the page and try again.");
       return response.json();
@@ -387,6 +390,7 @@
     }).catch(function (err) {
       showError(errorEl, err && err.message ? err.message : "The photo could not be read.");
       setStatus("");
+      syncSaveButton();
       showConfirm();
     }).then(finishRead);
   }
@@ -620,16 +624,32 @@
       list.innerHTML = "";
       showError(confirmError, "");
       reviewInvalid = false;
-      return;
+    } else {
+      reviewInvalid = true;
+      var heading = items.length === 1 ? "1 item missing" : items.length + " items missing";
+      summary.hidden = false;
+      countEl.textContent = heading;
+      list.innerHTML = items.map(function (item) {
+        return '<li><button type="button" data-goto="' + esc(item.id) + '">' + esc(item.label) + ". " + esc(item.message) + "</button></li>";
+      }).join("");
+      showError(confirmError, heading + ".");
     }
-    reviewInvalid = true;
-    var heading = items.length === 1 ? "1 item missing" : items.length + " items missing";
-    summary.hidden = false;
-    countEl.textContent = heading;
-    list.innerHTML = items.map(function (item) {
-      return '<li><button type="button" data-goto="' + esc(item.id) + '">' + esc(item.label) + ". " + esc(item.message) + "</button></li>";
-    }).join("");
-    showError(confirmError, heading + ".");
+    syncSaveButton();
+  }
+
+  function syncSaveButton() {
+    var button = document.getElementById("confirm-submit");
+    if (!button) return;
+    var count = collectMissing().length;
+    if (count) {
+      button.textContent = count === 1 ? "Fix 1 item" : "Fix " + count + " items";
+      button.classList.add("btn-fix");
+      button.classList.remove("btn-primary");
+    } else {
+      button.textContent = "Save";
+      button.classList.remove("btn-fix");
+      button.classList.add("btn-primary");
+    }
   }
 
   function clearMissing() {
@@ -1140,6 +1160,7 @@
     }
     refreshChecks();
     if (reviewInvalid) paintMissing(collectMissing());
+    else syncSaveButton();
   }
   confirmForm.addEventListener("input", onReviewEdit);
   confirmForm.addEventListener("change", onReviewEdit);
