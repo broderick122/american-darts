@@ -221,10 +221,7 @@ async function main() {
         finalScore: document.getElementById("final-score").textContent,
         finalSize: getComputedStyle(document.getElementById("final-score")).fontSize,
         totals: ["save-total-1", "save-total-2", "save-total-3", "save-total-sum"].map((id) => document.getElementById(id).textContent),
-        notes: [1, 2, 3].map((game) => {
-          const note = document.getElementById("save-sheet-" + game);
-          return note.hidden ? "" : note.textContent;
-        }),
+        teamTag: document.getElementById("g1-team").tagName,
         scoreType: document.getElementById("g1-s1-score").type,
         numeric: document.getElementById("g1-s1-score").getAttribute("data-numeric"),
         version: document.querySelector(".asset-version").textContent,
@@ -236,10 +233,11 @@ async function main() {
     if (form.roster.join(",") !== "12,7,23,4,,15,31,8") formProblems.push("roster " + form.roster.join(","));
     if (!form.rosterEBlank) formProblems.push("blank roster E was stored as a number");
     if (form.g1.join(",") !== "A,21,B,15,8,19,63,won") formProblems.push("game 1 " + form.g1.join(","));
-    if (form.g1Bad || !/63/.test(form.g1Check)) formProblems.push("game 1 sum " + form.g1Check);
+    if (form.g1Bad || form.g1Check) formProblems.push("game 1 sum " + form.g1Check);
+    if (form.teamTag !== "OUTPUT") formProblems.push("team total tag " + form.teamTag);
     if (form.g2Who !== "" || !/two marks/i.test(form.g2Flag)) formProblems.push("ambiguous who " + form.g2Who + " " + form.g2Flag);
-    if (!form.g2Bad || !/54/.test(form.g2Check) || !/50/.test(form.g2Check)) formProblems.push("game 2 sum " + form.g2Check);
-    if (form.g3Team !== "149" || !form.g3Bad || !/58/.test(form.g3Check) || !/149/.test(form.g3Check)) {
+    if (form.g2Check !== "Sheet total says 50, scores add to 54, check the scores." || !form.g2Bad) formProblems.push("game 2 sum " + form.g2Check);
+    if (form.g3Team !== "58" || !form.g3Bad || form.g3Check !== "Sheet total says 149, scores add to 58, check the scores.") {
       formProblems.push("game 3 total " + form.g3Team + " " + form.g3Check);
     }
     if (form.results.join(",") !== "won,lost,won") formProblems.push("results " + form.results.join(","));
@@ -248,7 +246,6 @@ async function main() {
     if (!/2 games won/.test(form.finalScore)) formProblems.push("final " + form.finalScore);
     if (parseFloat(form.finalSize) > 22) formProblems.push("final size " + form.finalSize);
     if (form.totals.join(",") !== "63,54,58,175") formProblems.push("sticky totals " + form.totals.join(","));
-    if (form.notes.join("|") !== "|sheet says 50|sheet says 149") formProblems.push("sheet notes " + form.notes.join("|"));
     if (form.scoreType !== "text" || form.numeric !== "true") formProblems.push("score field " + form.scoreType + " " + form.numeric);
     if (form.version !== "v20261015j") formProblems.push("version " + form.version);
     if (!/home/i.test(form.summary) || !/2 games won/.test(form.summary)) formProblems.push("summary " + form.summary);
@@ -266,19 +263,6 @@ async function main() {
       el.value = "12";
       el.dispatchEvent(new Event("input", { bubbles: true }));
     });
-    await upload.$eval("#g1-team", (el) => {
-      el.value = "80";
-      el.dispatchEvent(new Event("input", { bubbles: true }));
-    });
-    const typedTotal = await upload.evaluate(() => ({
-      totals: ["save-total-1", "save-total-2", "save-total-3", "save-total-sum"].map((id) => document.getElementById(id).textContent).join(","),
-      note: document.getElementById("save-sheet-1").hidden ? "" : document.getElementById("save-sheet-1").textContent
-    }));
-    if (typedTotal.totals !== "63,54,58,175" || typedTotal.note !== "sheet says 80") throw new Error("typed total " + JSON.stringify(typedTotal));
-    await upload.$eval("#g1-team", (el) => {
-      el.value = "63";
-      el.dispatchEvent(new Event("input", { bubbles: true }));
-    });
     await upload.$eval("#g1-s1-score", (el) => {
       el.value = "30";
       el.dispatchEvent(new Event("input", { bubbles: true }));
@@ -286,14 +270,12 @@ async function main() {
     const followed = await upload.evaluate(() => ({
       totals: ["save-total-1", "save-total-2", "save-total-3", "save-total-sum"].map((id) => document.getElementById(id).textContent).join(","),
       team: document.getElementById("g1-team").value,
-      note: document.getElementById("save-sheet-1").hidden ? "" : document.getElementById("save-sheet-1").textContent,
       check: document.getElementById("g1-check").textContent,
       bad: document.getElementById("g1-check").classList.contains("is-bad"),
       won: document.getElementById("final-score").textContent
     }));
-    if (followed.totals !== "72,54,58,184") throw new Error("shooter sum " + followed.totals);
-    if (followed.team !== "63" || followed.note !== "sheet says 63" || !followed.bad) throw new Error("sheet note " + JSON.stringify(followed));
-    if (!/72/.test(followed.check) || !/63/.test(followed.check)) throw new Error("check " + followed.check);
+    if (followed.totals !== "72,54,58,184" || followed.team !== "72") throw new Error("shooter sum " + JSON.stringify(followed));
+    if (followed.check !== "Sheet total says 63, scores add to 72, check the scores." || !followed.bad) throw new Error("sheet note " + followed.check);
     if (followed.won !== "2 games won") throw new Error("won while editing score " + followed.won);
     await upload.$eval("#g2-s1-score", (el) => {
       el.value = "10";
@@ -302,13 +284,12 @@ async function main() {
     const mismatch = await upload.evaluate(() => ({
       game: document.getElementById("save-total-2").textContent,
       team: document.getElementById("g2-team").value,
-      note: document.getElementById("save-sheet-2").hidden ? "" : document.getElementById("save-sheet-2").textContent,
       check: document.getElementById("g2-check").textContent,
       bad: document.getElementById("g2-check").classList.contains("is-bad"),
       total: document.getElementById("save-total-sum").textContent
     }));
-    if (mismatch.game !== "52" || mismatch.team !== "50" || mismatch.note !== "sheet says 50" || !mismatch.bad) throw new Error("mismatch panel " + JSON.stringify(mismatch));
-    if (!/52/.test(mismatch.check) || !/50/.test(mismatch.check)) throw new Error("mismatch text " + mismatch.check);
+    if (mismatch.game !== "52" || mismatch.team !== "52" || !mismatch.bad) throw new Error("mismatch panel " + JSON.stringify(mismatch));
+    if (mismatch.check !== "Sheet total says 50, scores add to 52, check the scores.") throw new Error("mismatch text " + mismatch.check);
     if (mismatch.total !== "182") throw new Error("mismatch total " + mismatch.total);
     await upload.$eval("#g2-result", (el) => {
       el.value = "won";
@@ -473,7 +454,6 @@ async function main() {
       markAmbiguous("roster-A");
       markAmbiguous("roster-F");
       markAmbiguous("g1-s2-score");
-      markAmbiguous("g1-team");
       var beer = document.getElementById("beer-result");
       beer.value = "";
       document.getElementById("beer-result-flag").textContent = "Check — two marks";
@@ -488,7 +468,7 @@ async function main() {
       document.getElementById("confirm-date").dispatchEvent(new Event("input", { bubbles: true }));
     });
     const fixSix = await upload.$eval("#confirm-submit", (el) => el.textContent);
-    if (fixSix !== "Fix 6 items") throw new Error("flagged button " + fixSix);
+    if (fixSix !== "Fix 5 items") throw new Error("flagged button " + fixSix);
     await upload.click("#confirm-submit");
     await upload.waitForFunction(() => document.activeElement && document.activeElement.id === "roster-A", { timeout: 5000 });
     await upload.waitForFunction(() => {
@@ -519,9 +499,11 @@ async function main() {
     if (rosterMissing.b !== "Enter player B ID. A game uses shooter B.") throw new Error("roster B " + rosterMissing.b);
     if (rosterMissing.g) throw new Error("unused roster G was required: " + rosterMissing.g);
     if (rosterMissing.score !== "Fix the score for Game 1, S2 (two marks).") throw new Error("score " + rosterMissing.score);
-    if (rosterMissing.total !== "Fix the team total for Game 1 (two marks).") throw new Error("total " + rosterMissing.total);
+    if (rosterMissing.total) throw new Error("derived team total blocked save: " + rosterMissing.total);
     if (rosterMissing.beer !== "Fix the beer frame (two marks).") throw new Error("beer " + rosterMissing.beer);
     if (!rosterMissing.labels.some((text) => text.indexOf("Player A ID") === 0)) throw new Error("summary " + rosterMissing.labels.join(" | "));
+    if (rosterMissing.count !== "5 items missing") throw new Error("flagged count " + rosterMissing.count);
+    if (rosterMissing.labels.some((text) => /team total/i.test(text))) throw new Error("team total still required " + rosterMissing.labels.join(" | "));
     console.log("flagged roster ids and other two-mark fields block save: " + rosterMissing.count);
 
     const denied = await browser.newPage();
@@ -566,10 +548,13 @@ async function main() {
     }, { timeout: 20000 });
     const tracksEnded = await scan.evaluate(() => (window.__camTracks || []).every((track) => track.readyState === "ended"));
     if (!tracksEnded) throw new Error("auto-capture left the camera running");
-    const scannedSide = await scan.$eval("#sheet-side", (el) => el.value);
-    const scannedTeam = await scan.$eval("#g3-team", (el) => el.value);
-    if (scannedSide !== "home" || scannedTeam !== "149") {
-      throw new Error("camera reading side " + scannedSide + " team " + scannedTeam);
+    const scannedSheet = await scan.evaluate(() => ({
+      side: document.getElementById("sheet-side").value,
+      total: document.getElementById("g3-team").value,
+      check: document.getElementById("g3-check").textContent
+    }));
+    if (scannedSheet.side !== "home" || scannedSheet.total !== "58" || scannedSheet.check !== "Sheet total says 149, scores add to 58, check the scores.") {
+      throw new Error("camera reading " + JSON.stringify(scannedSheet));
     }
     console.log("camera auto-capture read the same v16 sheet");
     await scan.screenshot({ path: "/opt/cursor/artifacts/v16_camera_review.png" });

@@ -1481,15 +1481,16 @@ tr.is-fresh td { animation: fresh 2.6s ease; }
 
 .save-score-sum strong { color: var(--red-deep); }
 
-.save-sheet-note {
+.team-total-display {
   display: block;
-  max-width: 100%;
-  margin-top: 0.05rem;
-  color: var(--red);
-  font-size: 0.68rem;
+  margin: 0;
+  padding: 0.15rem 0 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: 1.5rem;
   font-weight: 800;
-  line-height: 1.05;
-  overflow-wrap: anywhere;
+  line-height: 1.1;
 }
 
 .save-bar .status { margin: 0.2rem 0 0; }

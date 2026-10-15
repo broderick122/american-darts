@@ -116,8 +116,7 @@
       var totals =
         '<div class="game-totals">' +
         fieldBox("Team total",
-          numericControl("g" + game + "-team", 3, "Game " + game + " team total") +
-          '<span id="g' + game + '-team-flag" class="bubble-flag"></span>') +
+          '<output id="g' + game + '-team" class="team-total-display" aria-live="polite">—</output>') +
         fieldBox("Result",
           '<select id="g' + game + '-result"><option value="">Not marked</option><option value="won">Won</option><option value="lost">Lost</option></select><span id="g' + game + '-result-flag" class="bubble-flag"></span>') +
         "</div>" +
@@ -223,6 +222,8 @@
     finalScoreEl.textContent = won + (won === 1 ? " game won" : " games won");
   }
 
+  var scannedTeam = { 1: null, 2: null, 3: null };
+
   function shooterScores(game) {
     return SHOOTERS.map(function (n) {
       return numberOrNull(document.getElementById("g" + game + "-s" + n + "-score"));
@@ -240,30 +241,29 @@
     return any ? sum : null;
   }
 
+  function rememberScannedTeam(game, cell) {
+    var value = cell && cell.value != null && cell.status !== "blank" && cell.status !== "ambiguous" ? Number(cell.value) : null;
+    scannedTeam[game] = value != null && isFinite(value) ? value : null;
+  }
+
   function refreshChecks() {
     var shown = [];
     GAMES.forEach(function (game) {
       var scores = shooterScores(game);
       var complete = scores.every(function (value) { return value != null; });
       var sum = sumScores(scores);
-      var team = numberOrNull(document.getElementById("g" + game + "-team"));
+      var scanned = scannedTeam[game];
+      var display = document.getElementById("g" + game + "-team");
+      display.value = sum == null ? "—" : String(sum);
       var el = document.getElementById("g" + game + "-check");
       el.classList.remove("is-bad");
-      if (scores.every(function (value) { return value == null; }) && team == null) {
-        el.textContent = "";
-      } else if (!complete || team == null) {
-        el.textContent = "Game " + game + ": fill every shooter and the team total to check the sum.";
-      } else if (sum !== team) {
-        el.textContent = "Game " + game + ": shooters add up to " + sum + ", team total is " + team + ".";
+      if (complete && scanned != null && sum !== scanned) {
+        el.textContent = "Sheet total says " + scanned + ", scores add to " + sum + ", check the scores.";
         el.classList.add("is-bad");
       } else {
-        el.textContent = "Game " + game + ": shooters add up to the team total (" + sum + ").";
+        el.textContent = "";
       }
       document.getElementById("save-total-" + game).textContent = sum == null ? "—" : String(sum);
-      var note = document.getElementById("save-sheet-" + game);
-      var differs = team != null && sum !== team;
-      note.hidden = !differs;
-      note.textContent = differs ? "sheet says " + team : "";
       shown.push(sum);
     });
     var allShown = shown.every(function (value) { return value != null; });
@@ -280,7 +280,7 @@
         setChoice("g" + game + "-s" + n + "-who", "", "blank");
         setNumber("g" + game + "-s" + n + "-score", { status: "blank" });
       });
-      setNumber("g" + game + "-team", { status: "blank" });
+      scannedTeam[game] = null;
       setChoice("g" + game + "-result", "", "blank");
     });
     setChoice("beer-result", "", "blank", "Blank is allowed");
@@ -346,7 +346,7 @@
           setChoice("g" + n + "-s" + (shooterIndex + 1) + "-who", row.who && row.who.value, row.who && row.who.status);
           setNumber("g" + n + "-s" + (shooterIndex + 1) + "-score", row.score);
         });
-        setNumber("g" + n + "-team", game.team);
+        rememberScannedTeam(n, game.team);
         setChoice("g" + n + "-result", game.result && game.result.value, game.result && game.result.status);
       });
       setChoice("beer-result", result.beer && result.beer.value, result.beer && result.beer.status, "Blank is allowed");
@@ -429,7 +429,7 @@
         return {
           who: SHOOTERS.map(function (n) { return document.getElementById("g" + game + "-s" + n + "-who").value; }),
           scores: SHOOTERS.map(function (n) { return numberOrNull(document.getElementById("g" + game + "-s" + n + "-score")); }),
-          team: numberOrNull(document.getElementById("g" + game + "-team")),
+          team: sumScores(shooterScores(game)),
           result: document.getElementById("g" + game + "-result").value
         };
       }),
@@ -592,10 +592,6 @@
         if (scoreReason) add(score.id, scoreLabel, "Fix the score for Game " + game + ", S" + n + " (" + scoreReason + ").");
         else if (!inRange(score, 0, 49)) add(score.id, scoreLabel, "Enter the score for Game " + game + ", S" + n + ".");
       });
-      var total = document.getElementById("g" + game + "-team");
-      var totalReason = flagReason(total);
-      if (totalReason) add(total.id, "Game " + game + " team total", "Fix the team total for Game " + game + " (" + totalReason + ").");
-      else if (!inRange(total, 0, 199)) add(total.id, "Game " + game + " team total", "Enter the team total for Game " + game + ".");
       var result = document.getElementById("g" + game + "-result");
       var resultReason = flagReason(result);
       if (resultReason) add(result.id, "Game " + game + " result", "Fix Game " + game + " won or lost (" + resultReason + ").");
