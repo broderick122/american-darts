@@ -86,12 +86,14 @@
           "<span id=\"g" + game + "-s" + n + "-score-flag\" class=\"bubble-flag\"></span></td></tr>";
       }).join("");
       return '<section class="game-card"><h3>Game ' + game + "</h3>" +
-        '<div class="table-scroll"><table class="bubble-table"><caption>Who threw, and the score. Tens on the sheet only go to 4; a score under 10 has a blank tens bubble.</caption><thead><tr><th scope="col"></th><th scope="col">Who</th><th scope="col">Score</th></tr></thead><tbody>' +
+        '<div class="table-scroll"><table class="bubble-table"><caption>Who threw, and the score. Tens is a column of 1 through 4. A score under 10 leaves tens blank.</caption><thead><tr><th scope="col"></th><th scope="col">Who</th><th scope="col">Score</th></tr></thead><tbody>' +
         rows + "</tbody></table></div>" +
         '<div class="form-grid cols-3"><label class="field">Team total<input id="g' + game + '-team" type="number" min="0" max="199" inputmode="numeric" placeholder="—"><span id="g' + game + '-team-flag" class="bubble-flag"></span></label>' +
         '<label class="field">Result<select id="g' + game + '-result"><option value="">Not marked</option><option value="won">Won</option><option value="lost">Lost</option></select><span id="g' + game + '-result-flag" class="bubble-flag"></span></label></div>' +
         '<p id="g' + game + '-check" class="cross-check"></p></section>';
-    }).join("");
+    }).join("") +
+      '<div class="form-grid cols-2"><label class="field">Beer frame<select id="beer-result"><option value="">Not marked</option><option value="won">Won</option><option value="lost">Lost</option></select><span id="beer-result-flag" class="bubble-flag"></span></label>' +
+      '<label class="field">Total points<select id="points-result"><option value="">Not marked</option><option value="won">Won</option><option value="lost">Lost</option></select><span id="points-result-flag" class="bubble-flag"></span></label></div>';
   }
 
   buildReview();
@@ -219,6 +221,8 @@
       setNumber("g" + game + "-team", { status: "blank" });
       setChoice("g" + game + "-result", "", "blank");
     });
+    setChoice("beer-result", "", "blank", "Blank is allowed");
+    setChoice("points-result", "", "blank");
     refreshChecks();
   }
 
@@ -279,6 +283,8 @@
         setNumber("g" + n + "-team", game.team);
         setChoice("g" + n + "-result", game.result && game.result.value, game.result && game.result.status);
       });
+      setChoice("beer-result", result.beer && result.beer.value, result.beer && result.beer.status, "Blank is allowed");
+      setChoice("points-result", result.points && result.points.value, result.points && result.points.status);
     } else {
       clearSheet();
     }
@@ -347,7 +353,9 @@
           team: numberOrNull(document.getElementById("g" + game + "-team")),
           result: document.getElementById("g" + game + "-result").value
         };
-      })
+      }),
+      beer: document.getElementById("beer-result").value,
+      points: document.getElementById("points-result").value
     };
   }
 
