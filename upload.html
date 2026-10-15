@@ -11,8 +11,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script>window.RAD_ASSET_VERSION = "20261015f";</script>
-  <link rel="stylesheet" href="css/styles.css?v=20261015f">
+  <script>window.RAD_ASSET_VERSION = "20261015h";</script>
+  <link rel="stylesheet" href="css/styles.css?v=20261015h">
 </head>
 <body class="page-upload">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -133,9 +133,16 @@
         <div id="games-block" class="side-block"></div>
         <div class="save-bar">
           <div class="save-totals">
-            <p class="eyebrow">This team</p>
-            <p id="final-score" class="final-score" aria-live="polite">0 games won</p>
-            <p id="sheet-points" class="status"></p>
+            <p class="save-heading">
+              <span class="eyebrow">This team</span>
+              <span id="final-score" class="final-score" aria-live="polite">0 games won</span>
+            </p>
+            <div id="sheet-points" class="save-score-row" aria-live="polite">
+              <p class="save-score"><span>Game 1</span><strong id="save-total-1">—</strong></p>
+              <p class="save-score"><span>Game 2</span><strong id="save-total-2">—</strong></p>
+              <p class="save-score"><span>Game 3</span><strong id="save-total-3">—</strong></p>
+              <p class="save-score save-score-sum"><span>Total</span><strong id="save-total-sum">—</strong></p>
+            </div>
           </div>
           <p id="confirm-error" class="alert" role="alert" hidden></p>
           <button class="btn btn-primary btn-xl" id="confirm-submit" type="submit">Save</button>
@@ -181,9 +188,9 @@
     <a href="upload.html" aria-current="page">Scan</a>
     <a href="scoresheet/roslyn_scansheet_v16.pdf">Sheet</a>
   </nav>
-  <script src="config.js?v=20261015f"></script>
-  <script src="js/data.js?v=20261015f"></script>
-  <script src="js/sheet-ocr.js?v=20261015f"></script>
-  <script src="js/upload.js?v=20261015f"></script>
+  <script src="config.js?v=20261015h"></script>
+  <script src="js/data.js?v=20261015h"></script>
+  <script src="js/sheet-ocr.js?v=20261015h"></script>
+  <script src="js/upload.js?v=20261015h"></script>
 </body>
 </html>

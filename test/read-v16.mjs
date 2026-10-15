@@ -219,6 +219,8 @@ async function main() {
         beer: val("beer-result"),
         points: val("points-result"),
         finalScore: document.getElementById("final-score").textContent,
+        finalSize: getComputedStyle(document.getElementById("final-score")).fontSize,
+        totals: ["save-total-1", "save-total-2", "save-total-3", "save-total-sum"].map((id) => document.getElementById(id).textContent),
         summary: document.getElementById("ocr-summary").textContent
       };
     });
@@ -237,6 +239,8 @@ async function main() {
     if (form.beer !== "") formProblems.push("beer " + form.beer);
     if (form.points !== "won") formProblems.push("points " + form.points);
     if (!/2 games won/.test(form.finalScore)) formProblems.push("final " + form.finalScore);
+    if (parseFloat(form.finalSize) > 22) formProblems.push("final size " + form.finalSize);
+    if (form.totals.join(",") !== "63,50,149,262") formProblems.push("sticky totals " + form.totals.join(","));
     if (!/home/i.test(form.summary) || !/2 games won/.test(form.summary)) formProblems.push("summary " + form.summary);
     if (formProblems.length) {
       console.error(form);
@@ -252,6 +256,16 @@ async function main() {
       el.value = "12";
       el.dispatchEvent(new Event("input", { bubbles: true }));
     });
+    await upload.$eval("#g1-team", (el) => {
+      el.value = "80";
+      el.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    const liveTotals = await upload.evaluate(() => ["save-total-1", "save-total-2", "save-total-3", "save-total-sum"].map((id) => document.getElementById(id).textContent).join(","));
+    if (liveTotals !== "80,50,149,279") throw new Error("live totals " + liveTotals);
+    await upload.$eval("#g1-team", (el) => {
+      el.value = "63";
+      el.dispatchEvent(new Event("input", { bubbles: true }));
+    });
     console.log("upload review shows the v16 reading and accepts edits");
     mkdirSync("/opt/cursor/artifacts", { recursive: true });
     const section = await upload.$("#confirm-section");
@@ -264,7 +278,18 @@ async function main() {
       el.value = "5";
       el.dispatchEvent(new Event("input", { bubbles: true }));
     });
-    await upload.$eval("#confirm-date", (el) => { el.value = "2026-11-04"; });
+    await upload.$eval("#confirm-date", (el) => {
+      el.value = "2026-11-04";
+      el.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    const readyButton = await upload.$eval("#confirm-submit", (el) => ({
+      text: el.textContent,
+      primary: el.classList.contains("btn-primary"),
+      fix: el.classList.contains("btn-fix")
+    }));
+    if (readyButton.text !== "Save" || !readyButton.primary || readyButton.fix) {
+      throw new Error("ready button " + JSON.stringify(readyButton));
+    }
     await upload.click("#confirm-submit");
     await upload.waitForFunction(() => /opponent's sheet/i.test(document.getElementById("saved-note").textContent || ""));
     await upload.select("#sheet-side", "away");
@@ -289,7 +314,18 @@ async function main() {
       card.classList.add("is-collapsed");
       card.querySelector(".game-toggle").setAttribute("aria-expanded", "false");
       card.querySelector(".game-toggle-state").textContent = "Show";
+      document.getElementById("confirm-date").dispatchEvent(new Event("input", { bubbles: true }));
+      document.getElementById("g2-s3-who").dispatchEvent(new Event("change", { bubbles: true }));
     });
+    const fixTwo = await upload.$eval("#confirm-submit", (el) => ({
+      text: el.textContent,
+      fix: el.classList.contains("btn-fix"),
+      primary: el.classList.contains("btn-primary")
+    }));
+    if (fixTwo.text !== "Fix 2 items" || !fixTwo.fix || fixTwo.primary) {
+      throw new Error("fix button " + JSON.stringify(fixTwo));
+    }
+    const noteBeforeJump = await upload.$eval("#saved-note", (el) => el.textContent);
     await upload.click("#confirm-submit");
     await upload.waitForFunction(() => {
       const date = document.getElementById("confirm-date");
@@ -319,6 +355,10 @@ async function main() {
     if (!missing.labels.some((text) => text.indexOf("Match date") === 0) || !missing.labels.some((text) => text.indexOf("Game 2, shooter 3, who") === 0)) {
       throw new Error("summary labels " + missing.labels.join(" | "));
     }
+    const stillFixing = await upload.$eval("#confirm-submit", (el) => el.textContent);
+    const noteAfterJump = await upload.$eval("#saved-note", (el) => el.textContent);
+    if (stillFixing !== "Fix 2 items") throw new Error("button after jump " + stillFixing);
+    if (noteAfterJump !== noteBeforeJump) throw new Error("fix button saved the sheet");
     await upload.evaluate(() => document.querySelector('#missing-list button[data-goto="g2-s3-who"]').click());
     await upload.waitForFunction(() => {
       const who = document.getElementById("g2-s3-who");
@@ -331,9 +371,26 @@ async function main() {
     await upload.select("#g2-s3-who", "A");
     await upload.waitForFunction(() => {
       const who = document.getElementById("g2-s3-who");
+      const button = document.getElementById("confirm-submit");
       return !who.closest(".field").classList.contains("is-missing") &&
-        document.getElementById("missing-count").textContent === "1 item missing";
+        document.getElementById("missing-count").textContent === "1 item missing" &&
+        button.textContent === "Fix 1 item" &&
+        button.classList.contains("btn-fix") &&
+        !button.classList.contains("btn-primary");
     });
+    await upload.$eval("#confirm-date", (el) => {
+      el.value = "2026-11-04";
+      el.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    const savedAgain = await upload.$eval("#confirm-submit", (el) => ({
+      text: el.textContent,
+      primary: el.classList.contains("btn-primary"),
+      fix: el.classList.contains("btn-fix"),
+      summaryHidden: document.getElementById("missing-summary").hidden
+    }));
+    if (savedAgain.text !== "Save" || !savedAgain.primary || savedAgain.fix || !savedAgain.summaryHidden) {
+      throw new Error("save button " + JSON.stringify(savedAgain));
+    }
     console.log("save scrolls to the first missing field and clears a fix");
 
     await upload.evaluate(() => {
@@ -359,7 +416,10 @@ async function main() {
       rosterG.value = "";
       rosterG.classList.remove("is-ambiguous");
       document.getElementById("roster-G-flag").textContent = "Blank — not zero";
+      document.getElementById("confirm-date").dispatchEvent(new Event("input", { bubbles: true }));
     });
+    const fixSix = await upload.$eval("#confirm-submit", (el) => el.textContent);
+    if (fixSix !== "Fix 6 items") throw new Error("flagged button " + fixSix);
     await upload.click("#confirm-submit");
     await upload.waitForFunction(() => document.activeElement && document.activeElement.id === "roster-A", { timeout: 5000 });
     await upload.waitForFunction(() => {
