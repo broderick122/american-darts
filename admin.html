@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css?v=20261015c">
+  <link rel="stylesheet" href="css/styles.css?v=20261015d">
 </head>
 <body class="page-admin">
   <a class="skip-link" href="#admin-main">Skip to content</a>
@@ -24,7 +24,7 @@
           <small>American Darts</small>
         </span>
       </a>
-      <a href="index.html">Back to the site</a>
+      <a class="btn btn-ink" href="index.html">Back to the site</a>
     </div>
   </header>
   <main id="admin-main" class="wrap">
@@ -59,7 +59,7 @@
       <section class="section" id="admin-standings" style="padding-top:1rem">
         <h2>Standings</h2>
         <p>These numbers recalculate after every save, edit, or delete on this page.</p>
-        <p class="swipe-hint">Swipe sideways to read the full table.</p>
+        <p class="swipe-hint">Each team shows wins, losses, ties, games won, and points.</p>
         <div id="admin-standings-table"></div>
         <p class="formula" id="admin-rule"></p>
       </section>
@@ -140,8 +140,14 @@
       </section>
     </section>
   </main>
-  <script src="config.js?v=20261015c"></script>
-  <script src="js/data.js?v=20261015c"></script>
-  <script src="js/admin.js?v=20261015c"></script>
+  <nav class="thumb-nav" aria-label="Main">
+    <a href="index.html">Home</a>
+    <a href="index.html#standings">Standings</a>
+    <a href="upload.html">Scan</a>
+    <a href="admin.html" aria-current="page">Admin</a>
+  </nav>
+  <script src="config.js?v=20261015d"></script>
+  <script src="js/data.js?v=20261015d"></script>
+  <script src="js/admin.js?v=20261015d"></script>
 </body>
 </html>
