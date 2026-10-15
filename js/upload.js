@@ -342,7 +342,7 @@
   }
 
   function loadSpec() {
-    var version = window.RAD_ASSET_VERSION || "20261015e";
+    var version = window.RAD_ASSET_VERSION || "20261015f";
     return fetch("scoresheet/scansheet_v16_layout_spec.json?v=" + encodeURIComponent(version), { cache: "no-store" }).then(function (response) {
       if (!response.ok) throw new Error("The scan sheet layout could not be loaded (" + response.status + "). Reload the page and try again.");
       return response.json();
@@ -495,6 +495,27 @@
     return isFinite(value) && value >= min && value <= max;
   }
 
+  function flagReason(input) {
+    if (!input) return "";
+    var flag = document.getElementById(input.id + "-flag");
+    var text = flag ? String(flag.textContent || "").trim() : "";
+    var ambiguous = input.classList.contains("is-ambiguous") || /two marks/i.test(text);
+    if (ambiguous) return "two marks";
+    if (text && !/blank|not marked|allowed/i.test(text)) return text;
+    return "";
+  }
+
+  function slotsInUse() {
+    var used = {};
+    GAMES.forEach(function (game) {
+      SHOOTERS.forEach(function (n) {
+        var who = document.getElementById("g" + game + "-s" + n + "-who").value;
+        if (who) used[who] = true;
+      });
+    });
+    return used;
+  }
+
   function collectMissing() {
     var items = [];
     function add(id, label, message) {
@@ -503,7 +524,9 @@
     var date = document.getElementById("confirm-date");
     if (blankValue(date)) add("confirm-date", "Match date", "Add the match date.");
     var side = document.getElementById("sheet-side");
-    if (side.value !== "home" && side.value !== "away") add("sheet-side", "This sheet is", "Mark this sheet Home or Away.");
+    var sideReason = flagReason(side);
+    if (sideReason) add("sheet-side", "This sheet is", "Fix Home or Away (" + sideReason + ").");
+    else if (side.value !== "home" && side.value !== "away") add("sheet-side", "This sheet is", "Mark this sheet Home or Away.");
     var teamSelect = document.getElementById("team-select");
     var teamName = document.getElementById("team-name");
     var opponentSelect = document.getElementById("opponent-select");
@@ -518,24 +541,45 @@
     if (teamSelect.value === "new" && opponentSelect.value === "new" && !blankValue(teamName) && !blankValue(opponentName) && norm(teamName.value) === norm(opponentName.value)) {
       add("opponent-name", "Opponent, as written", "Type a different opponent.");
     }
-    GAMES.forEach(function (game) {
-      SHOOTERS.forEach(function (n) {
-        var whoId = "g" + game + "-s" + n + "-who";
-        var scoreId = "g" + game + "-s" + n + "-score";
-        var whoLabel = "Game " + game + ", shooter " + n + ", who";
-        var scoreLabel = "Game " + game + ", shooter " + n + ", score";
-        if (blankValue(document.getElementById(whoId))) add(whoId, whoLabel, "Pick who shot Game " + game + ", S" + n + ".");
-        if (!inRange(document.getElementById(scoreId), 0, 49)) add(scoreId, scoreLabel, "Enter the score for Game " + game + ", S" + n + ".");
-      });
-      var totalId = "g" + game + "-team";
-      if (!inRange(document.getElementById(totalId), 0, 199)) add(totalId, "Game " + game + " team total", "Enter the team total for Game " + game + ".");
-      var resultId = "g" + game + "-result";
-      if (document.getElementById(resultId).value !== "won" && document.getElementById(resultId).value !== "lost") {
-        add(resultId, "Game " + game + " result", "Mark Game " + game + " won or lost.");
+    var used = slotsInUse();
+    SLOTS.forEach(function (slot) {
+      var input = document.getElementById("roster-" + slot);
+      var reason = flagReason(input);
+      var label = "Player " + slot + " ID";
+      if (reason) add(input.id, label, "Fix player " + slot + " ID (" + reason + ").");
+      else if ((blankValue(input) || !inRange(input, 0, 99)) && used[slot]) {
+        add(input.id, label, "Enter player " + slot + " ID. A game uses shooter " + slot + ".");
       }
     });
+    GAMES.forEach(function (game) {
+      SHOOTERS.forEach(function (n) {
+        var who = document.getElementById("g" + game + "-s" + n + "-who");
+        var score = document.getElementById("g" + game + "-s" + n + "-score");
+        var whoLabel = "Game " + game + ", shooter " + n + ", who";
+        var scoreLabel = "Game " + game + ", shooter " + n + ", score";
+        var whoReason = flagReason(who);
+        var scoreReason = flagReason(score);
+        if (whoReason) add(who.id, whoLabel, "Fix who shot Game " + game + ", S" + n + " (" + whoReason + ").");
+        else if (blankValue(who)) add(who.id, whoLabel, "Pick who shot Game " + game + ", S" + n + ".");
+        if (scoreReason) add(score.id, scoreLabel, "Fix the score for Game " + game + ", S" + n + " (" + scoreReason + ").");
+        else if (!inRange(score, 0, 49)) add(score.id, scoreLabel, "Enter the score for Game " + game + ", S" + n + ".");
+      });
+      var total = document.getElementById("g" + game + "-team");
+      var totalReason = flagReason(total);
+      if (totalReason) add(total.id, "Game " + game + " team total", "Fix the team total for Game " + game + " (" + totalReason + ").");
+      else if (!inRange(total, 0, 199)) add(total.id, "Game " + game + " team total", "Enter the team total for Game " + game + ".");
+      var result = document.getElementById("g" + game + "-result");
+      var resultReason = flagReason(result);
+      if (resultReason) add(result.id, "Game " + game + " result", "Fix Game " + game + " won or lost (" + resultReason + ").");
+      else if (result.value !== "won" && result.value !== "lost") add(result.id, "Game " + game + " result", "Mark Game " + game + " won or lost.");
+    });
+    var beer = document.getElementById("beer-result");
+    var beerReason = flagReason(beer);
+    if (beerReason) add(beer.id, "Beer frame", "Fix the beer frame (" + beerReason + ").");
     var points = document.getElementById("points-result");
-    if (points.value !== "won" && points.value !== "lost") add("points-result", "Total points", "Mark total points won or lost.");
+    var pointsReason = flagReason(points);
+    if (pointsReason) add(points.id, "Total points", "Fix total points (" + pointsReason + ").");
+    else if (points.value !== "won" && points.value !== "lost") add(points.id, "Total points", "Mark total points won or lost.");
     return items;
   }
 
@@ -1085,10 +1129,14 @@
   function onReviewEdit(event) {
     formDirty = true;
     var target = event.target;
-    if (target && target.classList && target.type === "number") {
-      target.classList.remove("is-blank", "is-ambiguous");
+    if (target && target.id && (target.type === "number" || target.tagName === "SELECT")) {
+      if (target.type === "number") target.classList.remove("is-blank", "is-ambiguous");
       var flag = document.getElementById(target.id + "-flag");
-      if (flag) flag.textContent = target.value === "" ? "Blank — not zero" : "";
+      if (flag) {
+        if (target.type === "number") flag.textContent = String(target.value).trim() === "" ? "Blank — not zero" : "";
+        else if (target.id === "beer-result") flag.textContent = target.value ? "" : "Blank is allowed";
+        else flag.textContent = target.value ? "" : "Not marked";
+      }
     }
     refreshChecks();
     if (reviewInvalid) paintMissing(collectMissing());

@@ -260,6 +260,10 @@ async function main() {
     await upload.select("#team-select", "t_red");
     await upload.select("#opponent-select", "t_green");
     await upload.select("#g2-s2-who", "F");
+    await upload.$eval("#roster-E", (el) => {
+      el.value = "5";
+      el.dispatchEvent(new Event("input", { bubbles: true }));
+    });
     await upload.$eval("#confirm-date", (el) => { el.value = "2026-11-04"; });
     await upload.click("#confirm-submit");
     await upload.waitForFunction(() => /opponent's sheet/i.test(document.getElementById("saved-note").textContent || ""));
@@ -331,6 +335,65 @@ async function main() {
         document.getElementById("missing-count").textContent === "1 item missing";
     });
     console.log("save scrolls to the first missing field and clears a fix");
+
+    await upload.evaluate(() => {
+      document.getElementById("confirm-date").value = "2026-11-04";
+      function markAmbiguous(id) {
+        var el = document.getElementById(id);
+        el.value = "";
+        if (el.classList) el.classList.add("is-ambiguous");
+        document.getElementById(id + "-flag").textContent = "Check — two marks";
+      }
+      markAmbiguous("roster-A");
+      markAmbiguous("roster-F");
+      markAmbiguous("g1-s2-score");
+      markAmbiguous("g1-team");
+      var beer = document.getElementById("beer-result");
+      beer.value = "";
+      document.getElementById("beer-result-flag").textContent = "Check — two marks";
+      var rosterB = document.getElementById("roster-B");
+      rosterB.value = "";
+      rosterB.classList.remove("is-ambiguous");
+      document.getElementById("roster-B-flag").textContent = "Blank — not zero";
+      var rosterG = document.getElementById("roster-G");
+      rosterG.value = "";
+      rosterG.classList.remove("is-ambiguous");
+      document.getElementById("roster-G-flag").textContent = "Blank — not zero";
+    });
+    await upload.click("#confirm-submit");
+    await upload.waitForFunction(() => document.activeElement && document.activeElement.id === "roster-A", { timeout: 5000 });
+    await upload.waitForFunction(() => {
+      const field = document.getElementById("roster-A").closest(".field").getBoundingClientRect();
+      const save = document.querySelector(".save-bar").getBoundingClientRect();
+      const header = document.querySelector(".site-header").getBoundingClientRect();
+      return field.top >= header.bottom - 4 && field.bottom <= save.top + 4;
+    }, { timeout: 5000 });
+    const rosterMissing = await upload.evaluate(() => {
+      function note(id) {
+        const field = document.getElementById(id).closest(".field");
+        return field.classList.contains("is-missing") ? field.querySelector(".missing-note").textContent : "";
+      }
+      return {
+        count: document.getElementById("missing-count").textContent,
+        a: note("roster-A"),
+        f: note("roster-F"),
+        b: note("roster-B"),
+        g: note("roster-G"),
+        score: note("g1-s2-score"),
+        total: note("g1-team"),
+        beer: note("beer-result"),
+        labels: Array.from(document.querySelectorAll("#missing-list button")).map((button) => button.textContent)
+      };
+    });
+    if (rosterMissing.a !== "Fix player A ID (two marks).") throw new Error("roster A " + rosterMissing.a);
+    if (rosterMissing.f !== "Fix player F ID (two marks).") throw new Error("roster F " + rosterMissing.f);
+    if (rosterMissing.b !== "Enter player B ID. A game uses shooter B.") throw new Error("roster B " + rosterMissing.b);
+    if (rosterMissing.g) throw new Error("unused roster G was required: " + rosterMissing.g);
+    if (rosterMissing.score !== "Fix the score for Game 1, S2 (two marks).") throw new Error("score " + rosterMissing.score);
+    if (rosterMissing.total !== "Fix the team total for Game 1 (two marks).") throw new Error("total " + rosterMissing.total);
+    if (rosterMissing.beer !== "Fix the beer frame (two marks).") throw new Error("beer " + rosterMissing.beer);
+    if (!rosterMissing.labels.some((text) => text.indexOf("Player A ID") === 0)) throw new Error("summary " + rosterMissing.labels.join(" | "));
+    console.log("flagged roster ids and other two-mark fields block save: " + rosterMissing.count);
 
     const denied = await browser.newPage();
     await installCamera(denied, "denied", origin + "/test/fixtures/filled-v16.jpg");
