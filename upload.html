@@ -11,8 +11,22 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script>window.RAD_ASSET_VERSION = "20261015i";</script>
-  <link rel="stylesheet" href="css/styles.css?v=20261015i">
+  <script>
+    window.RAD_ASSET_VERSION = "20261015j";
+    (function () {
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function (regs) {
+          regs.forEach(function (reg) { reg.unregister(); });
+        }).catch(function () {});
+      }
+      if (window.caches && window.caches.keys) {
+        window.caches.keys().then(function (keys) {
+          keys.forEach(function (key) { window.caches.delete(key); });
+        }).catch(function () {});
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="css/styles.css?v=20261015j">
 </head>
 <body class="page-upload">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -96,7 +110,7 @@
         <p class="eyebrow">Confirm</p>
         <h2>Check the reading</h2>
       </div>
-      <p>Fix anything that is wrong, then save this team’s sheet. A red note means the four shooter scores do not add up to that game’s team total. Standings use Won and Lost, not the point totals. They update when the other team’s sheet for the same date is saved too.</p>
+      <p>Fix anything that is wrong, then save this team’s sheet. Each team total is the sum of that game’s shooter scores. A red note means the bubbles on the sheet showed a different total. That note does not stop the save. Standings use Won and Lost, not the point totals. They update when the other team’s sheet for the same date is saved too.</p>
       <form id="confirm-form" class="sheet" novalidate>
         <div id="missing-summary" class="missing-summary" hidden>
           <p id="missing-count"></p>
@@ -179,6 +193,7 @@
         <p>VFW phone: <a href="tel:+12155769349">(215) 576-9349</a></p>
       </address>
       <p><a href="scoresheet/roslyn_scansheet_v16.pdf">Scan sheet (v16)</a><br><a href="index.html#score">Typed score sheet</a><br><a href="admin.html">Admin</a></p>
+      <p class="asset-version">v20261015j</p>
     </div>
   </footer>
 
@@ -188,9 +203,9 @@
     <a href="upload.html" aria-current="page">Scan</a>
     <a href="scoresheet/roslyn_scansheet_v16.pdf">Sheet</a>
   </nav>
-  <script src="config.js?v=20261015i"></script>
-  <script src="js/data.js?v=20261015i"></script>
-  <script src="js/sheet-ocr.js?v=20261015i"></script>
-  <script src="js/upload.js?v=20261015i"></script>
+  <script src="config.js?v=20261015j"></script>
+  <script src="js/data.js?v=20261015j"></script>
+  <script src="js/sheet-ocr.js?v=20261015j"></script>
+  <script src="js/upload.js?v=20261015j"></script>
 </body>
 </html>

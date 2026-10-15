@@ -16,7 +16,22 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css?v=20261015i">
+  <link rel="stylesheet" href="css/styles.css?v=20261015j">
+  <script>
+    window.RAD_ASSET_VERSION = "20261015j";
+    (function () {
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function (regs) {
+          regs.forEach(function (reg) { reg.unregister(); });
+        }).catch(function () {});
+      }
+      if (window.caches && window.caches.keys) {
+        window.caches.keys().then(function (keys) {
+          keys.forEach(function (key) { window.caches.delete(key); });
+        }).catch(function () {});
+      }
+    })();
+  </script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -362,6 +377,7 @@
         <p>VFW phone: <a href="tel:+12155769349">(215) 576-9349</a></p>
       </address>
       <p><a href="scoresheet/roslyn_scansheet_v16.pdf">Scan sheet (v16)</a><br><a href="upload.html">Upload scan sheet</a><br><a href="admin.html">Admin</a></p>
+      <p class="asset-version">v20261015j</p>
       <nav class="footer-links" aria-label="On this page">
         <a href="#about">About</a>
         <a href="#schedule">Schedule</a>
@@ -391,8 +407,8 @@
     <p id="lightbox-caption"></p>
   </dialog>
   <noscript><style>#site-nav{display:block !important;position:static !important;box-shadow:none}</style></noscript>
-  <script src="config.js?v=20261015i"></script>
-  <script src="js/data.js?v=20261015i"></script>
-  <script src="js/main.js?v=20261015i"></script>
+  <script src="config.js?v=20261015j"></script>
+  <script src="js/data.js?v=20261015j"></script>
+  <script src="js/main.js?v=20261015j"></script>
 </body>
 </html>
