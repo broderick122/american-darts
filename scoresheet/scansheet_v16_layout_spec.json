@@ -1,5 +1,5 @@
 {
- "sheet": "Roslyn VFW Dart League One Team Scan Sheet",
+ "sheet": "Roslyn VFW Dart League Results Scan Sheet",
  "version": "v16",
  "page": {
   "size_pt": [
@@ -8,4133 +8,4601 @@
   ],
   "orientation": "portrait letter",
   "pages": 1,
-  "team_arrangement": "one_team"
+  "safe_margin_pt": 21.6,
+  "team_arrangement": "one team per sheet; side given by side_field"
  },
  "coordinate_system": "Normalized to corner-marker centres: (0,0)=TL, (1,0)=TR, (0,1)=BL; y down.",
  "fiducials": {
   "TL": {
    "center_pt_topleft": [
-    27.0,
-    27.0
+    32.6,
+    32.60000000000002
    ],
    "size_pt": 22
   },
   "TR": {
    "center_pt_topleft": [
-    585.0,
-    27.0
+    579.4,
+    32.60000000000002
    ],
    "size_pt": 22
   },
   "BL": {
    "center_pt_topleft": [
-    27.0,
-    765.0
+    32.6,
+    759.4
    ],
    "size_pt": 22
   },
   "BR": {
    "center_pt_topleft": [
-    585.0,
-    765.0
+    579.4,
+    759.4
    ],
    "size_pt": 22
   }
  },
- "fiducial_note": "Solid black squares; TL has white notch for orientation.",
- "bubble_radius": {
-  "pt": 7.4,
-  "norm_x": 0.01326,
-  "norm_y": 0.01003
+ "orientation": "Determined from the corner squares alone: only TL has a white notch.",
+ "version_marker": {
+  "text": "v16",
+  "note": "No QR code. Version identified by the small printed marker (bottom right, above BR marker) and the layout."
  },
- "qr": {
-  "payload_placeholder": "ROSLYN|2026|WK01|ONE-TEAM",
-  "bbox_norm": [
-   0.90502,
-   -0.0122,
-   0.06093,
-   0.04607
+ "band_colors_hex": {
+  "home": {
+   "a": "#E3EFFF",
+   "b": "#CCE0FA",
+   "team": "#D6D0F5"
+  },
+  "away": {
+   "a": "#FFEEDD",
+   "b": "#FFDCC2",
+   "team": "#FFF0B3"
+  }
+ },
+ "digit_layout": "0-9 keypads: 1-2-3 / 4-5-6 / 7-8-9 / 0 under 8. Shooter TENS: column 1-4 (blank = 0). WHO: A B C D / E F G H.",
+ "bubble_size_pt": {
+  "score": {
+   "width": 20.76,
+   "height": 16.8,
+   "pitch_x": 22.96,
+   "pitch_y": 19.0
+  },
+  "who": {
+   "width": 17.32,
+   "height": 16.8,
+   "pitch_x": 19.52,
+   "pitch_y": 19.0
+  },
+  "roster_id": {
+   "width": 16.8,
+   "height": 13.44,
+   "pitch_x": 22.2,
+   "pitch_y": 15.64
+  },
+  "result": {
+   "width": 32,
+   "height": 20
+  }
+ },
+ "bubble_radius_norm": {
+  "score": [
+   0.01899,
+   0.01156
+  ],
+  "who": [
+   0.01584,
+   0.01156
+  ],
+  "roster_id": [
+   0.01536,
+   0.00925
+  ],
+  "result": [
+   0.02926,
+   0.01376
   ]
  },
- "reading_rules": "One team per sheet. HOME/AWAY: exactly one. Roster A-H: two-digit id (00-99). Each game has four shooter rows; WHO is exactly one of A-H. Shooter tens bubbles are 1-4 only; a blank tens with a filled ones digit is a score under 10. Ones are 0-9. Team total is a 100 flag plus tens 0-9 and ones 0-9. Each game is WON or LOST. Handwritten name, date, opponent, and score boxes are not read.",
- "slots": [
-  "A",
-  "B",
-  "C",
-  "D",
-  "E",
-  "F",
-  "G",
-  "H"
- ],
- "games_count": 3,
- "shooters_per_game": 4,
- "side_field": [
-  {
-   "value": "home",
-   "center_norm": [
-    0.72222,
-    0.07453
+ "reading_rules": "Roster: each used slot A-H has a 2-digit ID (one key per pad); unused slots blank. WHO: exactly one of A-H per shooter row per game, naming the roster slot that shot. Shooter TENS (1-4 column): zero or one, blank = 0; ONES: exactly one; shooter max 49. Team total: '100' flag (filled = +100), TENS and ONES exactly one each; max 199. Side: exactly one of home/away. Results: one of won/lost per group. Ignore all human_only regions.",
+ "roster_fields": {
+  "team_A": {
+   "slot": "A",
+   "type": "player_id",
+   "format": "[0-9]{2}",
+   "max_ids": 100,
+   "blank_slot_allowed": true,
+   "digits": [
+    {
+     "place": "tens",
+     "layout": "keypad_0_under_8",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.00567,
+        0.15936
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.04627,
+        0.15936
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.08687,
+        0.15936
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.00567,
+        0.18088
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.04627,
+        0.18088
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.08687,
+        0.18088
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.00567,
+        0.2024
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.04627,
+        0.2024
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.08687,
+        0.2024
+       ]
+      },
+      {
+       "value": 0,
+       "center_norm": [
+        0.04627,
+        0.22392
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "layout": "keypad_0_under_8",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.13296,
+        0.15936
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.17356,
+        0.15936
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.21416,
+        0.15936
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.13296,
+        0.18088
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.17356,
+        0.18088
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.21416,
+        0.18088
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.13296,
+        0.2024
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.17356,
+        0.2024
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.21416,
+        0.2024
+       ]
+      },
+      {
+       "value": 0,
+       "center_norm": [
+        0.17356,
+        0.22392
+       ]
+      }
+     ]
+    }
    ]
   },
-  {
-   "value": "away",
-   "center_norm": [
-    0.78674,
-    0.07453
+  "team_B": {
+   "slot": "B",
+   "type": "player_id",
+   "format": "[0-9]{2}",
+   "max_ids": 100,
+   "blank_slot_allowed": true,
+   "digits": [
+    {
+     "place": "tens",
+     "layout": "keypad_0_under_8",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.26573,
+        0.15936
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.30633,
+        0.15936
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.34693,
+        0.15936
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.26573,
+        0.18088
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.30633,
+        0.18088
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.34693,
+        0.18088
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.26573,
+        0.2024
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.30633,
+        0.2024
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.34693,
+        0.2024
+       ]
+      },
+      {
+       "value": 0,
+       "center_norm": [
+        0.30633,
+        0.22392
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "layout": "keypad_0_under_8",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.39301,
+        0.15936
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.43361,
+        0.15936
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.47421,
+        0.15936
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.39301,
+        0.18088
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.43361,
+        0.18088
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.47421,
+        0.18088
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.39301,
+        0.2024
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.43361,
+        0.2024
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.47421,
+        0.2024
+       ]
+      },
+      {
+       "value": 0,
+       "center_norm": [
+        0.43361,
+        0.22392
+       ]
+      }
+     ]
+    }
    ]
-  }
- ],
- "roster": {
-  "A": {
-   "tens": {
-    "place": "tens",
-    "bubbles": [
-     {
-      "value": 0,
-      "center_norm": [
-       0.3638,
-       0.11247
-      ]
-     },
-     {
-      "value": 1,
-      "center_norm": [
-       0.39104,
-       0.11247
-      ]
-     },
-     {
-      "value": 2,
-      "center_norm": [
-       0.41828,
-       0.11247
-      ]
-     },
-     {
-      "value": 3,
-      "center_norm": [
-       0.44552,
-       0.11247
-      ]
-     },
-     {
-      "value": 4,
-      "center_norm": [
-       0.47276,
-       0.11247
-      ]
-     },
-     {
-      "value": 5,
-      "center_norm": [
-       0.5,
-       0.11247
-      ]
-     },
-     {
-      "value": 6,
-      "center_norm": [
-       0.52724,
-       0.11247
-      ]
-     },
-     {
-      "value": 7,
-      "center_norm": [
-       0.55448,
-       0.11247
-      ]
-     },
-     {
-      "value": 8,
-      "center_norm": [
-       0.58172,
-       0.11247
-      ]
-     },
-     {
-      "value": 9,
-      "center_norm": [
-       0.60896,
-       0.11247
-      ]
-     }
-    ]
-   },
-   "ones": {
-    "place": "ones",
-    "bubbles": [
-     {
-      "value": 0,
-      "center_norm": [
-       0.65771,
-       0.11247
-      ]
-     },
-     {
-      "value": 1,
-      "center_norm": [
-       0.68495,
-       0.11247
-      ]
-     },
-     {
-      "value": 2,
-      "center_norm": [
-       0.71219,
-       0.11247
-      ]
-     },
-     {
-      "value": 3,
-      "center_norm": [
-       0.73943,
-       0.11247
-      ]
-     },
-     {
-      "value": 4,
-      "center_norm": [
-       0.76667,
-       0.11247
-      ]
-     },
-     {
-      "value": 5,
-      "center_norm": [
-       0.79391,
-       0.11247
-      ]
-     },
-     {
-      "value": 6,
-      "center_norm": [
-       0.82115,
-       0.11247
-      ]
-     },
-     {
-      "value": 7,
-      "center_norm": [
-       0.84839,
-       0.11247
-      ]
-     },
-     {
-      "value": 8,
-      "center_norm": [
-       0.87563,
-       0.11247
-      ]
-     },
-     {
-      "value": 9,
-      "center_norm": [
-       0.90287,
-       0.11247
-      ]
-     }
-    ]
-   }
   },
-  "B": {
-   "tens": {
-    "place": "tens",
-    "bubbles": [
-     {
-      "value": 0,
-      "center_norm": [
-       0.3638,
-       0.13957
-      ]
-     },
-     {
-      "value": 1,
-      "center_norm": [
-       0.39104,
-       0.13957
-      ]
-     },
-     {
-      "value": 2,
-      "center_norm": [
-       0.41828,
-       0.13957
-      ]
-     },
-     {
-      "value": 3,
-      "center_norm": [
-       0.44552,
-       0.13957
-      ]
-     },
-     {
-      "value": 4,
-      "center_norm": [
-       0.47276,
-       0.13957
-      ]
-     },
-     {
-      "value": 5,
-      "center_norm": [
-       0.5,
-       0.13957
-      ]
-     },
-     {
-      "value": 6,
-      "center_norm": [
-       0.52724,
-       0.13957
-      ]
-     },
-     {
-      "value": 7,
-      "center_norm": [
-       0.55448,
-       0.13957
-      ]
-     },
-     {
-      "value": 8,
-      "center_norm": [
-       0.58172,
-       0.13957
-      ]
-     },
-     {
-      "value": 9,
-      "center_norm": [
-       0.60896,
-       0.13957
-      ]
-     }
-    ]
-   },
-   "ones": {
-    "place": "ones",
-    "bubbles": [
-     {
-      "value": 0,
-      "center_norm": [
-       0.65771,
-       0.13957
-      ]
-     },
-     {
-      "value": 1,
-      "center_norm": [
-       0.68495,
-       0.13957
-      ]
-     },
-     {
-      "value": 2,
-      "center_norm": [
-       0.71219,
-       0.13957
-      ]
-     },
-     {
-      "value": 3,
-      "center_norm": [
-       0.73943,
-       0.13957
-      ]
-     },
-     {
-      "value": 4,
-      "center_norm": [
-       0.76667,
-       0.13957
-      ]
-     },
-     {
-      "value": 5,
-      "center_norm": [
-       0.79391,
-       0.13957
-      ]
-     },
-     {
-      "value": 6,
-      "center_norm": [
-       0.82115,
-       0.13957
-      ]
-     },
-     {
-      "value": 7,
-      "center_norm": [
-       0.84839,
-       0.13957
-      ]
-     },
-     {
-      "value": 8,
-      "center_norm": [
-       0.87563,
-       0.13957
-      ]
-     },
-     {
-      "value": 9,
-      "center_norm": [
-       0.90287,
-       0.13957
-      ]
-     }
-    ]
-   }
+  "team_C": {
+   "slot": "C",
+   "type": "player_id",
+   "format": "[0-9]{2}",
+   "max_ids": 100,
+   "blank_slot_allowed": true,
+   "digits": [
+    {
+     "place": "tens",
+     "layout": "keypad_0_under_8",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.52579,
+        0.15936
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.56639,
+        0.15936
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.60699,
+        0.15936
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.52579,
+        0.18088
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.56639,
+        0.18088
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.60699,
+        0.18088
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.52579,
+        0.2024
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.56639,
+        0.2024
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.60699,
+        0.2024
+       ]
+      },
+      {
+       "value": 0,
+       "center_norm": [
+        0.56639,
+        0.22392
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "layout": "keypad_0_under_8",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.65307,
+        0.15936
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.69367,
+        0.15936
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.73427,
+        0.15936
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.65307,
+        0.18088
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.69367,
+        0.18088
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.73427,
+        0.18088
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.65307,
+        0.2024
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.69367,
+        0.2024
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.73427,
+        0.2024
+       ]
+      },
+      {
+       "value": 0,
+       "center_norm": [
+        0.69367,
+        0.22392
+       ]
+      }
+     ]
+    }
+   ]
   },
-  "C": {
-   "tens": {
-    "place": "tens",
-    "bubbles": [
-     {
-      "value": 0,
-      "center_norm": [
-       0.3638,
-       0.16667
-      ]
-     },
-     {
-      "value": 1,
-      "center_norm": [
-       0.39104,
-       0.16667
-      ]
-     },
-     {
-      "value": 2,
-      "center_norm": [
-       0.41828,
-       0.16667
-      ]
-     },
-     {
-      "value": 3,
-      "center_norm": [
-       0.44552,
-       0.16667
-      ]
-     },
-     {
-      "value": 4,
-      "center_norm": [
-       0.47276,
-       0.16667
-      ]
-     },
-     {
-      "value": 5,
-      "center_norm": [
-       0.5,
-       0.16667
-      ]
-     },
-     {
-      "value": 6,
-      "center_norm": [
-       0.52724,
-       0.16667
-      ]
-     },
-     {
-      "value": 7,
-      "center_norm": [
-       0.55448,
-       0.16667
-      ]
-     },
-     {
-      "value": 8,
-      "center_norm": [
-       0.58172,
-       0.16667
-      ]
-     },
-     {
-      "value": 9,
-      "center_norm": [
-       0.60896,
-       0.16667
-      ]
-     }
-    ]
-   },
-   "ones": {
-    "place": "ones",
-    "bubbles": [
-     {
-      "value": 0,
-      "center_norm": [
-       0.65771,
-       0.16667
-      ]
-     },
-     {
-      "value": 1,
-      "center_norm": [
-       0.68495,
-       0.16667
-      ]
-     },
-     {
-      "value": 2,
-      "center_norm": [
-       0.71219,
-       0.16667
-      ]
-     },
-     {
-      "value": 3,
-      "center_norm": [
-       0.73943,
-       0.16667
-      ]
-     },
-     {
-      "value": 4,
-      "center_norm": [
-       0.76667,
-       0.16667
-      ]
-     },
-     {
-      "value": 5,
-      "center_norm": [
-       0.79391,
-       0.16667
-      ]
-     },
-     {
-      "value": 6,
-      "center_norm": [
-       0.82115,
-       0.16667
-      ]
-     },
-     {
-      "value": 7,
-      "center_norm": [
-       0.84839,
-       0.16667
-      ]
-     },
-     {
-      "value": 8,
-      "center_norm": [
-       0.87563,
-       0.16667
-      ]
-     },
-     {
-      "value": 9,
-      "center_norm": [
-       0.90287,
-       0.16667
-      ]
-     }
-    ]
-   }
+  "team_D": {
+   "slot": "D",
+   "type": "player_id",
+   "format": "[0-9]{2}",
+   "max_ids": 100,
+   "blank_slot_allowed": true,
+   "digits": [
+    {
+     "place": "tens",
+     "layout": "keypad_0_under_8",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.78584,
+        0.15936
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.82644,
+        0.15936
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.86704,
+        0.15936
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.78584,
+        0.18088
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.82644,
+        0.18088
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.86704,
+        0.18088
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.78584,
+        0.2024
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.82644,
+        0.2024
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.86704,
+        0.2024
+       ]
+      },
+      {
+       "value": 0,
+       "center_norm": [
+        0.82644,
+        0.22392
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "layout": "keypad_0_under_8",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.91313,
+        0.15936
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.95373,
+        0.15936
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.99433,
+        0.15936
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.91313,
+        0.18088
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.95373,
+        0.18088
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.99433,
+        0.18088
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.91313,
+        0.2024
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.95373,
+        0.2024
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.99433,
+        0.2024
+       ]
+      },
+      {
+       "value": 0,
+       "center_norm": [
+        0.95373,
+        0.22392
+       ]
+      }
+     ]
+    }
+   ]
   },
-  "D": {
-   "tens": {
-    "place": "tens",
-    "bubbles": [
-     {
-      "value": 0,
-      "center_norm": [
-       0.3638,
-       0.19377
-      ]
-     },
-     {
-      "value": 1,
-      "center_norm": [
-       0.39104,
-       0.19377
-      ]
-     },
-     {
-      "value": 2,
-      "center_norm": [
-       0.41828,
-       0.19377
-      ]
-     },
-     {
-      "value": 3,
-      "center_norm": [
-       0.44552,
-       0.19377
-      ]
-     },
-     {
-      "value": 4,
-      "center_norm": [
-       0.47276,
-       0.19377
-      ]
-     },
-     {
-      "value": 5,
-      "center_norm": [
-       0.5,
-       0.19377
-      ]
-     },
-     {
-      "value": 6,
-      "center_norm": [
-       0.52724,
-       0.19377
-      ]
-     },
-     {
-      "value": 7,
-      "center_norm": [
-       0.55448,
-       0.19377
-      ]
-     },
-     {
-      "value": 8,
-      "center_norm": [
-       0.58172,
-       0.19377
-      ]
-     },
-     {
-      "value": 9,
-      "center_norm": [
-       0.60896,
-       0.19377
-      ]
-     }
-    ]
-   },
-   "ones": {
-    "place": "ones",
-    "bubbles": [
-     {
-      "value": 0,
-      "center_norm": [
-       0.65771,
-       0.19377
-      ]
-     },
-     {
-      "value": 1,
-      "center_norm": [
-       0.68495,
-       0.19377
-      ]
-     },
-     {
-      "value": 2,
-      "center_norm": [
-       0.71219,
-       0.19377
-      ]
-     },
-     {
-      "value": 3,
-      "center_norm": [
-       0.73943,
-       0.19377
-      ]
-     },
-     {
-      "value": 4,
-      "center_norm": [
-       0.76667,
-       0.19377
-      ]
-     },
-     {
-      "value": 5,
-      "center_norm": [
-       0.79391,
-       0.19377
-      ]
-     },
-     {
-      "value": 6,
-      "center_norm": [
-       0.82115,
-       0.19377
-      ]
-     },
-     {
-      "value": 7,
-      "center_norm": [
-       0.84839,
-       0.19377
-      ]
-     },
-     {
-      "value": 8,
-      "center_norm": [
-       0.87563,
-       0.19377
-      ]
-     },
-     {
-      "value": 9,
-      "center_norm": [
-       0.90287,
-       0.19377
-      ]
-     }
-    ]
-   }
+  "team_E": {
+   "slot": "E",
+   "type": "player_id",
+   "format": "[0-9]{2}",
+   "max_ids": 100,
+   "blank_slot_allowed": true,
+   "digits": [
+    {
+     "place": "tens",
+     "layout": "keypad_0_under_8",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.00567,
+        0.28397
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.04627,
+        0.28397
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.08687,
+        0.28397
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.00567,
+        0.30549
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.04627,
+        0.30549
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.08687,
+        0.30549
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.00567,
+        0.32702
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.04627,
+        0.32702
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.08687,
+        0.32702
+       ]
+      },
+      {
+       "value": 0,
+       "center_norm": [
+        0.04627,
+        0.34854
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "layout": "keypad_0_under_8",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.13296,
+        0.28397
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.17356,
+        0.28397
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.21416,
+        0.28397
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.13296,
+        0.30549
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.17356,
+        0.30549
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.21416,
+        0.30549
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.13296,
+        0.32702
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.17356,
+        0.32702
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.21416,
+        0.32702
+       ]
+      },
+      {
+       "value": 0,
+       "center_norm": [
+        0.17356,
+        0.34854
+       ]
+      }
+     ]
+    }
+   ]
   },
-  "E": {
-   "tens": {
-    "place": "tens",
-    "bubbles": [
-     {
-      "value": 0,
-      "center_norm": [
-       0.3638,
-       0.22087
-      ]
-     },
-     {
-      "value": 1,
-      "center_norm": [
-       0.39104,
-       0.22087
-      ]
-     },
-     {
-      "value": 2,
-      "center_norm": [
-       0.41828,
-       0.22087
-      ]
-     },
-     {
-      "value": 3,
-      "center_norm": [
-       0.44552,
-       0.22087
-      ]
-     },
-     {
-      "value": 4,
-      "center_norm": [
-       0.47276,
-       0.22087
-      ]
-     },
-     {
-      "value": 5,
-      "center_norm": [
-       0.5,
-       0.22087
-      ]
-     },
-     {
-      "value": 6,
-      "center_norm": [
-       0.52724,
-       0.22087
-      ]
-     },
-     {
-      "value": 7,
-      "center_norm": [
-       0.55448,
-       0.22087
-      ]
-     },
-     {
-      "value": 8,
-      "center_norm": [
-       0.58172,
-       0.22087
-      ]
-     },
-     {
-      "value": 9,
-      "center_norm": [
-       0.60896,
-       0.22087
-      ]
-     }
-    ]
-   },
-   "ones": {
-    "place": "ones",
-    "bubbles": [
-     {
-      "value": 0,
-      "center_norm": [
-       0.65771,
-       0.22087
-      ]
-     },
-     {
-      "value": 1,
-      "center_norm": [
-       0.68495,
-       0.22087
-      ]
-     },
-     {
-      "value": 2,
-      "center_norm": [
-       0.71219,
-       0.22087
-      ]
-     },
-     {
-      "value": 3,
-      "center_norm": [
-       0.73943,
-       0.22087
-      ]
-     },
-     {
-      "value": 4,
-      "center_norm": [
-       0.76667,
-       0.22087
-      ]
-     },
-     {
-      "value": 5,
-      "center_norm": [
-       0.79391,
-       0.22087
-      ]
-     },
-     {
-      "value": 6,
-      "center_norm": [
-       0.82115,
-       0.22087
-      ]
-     },
-     {
-      "value": 7,
-      "center_norm": [
-       0.84839,
-       0.22087
-      ]
-     },
-     {
-      "value": 8,
-      "center_norm": [
-       0.87563,
-       0.22087
-      ]
-     },
-     {
-      "value": 9,
-      "center_norm": [
-       0.90287,
-       0.22087
-      ]
-     }
-    ]
-   }
+  "team_F": {
+   "slot": "F",
+   "type": "player_id",
+   "format": "[0-9]{2}",
+   "max_ids": 100,
+   "blank_slot_allowed": true,
+   "digits": [
+    {
+     "place": "tens",
+     "layout": "keypad_0_under_8",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.26573,
+        0.28397
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.30633,
+        0.28397
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.34693,
+        0.28397
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.26573,
+        0.30549
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.30633,
+        0.30549
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.34693,
+        0.30549
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.26573,
+        0.32702
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.30633,
+        0.32702
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.34693,
+        0.32702
+       ]
+      },
+      {
+       "value": 0,
+       "center_norm": [
+        0.30633,
+        0.34854
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "layout": "keypad_0_under_8",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.39301,
+        0.28397
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.43361,
+        0.28397
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.47421,
+        0.28397
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.39301,
+        0.30549
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.43361,
+        0.30549
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.47421,
+        0.30549
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.39301,
+        0.32702
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.43361,
+        0.32702
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.47421,
+        0.32702
+       ]
+      },
+      {
+       "value": 0,
+       "center_norm": [
+        0.43361,
+        0.34854
+       ]
+      }
+     ]
+    }
+   ]
   },
-  "F": {
-   "tens": {
-    "place": "tens",
-    "bubbles": [
-     {
-      "value": 0,
-      "center_norm": [
-       0.3638,
-       0.24797
-      ]
-     },
-     {
-      "value": 1,
-      "center_norm": [
-       0.39104,
-       0.24797
-      ]
-     },
-     {
-      "value": 2,
-      "center_norm": [
-       0.41828,
-       0.24797
-      ]
-     },
-     {
-      "value": 3,
-      "center_norm": [
-       0.44552,
-       0.24797
-      ]
-     },
-     {
-      "value": 4,
-      "center_norm": [
-       0.47276,
-       0.24797
-      ]
-     },
-     {
-      "value": 5,
-      "center_norm": [
-       0.5,
-       0.24797
-      ]
-     },
-     {
-      "value": 6,
-      "center_norm": [
-       0.52724,
-       0.24797
-      ]
-     },
-     {
-      "value": 7,
-      "center_norm": [
-       0.55448,
-       0.24797
-      ]
-     },
-     {
-      "value": 8,
-      "center_norm": [
-       0.58172,
-       0.24797
-      ]
-     },
-     {
-      "value": 9,
-      "center_norm": [
-       0.60896,
-       0.24797
-      ]
-     }
-    ]
-   },
-   "ones": {
-    "place": "ones",
-    "bubbles": [
-     {
-      "value": 0,
-      "center_norm": [
-       0.65771,
-       0.24797
-      ]
-     },
-     {
-      "value": 1,
-      "center_norm": [
-       0.68495,
-       0.24797
-      ]
-     },
-     {
-      "value": 2,
-      "center_norm": [
-       0.71219,
-       0.24797
-      ]
-     },
-     {
-      "value": 3,
-      "center_norm": [
-       0.73943,
-       0.24797
-      ]
-     },
-     {
-      "value": 4,
-      "center_norm": [
-       0.76667,
-       0.24797
-      ]
-     },
-     {
-      "value": 5,
-      "center_norm": [
-       0.79391,
-       0.24797
-      ]
-     },
-     {
-      "value": 6,
-      "center_norm": [
-       0.82115,
-       0.24797
-      ]
-     },
-     {
-      "value": 7,
-      "center_norm": [
-       0.84839,
-       0.24797
-      ]
-     },
-     {
-      "value": 8,
-      "center_norm": [
-       0.87563,
-       0.24797
-      ]
-     },
-     {
-      "value": 9,
-      "center_norm": [
-       0.90287,
-       0.24797
-      ]
-     }
-    ]
-   }
+  "team_G": {
+   "slot": "G",
+   "type": "player_id",
+   "format": "[0-9]{2}",
+   "max_ids": 100,
+   "blank_slot_allowed": true,
+   "digits": [
+    {
+     "place": "tens",
+     "layout": "keypad_0_under_8",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.52579,
+        0.28397
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.56639,
+        0.28397
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.60699,
+        0.28397
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.52579,
+        0.30549
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.56639,
+        0.30549
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.60699,
+        0.30549
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.52579,
+        0.32702
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.56639,
+        0.32702
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.60699,
+        0.32702
+       ]
+      },
+      {
+       "value": 0,
+       "center_norm": [
+        0.56639,
+        0.34854
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "layout": "keypad_0_under_8",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.65307,
+        0.28397
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.69367,
+        0.28397
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.73427,
+        0.28397
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.65307,
+        0.30549
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.69367,
+        0.30549
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.73427,
+        0.30549
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.65307,
+        0.32702
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.69367,
+        0.32702
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.73427,
+        0.32702
+       ]
+      },
+      {
+       "value": 0,
+       "center_norm": [
+        0.69367,
+        0.34854
+       ]
+      }
+     ]
+    }
+   ]
   },
-  "G": {
-   "tens": {
-    "place": "tens",
-    "bubbles": [
-     {
-      "value": 0,
-      "center_norm": [
-       0.3638,
-       0.27507
-      ]
-     },
-     {
-      "value": 1,
-      "center_norm": [
-       0.39104,
-       0.27507
-      ]
-     },
-     {
-      "value": 2,
-      "center_norm": [
-       0.41828,
-       0.27507
-      ]
-     },
-     {
-      "value": 3,
-      "center_norm": [
-       0.44552,
-       0.27507
-      ]
-     },
-     {
-      "value": 4,
-      "center_norm": [
-       0.47276,
-       0.27507
-      ]
-     },
-     {
-      "value": 5,
-      "center_norm": [
-       0.5,
-       0.27507
-      ]
-     },
-     {
-      "value": 6,
-      "center_norm": [
-       0.52724,
-       0.27507
-      ]
-     },
-     {
-      "value": 7,
-      "center_norm": [
-       0.55448,
-       0.27507
-      ]
-     },
-     {
-      "value": 8,
-      "center_norm": [
-       0.58172,
-       0.27507
-      ]
-     },
-     {
-      "value": 9,
-      "center_norm": [
-       0.60896,
-       0.27507
-      ]
-     }
-    ]
-   },
-   "ones": {
-    "place": "ones",
-    "bubbles": [
-     {
-      "value": 0,
-      "center_norm": [
-       0.65771,
-       0.27507
-      ]
-     },
-     {
-      "value": 1,
-      "center_norm": [
-       0.68495,
-       0.27507
-      ]
-     },
-     {
-      "value": 2,
-      "center_norm": [
-       0.71219,
-       0.27507
-      ]
-     },
-     {
-      "value": 3,
-      "center_norm": [
-       0.73943,
-       0.27507
-      ]
-     },
-     {
-      "value": 4,
-      "center_norm": [
-       0.76667,
-       0.27507
-      ]
-     },
-     {
-      "value": 5,
-      "center_norm": [
-       0.79391,
-       0.27507
-      ]
-     },
-     {
-      "value": 6,
-      "center_norm": [
-       0.82115,
-       0.27507
-      ]
-     },
-     {
-      "value": 7,
-      "center_norm": [
-       0.84839,
-       0.27507
-      ]
-     },
-     {
-      "value": 8,
-      "center_norm": [
-       0.87563,
-       0.27507
-      ]
-     },
-     {
-      "value": 9,
-      "center_norm": [
-       0.90287,
-       0.27507
-      ]
-     }
-    ]
-   }
-  },
-  "H": {
-   "tens": {
-    "place": "tens",
-    "bubbles": [
-     {
-      "value": 0,
-      "center_norm": [
-       0.3638,
-       0.30217
-      ]
-     },
-     {
-      "value": 1,
-      "center_norm": [
-       0.39104,
-       0.30217
-      ]
-     },
-     {
-      "value": 2,
-      "center_norm": [
-       0.41828,
-       0.30217
-      ]
-     },
-     {
-      "value": 3,
-      "center_norm": [
-       0.44552,
-       0.30217
-      ]
-     },
-     {
-      "value": 4,
-      "center_norm": [
-       0.47276,
-       0.30217
-      ]
-     },
-     {
-      "value": 5,
-      "center_norm": [
-       0.5,
-       0.30217
-      ]
-     },
-     {
-      "value": 6,
-      "center_norm": [
-       0.52724,
-       0.30217
-      ]
-     },
-     {
-      "value": 7,
-      "center_norm": [
-       0.55448,
-       0.30217
-      ]
-     },
-     {
-      "value": 8,
-      "center_norm": [
-       0.58172,
-       0.30217
-      ]
-     },
-     {
-      "value": 9,
-      "center_norm": [
-       0.60896,
-       0.30217
-      ]
-     }
-    ]
-   },
-   "ones": {
-    "place": "ones",
-    "bubbles": [
-     {
-      "value": 0,
-      "center_norm": [
-       0.65771,
-       0.30217
-      ]
-     },
-     {
-      "value": 1,
-      "center_norm": [
-       0.68495,
-       0.30217
-      ]
-     },
-     {
-      "value": 2,
-      "center_norm": [
-       0.71219,
-       0.30217
-      ]
-     },
-     {
-      "value": 3,
-      "center_norm": [
-       0.73943,
-       0.30217
-      ]
-     },
-     {
-      "value": 4,
-      "center_norm": [
-       0.76667,
-       0.30217
-      ]
-     },
-     {
-      "value": 5,
-      "center_norm": [
-       0.79391,
-       0.30217
-      ]
-     },
-     {
-      "value": 6,
-      "center_norm": [
-       0.82115,
-       0.30217
-      ]
-     },
-     {
-      "value": 7,
-      "center_norm": [
-       0.84839,
-       0.30217
-      ]
-     },
-     {
-      "value": 8,
-      "center_norm": [
-       0.87563,
-       0.30217
-      ]
-     },
-     {
-      "value": 9,
-      "center_norm": [
-       0.90287,
-       0.30217
-      ]
-     }
-    ]
-   }
+  "team_H": {
+   "slot": "H",
+   "type": "player_id",
+   "format": "[0-9]{2}",
+   "max_ids": 100,
+   "blank_slot_allowed": true,
+   "digits": [
+    {
+     "place": "tens",
+     "layout": "keypad_0_under_8",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.78584,
+        0.28397
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.82644,
+        0.28397
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.86704,
+        0.28397
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.78584,
+        0.30549
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.82644,
+        0.30549
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.86704,
+        0.30549
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.78584,
+        0.32702
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.82644,
+        0.32702
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.86704,
+        0.32702
+       ]
+      },
+      {
+       "value": 0,
+       "center_norm": [
+        0.82644,
+        0.34854
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "layout": "keypad_0_under_8",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.91313,
+        0.28397
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.95373,
+        0.28397
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.99433,
+        0.28397
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.91313,
+        0.30549
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.95373,
+        0.30549
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.99433,
+        0.30549
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.91313,
+        0.32702
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.95373,
+        0.32702
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.99433,
+        0.32702
+       ]
+      },
+      {
+       "value": 0,
+       "center_norm": [
+        0.95373,
+        0.34854
+       ]
+      }
+     ]
+    }
+   ]
   }
  },
- "games": {
-  "1": {
-   "shooters": [
-    {
-     "who": {
-      "place": "who",
-      "bubbles": [
-       {
-        "value": "A",
-        "center_norm": [
-         0.07706,
-         0.38618
-        ]
-       },
-       {
-        "value": "B",
-        "center_norm": [
-         0.10789,
-         0.38618
-        ]
-       },
-       {
-        "value": "C",
-        "center_norm": [
-         0.13871,
-         0.38618
-        ]
-       },
-       {
-        "value": "D",
-        "center_norm": [
-         0.16953,
-         0.38618
-        ]
-       },
-       {
-        "value": "E",
-        "center_norm": [
-         0.20036,
-         0.38618
-        ]
-       },
-       {
-        "value": "F",
-        "center_norm": [
-         0.23118,
-         0.38618
-        ]
-       },
-       {
-        "value": "G",
-        "center_norm": [
-         0.26201,
-         0.38618
-        ]
-       },
-       {
-        "value": "H",
-        "center_norm": [
-         0.29283,
-         0.38618
-        ]
-       }
-      ]
-     },
-     "tens": {
-      "place": "tens",
-      "bubbles": [
-       {
-        "value": 1,
-        "center_norm": [
-         0.36022,
-         0.38618
-        ]
-       },
-       {
-        "value": 2,
-        "center_norm": [
-         0.39104,
-         0.38618
-        ]
-       },
-       {
-        "value": 3,
-        "center_norm": [
-         0.42186,
-         0.38618
-        ]
-       },
-       {
-        "value": 4,
-        "center_norm": [
-         0.45269,
-         0.38618
-        ]
-       }
-      ]
-     },
-     "ones": {
-      "place": "ones",
-      "bubbles": [
-       {
-        "value": 0,
-        "center_norm": [
-         0.52151,
-         0.38618
-        ]
-       },
-       {
-        "value": 1,
-        "center_norm": [
-         0.55233,
-         0.38618
-        ]
-       },
-       {
-        "value": 2,
-        "center_norm": [
-         0.58315,
-         0.38618
-        ]
-       },
-       {
-        "value": 3,
-        "center_norm": [
-         0.61398,
-         0.38618
-        ]
-       },
-       {
-        "value": 4,
-        "center_norm": [
-         0.6448,
-         0.38618
-        ]
-       },
-       {
-        "value": 5,
-        "center_norm": [
-         0.67563,
-         0.38618
-        ]
-       },
-       {
-        "value": 6,
-        "center_norm": [
-         0.70645,
-         0.38618
-        ]
-       },
-       {
-        "value": 7,
-        "center_norm": [
-         0.73728,
-         0.38618
-        ]
-       },
-       {
-        "value": 8,
-        "center_norm": [
-         0.7681,
-         0.38618
-        ]
-       },
-       {
-        "value": 9,
-        "center_norm": [
-         0.79892,
-         0.38618
-        ]
-       }
-      ]
-     }
-    },
-    {
-     "who": {
-      "place": "who",
-      "bubbles": [
-       {
-        "value": "A",
-        "center_norm": [
-         0.07706,
-         0.41057
-        ]
-       },
-       {
-        "value": "B",
-        "center_norm": [
-         0.10789,
-         0.41057
-        ]
-       },
-       {
-        "value": "C",
-        "center_norm": [
-         0.13871,
-         0.41057
-        ]
-       },
-       {
-        "value": "D",
-        "center_norm": [
-         0.16953,
-         0.41057
-        ]
-       },
-       {
-        "value": "E",
-        "center_norm": [
-         0.20036,
-         0.41057
-        ]
-       },
-       {
-        "value": "F",
-        "center_norm": [
-         0.23118,
-         0.41057
-        ]
-       },
-       {
-        "value": "G",
-        "center_norm": [
-         0.26201,
-         0.41057
-        ]
-       },
-       {
-        "value": "H",
-        "center_norm": [
-         0.29283,
-         0.41057
-        ]
-       }
-      ]
-     },
-     "tens": {
-      "place": "tens",
-      "bubbles": [
-       {
-        "value": 1,
-        "center_norm": [
-         0.36022,
-         0.41057
-        ]
-       },
-       {
-        "value": 2,
-        "center_norm": [
-         0.39104,
-         0.41057
-        ]
-       },
-       {
-        "value": 3,
-        "center_norm": [
-         0.42186,
-         0.41057
-        ]
-       },
-       {
-        "value": 4,
-        "center_norm": [
-         0.45269,
-         0.41057
-        ]
-       }
-      ]
-     },
-     "ones": {
-      "place": "ones",
-      "bubbles": [
-       {
-        "value": 0,
-        "center_norm": [
-         0.52151,
-         0.41057
-        ]
-       },
-       {
-        "value": 1,
-        "center_norm": [
-         0.55233,
-         0.41057
-        ]
-       },
-       {
-        "value": 2,
-        "center_norm": [
-         0.58315,
-         0.41057
-        ]
-       },
-       {
-        "value": 3,
-        "center_norm": [
-         0.61398,
-         0.41057
-        ]
-       },
-       {
-        "value": 4,
-        "center_norm": [
-         0.6448,
-         0.41057
-        ]
-       },
-       {
-        "value": 5,
-        "center_norm": [
-         0.67563,
-         0.41057
-        ]
-       },
-       {
-        "value": 6,
-        "center_norm": [
-         0.70645,
-         0.41057
-        ]
-       },
-       {
-        "value": 7,
-        "center_norm": [
-         0.73728,
-         0.41057
-        ]
-       },
-       {
-        "value": 8,
-        "center_norm": [
-         0.7681,
-         0.41057
-        ]
-       },
-       {
-        "value": 9,
-        "center_norm": [
-         0.79892,
-         0.41057
-        ]
-       }
-      ]
-     }
-    },
-    {
-     "who": {
-      "place": "who",
-      "bubbles": [
-       {
-        "value": "A",
-        "center_norm": [
-         0.07706,
-         0.43496
-        ]
-       },
-       {
-        "value": "B",
-        "center_norm": [
-         0.10789,
-         0.43496
-        ]
-       },
-       {
-        "value": "C",
-        "center_norm": [
-         0.13871,
-         0.43496
-        ]
-       },
-       {
-        "value": "D",
-        "center_norm": [
-         0.16953,
-         0.43496
-        ]
-       },
-       {
-        "value": "E",
-        "center_norm": [
-         0.20036,
-         0.43496
-        ]
-       },
-       {
-        "value": "F",
-        "center_norm": [
-         0.23118,
-         0.43496
-        ]
-       },
-       {
-        "value": "G",
-        "center_norm": [
-         0.26201,
-         0.43496
-        ]
-       },
-       {
-        "value": "H",
-        "center_norm": [
-         0.29283,
-         0.43496
-        ]
-       }
-      ]
-     },
-     "tens": {
-      "place": "tens",
-      "bubbles": [
-       {
-        "value": 1,
-        "center_norm": [
-         0.36022,
-         0.43496
-        ]
-       },
-       {
-        "value": 2,
-        "center_norm": [
-         0.39104,
-         0.43496
-        ]
-       },
-       {
-        "value": 3,
-        "center_norm": [
-         0.42186,
-         0.43496
-        ]
-       },
-       {
-        "value": 4,
-        "center_norm": [
-         0.45269,
-         0.43496
-        ]
-       }
-      ]
-     },
-     "ones": {
-      "place": "ones",
-      "bubbles": [
-       {
-        "value": 0,
-        "center_norm": [
-         0.52151,
-         0.43496
-        ]
-       },
-       {
-        "value": 1,
-        "center_norm": [
-         0.55233,
-         0.43496
-        ]
-       },
-       {
-        "value": 2,
-        "center_norm": [
-         0.58315,
-         0.43496
-        ]
-       },
-       {
-        "value": 3,
-        "center_norm": [
-         0.61398,
-         0.43496
-        ]
-       },
-       {
-        "value": 4,
-        "center_norm": [
-         0.6448,
-         0.43496
-        ]
-       },
-       {
-        "value": 5,
-        "center_norm": [
-         0.67563,
-         0.43496
-        ]
-       },
-       {
-        "value": 6,
-        "center_norm": [
-         0.70645,
-         0.43496
-        ]
-       },
-       {
-        "value": 7,
-        "center_norm": [
-         0.73728,
-         0.43496
-        ]
-       },
-       {
-        "value": 8,
-        "center_norm": [
-         0.7681,
-         0.43496
-        ]
-       },
-       {
-        "value": 9,
-        "center_norm": [
-         0.79892,
-         0.43496
-        ]
-       }
-      ]
-     }
-    },
-    {
-     "who": {
-      "place": "who",
-      "bubbles": [
-       {
-        "value": "A",
-        "center_norm": [
-         0.07706,
-         0.45935
-        ]
-       },
-       {
-        "value": "B",
-        "center_norm": [
-         0.10789,
-         0.45935
-        ]
-       },
-       {
-        "value": "C",
-        "center_norm": [
-         0.13871,
-         0.45935
-        ]
-       },
-       {
-        "value": "D",
-        "center_norm": [
-         0.16953,
-         0.45935
-        ]
-       },
-       {
-        "value": "E",
-        "center_norm": [
-         0.20036,
-         0.45935
-        ]
-       },
-       {
-        "value": "F",
-        "center_norm": [
-         0.23118,
-         0.45935
-        ]
-       },
-       {
-        "value": "G",
-        "center_norm": [
-         0.26201,
-         0.45935
-        ]
-       },
-       {
-        "value": "H",
-        "center_norm": [
-         0.29283,
-         0.45935
-        ]
-       }
-      ]
-     },
-     "tens": {
-      "place": "tens",
-      "bubbles": [
-       {
-        "value": 1,
-        "center_norm": [
-         0.36022,
-         0.45935
-        ]
-       },
-       {
-        "value": 2,
-        "center_norm": [
-         0.39104,
-         0.45935
-        ]
-       },
-       {
-        "value": 3,
-        "center_norm": [
-         0.42186,
-         0.45935
-        ]
-       },
-       {
-        "value": 4,
-        "center_norm": [
-         0.45269,
-         0.45935
-        ]
-       }
-      ]
-     },
-     "ones": {
-      "place": "ones",
-      "bubbles": [
-       {
-        "value": 0,
-        "center_norm": [
-         0.52151,
-         0.45935
-        ]
-       },
-       {
-        "value": 1,
-        "center_norm": [
-         0.55233,
-         0.45935
-        ]
-       },
-       {
-        "value": 2,
-        "center_norm": [
-         0.58315,
-         0.45935
-        ]
-       },
-       {
-        "value": 3,
-        "center_norm": [
-         0.61398,
-         0.45935
-        ]
-       },
-       {
-        "value": 4,
-        "center_norm": [
-         0.6448,
-         0.45935
-        ]
-       },
-       {
-        "value": 5,
-        "center_norm": [
-         0.67563,
-         0.45935
-        ]
-       },
-       {
-        "value": 6,
-        "center_norm": [
-         0.70645,
-         0.45935
-        ]
-       },
-       {
-        "value": 7,
-        "center_norm": [
-         0.73728,
-         0.45935
-        ]
-       },
-       {
-        "value": 8,
-        "center_norm": [
-         0.7681,
-         0.45935
-        ]
-       },
-       {
-        "value": 9,
-        "center_norm": [
-         0.79892,
-         0.45935
-        ]
-       }
-      ]
-     }
-    }
+ "who_fields": {
+  "team_g1_s1": {
+   "rule": "exactly one",
+   "options": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H"
    ],
-   "team": {
-    "hundreds": {
-     "place": "hundreds",
-     "type": "flag",
-     "bubbles": [
-      {
-       "value": 1,
-       "center_norm": [
-        0.07706,
-        0.48374
-       ]
-      }
-     ]
-    },
-    "tens": {
-     "place": "tens",
-     "bubbles": [
-      {
-       "value": 0,
-       "center_norm": [
-        0.36022,
-        0.48374
-       ]
-      },
-      {
-       "value": 1,
-       "center_norm": [
-        0.38746,
-        0.48374
-       ]
-      },
-      {
-       "value": 2,
-       "center_norm": [
-        0.4147,
-        0.48374
-       ]
-      },
-      {
-       "value": 3,
-       "center_norm": [
-        0.44194,
-        0.48374
-       ]
-      },
-      {
-       "value": 4,
-       "center_norm": [
-        0.46918,
-        0.48374
-       ]
-      },
-      {
-       "value": 5,
-       "center_norm": [
-        0.49642,
-        0.48374
-       ]
-      },
-      {
-       "value": 6,
-       "center_norm": [
-        0.52366,
-        0.48374
-       ]
-      },
-      {
-       "value": 7,
-       "center_norm": [
-        0.5509,
-        0.48374
-       ]
-      },
-      {
-       "value": 8,
-       "center_norm": [
-        0.57814,
-        0.48374
-       ]
-      },
-      {
-       "value": 9,
-       "center_norm": [
-        0.60538,
-        0.48374
-       ]
-      }
-     ]
-    },
-    "ones": {
-     "place": "ones",
-     "bubbles": [
-      {
-       "value": 0,
-       "center_norm": [
-        0.65771,
-        0.48374
-       ]
-      },
-      {
-       "value": 1,
-       "center_norm": [
-        0.68495,
-        0.48374
-       ]
-      },
-      {
-       "value": 2,
-       "center_norm": [
-        0.71219,
-        0.48374
-       ]
-      },
-      {
-       "value": 3,
-       "center_norm": [
-        0.73943,
-        0.48374
-       ]
-      },
-      {
-       "value": 4,
-       "center_norm": [
-        0.76667,
-        0.48374
-       ]
-      },
-      {
-       "value": 5,
-       "center_norm": [
-        0.79391,
-        0.48374
-       ]
-      },
-      {
-       "value": 6,
-       "center_norm": [
-        0.82115,
-        0.48374
-       ]
-      },
-      {
-       "value": 7,
-       "center_norm": [
-        0.84839,
-        0.48374
-       ]
-      },
-      {
-       "value": 8,
-       "center_norm": [
-        0.87563,
-        0.48374
-       ]
-      },
-      {
-       "value": 9,
-       "center_norm": [
-        0.90287,
-        0.48374
-       ]
-      }
-     ]
-    }
-   },
-   "result": [
+   "bubbles": [
     {
-     "value": "won",
+     "value": "A",
      "center_norm": [
-      0.1129,
-      0.50813
+      0.03797,
+      0.39989
      ]
     },
     {
-     "value": "lost",
+     "value": "B",
      "center_norm": [
-      0.19534,
-      0.50813
+      0.07366,
+      0.39989
+     ]
+    },
+    {
+     "value": "C",
+     "center_norm": [
+      0.10936,
+      0.39989
+     ]
+    },
+    {
+     "value": "D",
+     "center_norm": [
+      0.14506,
+      0.39989
+     ]
+    },
+    {
+     "value": "E",
+     "center_norm": [
+      0.03797,
+      0.42604
+     ]
+    },
+    {
+     "value": "F",
+     "center_norm": [
+      0.07366,
+      0.42604
+     ]
+    },
+    {
+     "value": "G",
+     "center_norm": [
+      0.10936,
+      0.42604
+     ]
+    },
+    {
+     "value": "H",
+     "center_norm": [
+      0.14506,
+      0.42604
      ]
     }
    ]
   },
-  "2": {
-   "shooters": [
-    {
-     "who": {
-      "place": "who",
-      "bubbles": [
-       {
-        "value": "A",
-        "center_norm": [
-         0.07706,
-         0.58401
-        ]
-       },
-       {
-        "value": "B",
-        "center_norm": [
-         0.10789,
-         0.58401
-        ]
-       },
-       {
-        "value": "C",
-        "center_norm": [
-         0.13871,
-         0.58401
-        ]
-       },
-       {
-        "value": "D",
-        "center_norm": [
-         0.16953,
-         0.58401
-        ]
-       },
-       {
-        "value": "E",
-        "center_norm": [
-         0.20036,
-         0.58401
-        ]
-       },
-       {
-        "value": "F",
-        "center_norm": [
-         0.23118,
-         0.58401
-        ]
-       },
-       {
-        "value": "G",
-        "center_norm": [
-         0.26201,
-         0.58401
-        ]
-       },
-       {
-        "value": "H",
-        "center_norm": [
-         0.29283,
-         0.58401
-        ]
-       }
-      ]
-     },
-     "tens": {
-      "place": "tens",
-      "bubbles": [
-       {
-        "value": 1,
-        "center_norm": [
-         0.36022,
-         0.58401
-        ]
-       },
-       {
-        "value": 2,
-        "center_norm": [
-         0.39104,
-         0.58401
-        ]
-       },
-       {
-        "value": 3,
-        "center_norm": [
-         0.42186,
-         0.58401
-        ]
-       },
-       {
-        "value": 4,
-        "center_norm": [
-         0.45269,
-         0.58401
-        ]
-       }
-      ]
-     },
-     "ones": {
-      "place": "ones",
-      "bubbles": [
-       {
-        "value": 0,
-        "center_norm": [
-         0.52151,
-         0.58401
-        ]
-       },
-       {
-        "value": 1,
-        "center_norm": [
-         0.55233,
-         0.58401
-        ]
-       },
-       {
-        "value": 2,
-        "center_norm": [
-         0.58315,
-         0.58401
-        ]
-       },
-       {
-        "value": 3,
-        "center_norm": [
-         0.61398,
-         0.58401
-        ]
-       },
-       {
-        "value": 4,
-        "center_norm": [
-         0.6448,
-         0.58401
-        ]
-       },
-       {
-        "value": 5,
-        "center_norm": [
-         0.67563,
-         0.58401
-        ]
-       },
-       {
-        "value": 6,
-        "center_norm": [
-         0.70645,
-         0.58401
-        ]
-       },
-       {
-        "value": 7,
-        "center_norm": [
-         0.73728,
-         0.58401
-        ]
-       },
-       {
-        "value": 8,
-        "center_norm": [
-         0.7681,
-         0.58401
-        ]
-       },
-       {
-        "value": 9,
-        "center_norm": [
-         0.79892,
-         0.58401
-        ]
-       }
-      ]
-     }
-    },
-    {
-     "who": {
-      "place": "who",
-      "bubbles": [
-       {
-        "value": "A",
-        "center_norm": [
-         0.07706,
-         0.6084
-        ]
-       },
-       {
-        "value": "B",
-        "center_norm": [
-         0.10789,
-         0.6084
-        ]
-       },
-       {
-        "value": "C",
-        "center_norm": [
-         0.13871,
-         0.6084
-        ]
-       },
-       {
-        "value": "D",
-        "center_norm": [
-         0.16953,
-         0.6084
-        ]
-       },
-       {
-        "value": "E",
-        "center_norm": [
-         0.20036,
-         0.6084
-        ]
-       },
-       {
-        "value": "F",
-        "center_norm": [
-         0.23118,
-         0.6084
-        ]
-       },
-       {
-        "value": "G",
-        "center_norm": [
-         0.26201,
-         0.6084
-        ]
-       },
-       {
-        "value": "H",
-        "center_norm": [
-         0.29283,
-         0.6084
-        ]
-       }
-      ]
-     },
-     "tens": {
-      "place": "tens",
-      "bubbles": [
-       {
-        "value": 1,
-        "center_norm": [
-         0.36022,
-         0.6084
-        ]
-       },
-       {
-        "value": 2,
-        "center_norm": [
-         0.39104,
-         0.6084
-        ]
-       },
-       {
-        "value": 3,
-        "center_norm": [
-         0.42186,
-         0.6084
-        ]
-       },
-       {
-        "value": 4,
-        "center_norm": [
-         0.45269,
-         0.6084
-        ]
-       }
-      ]
-     },
-     "ones": {
-      "place": "ones",
-      "bubbles": [
-       {
-        "value": 0,
-        "center_norm": [
-         0.52151,
-         0.6084
-        ]
-       },
-       {
-        "value": 1,
-        "center_norm": [
-         0.55233,
-         0.6084
-        ]
-       },
-       {
-        "value": 2,
-        "center_norm": [
-         0.58315,
-         0.6084
-        ]
-       },
-       {
-        "value": 3,
-        "center_norm": [
-         0.61398,
-         0.6084
-        ]
-       },
-       {
-        "value": 4,
-        "center_norm": [
-         0.6448,
-         0.6084
-        ]
-       },
-       {
-        "value": 5,
-        "center_norm": [
-         0.67563,
-         0.6084
-        ]
-       },
-       {
-        "value": 6,
-        "center_norm": [
-         0.70645,
-         0.6084
-        ]
-       },
-       {
-        "value": 7,
-        "center_norm": [
-         0.73728,
-         0.6084
-        ]
-       },
-       {
-        "value": 8,
-        "center_norm": [
-         0.7681,
-         0.6084
-        ]
-       },
-       {
-        "value": 9,
-        "center_norm": [
-         0.79892,
-         0.6084
-        ]
-       }
-      ]
-     }
-    },
-    {
-     "who": {
-      "place": "who",
-      "bubbles": [
-       {
-        "value": "A",
-        "center_norm": [
-         0.07706,
-         0.63279
-        ]
-       },
-       {
-        "value": "B",
-        "center_norm": [
-         0.10789,
-         0.63279
-        ]
-       },
-       {
-        "value": "C",
-        "center_norm": [
-         0.13871,
-         0.63279
-        ]
-       },
-       {
-        "value": "D",
-        "center_norm": [
-         0.16953,
-         0.63279
-        ]
-       },
-       {
-        "value": "E",
-        "center_norm": [
-         0.20036,
-         0.63279
-        ]
-       },
-       {
-        "value": "F",
-        "center_norm": [
-         0.23118,
-         0.63279
-        ]
-       },
-       {
-        "value": "G",
-        "center_norm": [
-         0.26201,
-         0.63279
-        ]
-       },
-       {
-        "value": "H",
-        "center_norm": [
-         0.29283,
-         0.63279
-        ]
-       }
-      ]
-     },
-     "tens": {
-      "place": "tens",
-      "bubbles": [
-       {
-        "value": 1,
-        "center_norm": [
-         0.36022,
-         0.63279
-        ]
-       },
-       {
-        "value": 2,
-        "center_norm": [
-         0.39104,
-         0.63279
-        ]
-       },
-       {
-        "value": 3,
-        "center_norm": [
-         0.42186,
-         0.63279
-        ]
-       },
-       {
-        "value": 4,
-        "center_norm": [
-         0.45269,
-         0.63279
-        ]
-       }
-      ]
-     },
-     "ones": {
-      "place": "ones",
-      "bubbles": [
-       {
-        "value": 0,
-        "center_norm": [
-         0.52151,
-         0.63279
-        ]
-       },
-       {
-        "value": 1,
-        "center_norm": [
-         0.55233,
-         0.63279
-        ]
-       },
-       {
-        "value": 2,
-        "center_norm": [
-         0.58315,
-         0.63279
-        ]
-       },
-       {
-        "value": 3,
-        "center_norm": [
-         0.61398,
-         0.63279
-        ]
-       },
-       {
-        "value": 4,
-        "center_norm": [
-         0.6448,
-         0.63279
-        ]
-       },
-       {
-        "value": 5,
-        "center_norm": [
-         0.67563,
-         0.63279
-        ]
-       },
-       {
-        "value": 6,
-        "center_norm": [
-         0.70645,
-         0.63279
-        ]
-       },
-       {
-        "value": 7,
-        "center_norm": [
-         0.73728,
-         0.63279
-        ]
-       },
-       {
-        "value": 8,
-        "center_norm": [
-         0.7681,
-         0.63279
-        ]
-       },
-       {
-        "value": 9,
-        "center_norm": [
-         0.79892,
-         0.63279
-        ]
-       }
-      ]
-     }
-    },
-    {
-     "who": {
-      "place": "who",
-      "bubbles": [
-       {
-        "value": "A",
-        "center_norm": [
-         0.07706,
-         0.65718
-        ]
-       },
-       {
-        "value": "B",
-        "center_norm": [
-         0.10789,
-         0.65718
-        ]
-       },
-       {
-        "value": "C",
-        "center_norm": [
-         0.13871,
-         0.65718
-        ]
-       },
-       {
-        "value": "D",
-        "center_norm": [
-         0.16953,
-         0.65718
-        ]
-       },
-       {
-        "value": "E",
-        "center_norm": [
-         0.20036,
-         0.65718
-        ]
-       },
-       {
-        "value": "F",
-        "center_norm": [
-         0.23118,
-         0.65718
-        ]
-       },
-       {
-        "value": "G",
-        "center_norm": [
-         0.26201,
-         0.65718
-        ]
-       },
-       {
-        "value": "H",
-        "center_norm": [
-         0.29283,
-         0.65718
-        ]
-       }
-      ]
-     },
-     "tens": {
-      "place": "tens",
-      "bubbles": [
-       {
-        "value": 1,
-        "center_norm": [
-         0.36022,
-         0.65718
-        ]
-       },
-       {
-        "value": 2,
-        "center_norm": [
-         0.39104,
-         0.65718
-        ]
-       },
-       {
-        "value": 3,
-        "center_norm": [
-         0.42186,
-         0.65718
-        ]
-       },
-       {
-        "value": 4,
-        "center_norm": [
-         0.45269,
-         0.65718
-        ]
-       }
-      ]
-     },
-     "ones": {
-      "place": "ones",
-      "bubbles": [
-       {
-        "value": 0,
-        "center_norm": [
-         0.52151,
-         0.65718
-        ]
-       },
-       {
-        "value": 1,
-        "center_norm": [
-         0.55233,
-         0.65718
-        ]
-       },
-       {
-        "value": 2,
-        "center_norm": [
-         0.58315,
-         0.65718
-        ]
-       },
-       {
-        "value": 3,
-        "center_norm": [
-         0.61398,
-         0.65718
-        ]
-       },
-       {
-        "value": 4,
-        "center_norm": [
-         0.6448,
-         0.65718
-        ]
-       },
-       {
-        "value": 5,
-        "center_norm": [
-         0.67563,
-         0.65718
-        ]
-       },
-       {
-        "value": 6,
-        "center_norm": [
-         0.70645,
-         0.65718
-        ]
-       },
-       {
-        "value": 7,
-        "center_norm": [
-         0.73728,
-         0.65718
-        ]
-       },
-       {
-        "value": 8,
-        "center_norm": [
-         0.7681,
-         0.65718
-        ]
-       },
-       {
-        "value": 9,
-        "center_norm": [
-         0.79892,
-         0.65718
-        ]
-       }
-      ]
-     }
-    }
+  "team_g2_s1": {
+   "rule": "exactly one",
+   "options": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H"
    ],
-   "team": {
-    "hundreds": {
-     "place": "hundreds",
-     "type": "flag",
-     "bubbles": [
-      {
-       "value": 1,
-       "center_norm": [
-        0.07706,
-        0.68157
-       ]
-      }
-     ]
-    },
-    "tens": {
-     "place": "tens",
-     "bubbles": [
-      {
-       "value": 0,
-       "center_norm": [
-        0.36022,
-        0.68157
-       ]
-      },
-      {
-       "value": 1,
-       "center_norm": [
-        0.38746,
-        0.68157
-       ]
-      },
-      {
-       "value": 2,
-       "center_norm": [
-        0.4147,
-        0.68157
-       ]
-      },
-      {
-       "value": 3,
-       "center_norm": [
-        0.44194,
-        0.68157
-       ]
-      },
-      {
-       "value": 4,
-       "center_norm": [
-        0.46918,
-        0.68157
-       ]
-      },
-      {
-       "value": 5,
-       "center_norm": [
-        0.49642,
-        0.68157
-       ]
-      },
-      {
-       "value": 6,
-       "center_norm": [
-        0.52366,
-        0.68157
-       ]
-      },
-      {
-       "value": 7,
-       "center_norm": [
-        0.5509,
-        0.68157
-       ]
-      },
-      {
-       "value": 8,
-       "center_norm": [
-        0.57814,
-        0.68157
-       ]
-      },
-      {
-       "value": 9,
-       "center_norm": [
-        0.60538,
-        0.68157
-       ]
-      }
-     ]
-    },
-    "ones": {
-     "place": "ones",
-     "bubbles": [
-      {
-       "value": 0,
-       "center_norm": [
-        0.65771,
-        0.68157
-       ]
-      },
-      {
-       "value": 1,
-       "center_norm": [
-        0.68495,
-        0.68157
-       ]
-      },
-      {
-       "value": 2,
-       "center_norm": [
-        0.71219,
-        0.68157
-       ]
-      },
-      {
-       "value": 3,
-       "center_norm": [
-        0.73943,
-        0.68157
-       ]
-      },
-      {
-       "value": 4,
-       "center_norm": [
-        0.76667,
-        0.68157
-       ]
-      },
-      {
-       "value": 5,
-       "center_norm": [
-        0.79391,
-        0.68157
-       ]
-      },
-      {
-       "value": 6,
-       "center_norm": [
-        0.82115,
-        0.68157
-       ]
-      },
-      {
-       "value": 7,
-       "center_norm": [
-        0.84839,
-        0.68157
-       ]
-      },
-      {
-       "value": 8,
-       "center_norm": [
-        0.87563,
-        0.68157
-       ]
-      },
-      {
-       "value": 9,
-       "center_norm": [
-        0.90287,
-        0.68157
-       ]
-      }
-     ]
-    }
-   },
-   "result": [
+   "bubbles": [
     {
-     "value": "won",
+     "value": "A",
      "center_norm": [
-      0.1129,
-      0.70596
+      0.37618,
+      0.39989
      ]
     },
     {
-     "value": "lost",
+     "value": "B",
      "center_norm": [
-      0.19534,
-      0.70596
+      0.41187,
+      0.39989
+     ]
+    },
+    {
+     "value": "C",
+     "center_norm": [
+      0.44757,
+      0.39989
+     ]
+    },
+    {
+     "value": "D",
+     "center_norm": [
+      0.48327,
+      0.39989
+     ]
+    },
+    {
+     "value": "E",
+     "center_norm": [
+      0.37618,
+      0.42604
+     ]
+    },
+    {
+     "value": "F",
+     "center_norm": [
+      0.41187,
+      0.42604
+     ]
+    },
+    {
+     "value": "G",
+     "center_norm": [
+      0.44757,
+      0.42604
+     ]
+    },
+    {
+     "value": "H",
+     "center_norm": [
+      0.48327,
+      0.42604
      ]
     }
    ]
   },
-  "3": {
-   "shooters": [
-    {
-     "who": {
-      "place": "who",
-      "bubbles": [
-       {
-        "value": "A",
-        "center_norm": [
-         0.07706,
-         0.78184
-        ]
-       },
-       {
-        "value": "B",
-        "center_norm": [
-         0.10789,
-         0.78184
-        ]
-       },
-       {
-        "value": "C",
-        "center_norm": [
-         0.13871,
-         0.78184
-        ]
-       },
-       {
-        "value": "D",
-        "center_norm": [
-         0.16953,
-         0.78184
-        ]
-       },
-       {
-        "value": "E",
-        "center_norm": [
-         0.20036,
-         0.78184
-        ]
-       },
-       {
-        "value": "F",
-        "center_norm": [
-         0.23118,
-         0.78184
-        ]
-       },
-       {
-        "value": "G",
-        "center_norm": [
-         0.26201,
-         0.78184
-        ]
-       },
-       {
-        "value": "H",
-        "center_norm": [
-         0.29283,
-         0.78184
-        ]
-       }
-      ]
-     },
-     "tens": {
-      "place": "tens",
-      "bubbles": [
-       {
-        "value": 1,
-        "center_norm": [
-         0.36022,
-         0.78184
-        ]
-       },
-       {
-        "value": 2,
-        "center_norm": [
-         0.39104,
-         0.78184
-        ]
-       },
-       {
-        "value": 3,
-        "center_norm": [
-         0.42186,
-         0.78184
-        ]
-       },
-       {
-        "value": 4,
-        "center_norm": [
-         0.45269,
-         0.78184
-        ]
-       }
-      ]
-     },
-     "ones": {
-      "place": "ones",
-      "bubbles": [
-       {
-        "value": 0,
-        "center_norm": [
-         0.52151,
-         0.78184
-        ]
-       },
-       {
-        "value": 1,
-        "center_norm": [
-         0.55233,
-         0.78184
-        ]
-       },
-       {
-        "value": 2,
-        "center_norm": [
-         0.58315,
-         0.78184
-        ]
-       },
-       {
-        "value": 3,
-        "center_norm": [
-         0.61398,
-         0.78184
-        ]
-       },
-       {
-        "value": 4,
-        "center_norm": [
-         0.6448,
-         0.78184
-        ]
-       },
-       {
-        "value": 5,
-        "center_norm": [
-         0.67563,
-         0.78184
-        ]
-       },
-       {
-        "value": 6,
-        "center_norm": [
-         0.70645,
-         0.78184
-        ]
-       },
-       {
-        "value": 7,
-        "center_norm": [
-         0.73728,
-         0.78184
-        ]
-       },
-       {
-        "value": 8,
-        "center_norm": [
-         0.7681,
-         0.78184
-        ]
-       },
-       {
-        "value": 9,
-        "center_norm": [
-         0.79892,
-         0.78184
-        ]
-       }
-      ]
-     }
-    },
-    {
-     "who": {
-      "place": "who",
-      "bubbles": [
-       {
-        "value": "A",
-        "center_norm": [
-         0.07706,
-         0.80623
-        ]
-       },
-       {
-        "value": "B",
-        "center_norm": [
-         0.10789,
-         0.80623
-        ]
-       },
-       {
-        "value": "C",
-        "center_norm": [
-         0.13871,
-         0.80623
-        ]
-       },
-       {
-        "value": "D",
-        "center_norm": [
-         0.16953,
-         0.80623
-        ]
-       },
-       {
-        "value": "E",
-        "center_norm": [
-         0.20036,
-         0.80623
-        ]
-       },
-       {
-        "value": "F",
-        "center_norm": [
-         0.23118,
-         0.80623
-        ]
-       },
-       {
-        "value": "G",
-        "center_norm": [
-         0.26201,
-         0.80623
-        ]
-       },
-       {
-        "value": "H",
-        "center_norm": [
-         0.29283,
-         0.80623
-        ]
-       }
-      ]
-     },
-     "tens": {
-      "place": "tens",
-      "bubbles": [
-       {
-        "value": 1,
-        "center_norm": [
-         0.36022,
-         0.80623
-        ]
-       },
-       {
-        "value": 2,
-        "center_norm": [
-         0.39104,
-         0.80623
-        ]
-       },
-       {
-        "value": 3,
-        "center_norm": [
-         0.42186,
-         0.80623
-        ]
-       },
-       {
-        "value": 4,
-        "center_norm": [
-         0.45269,
-         0.80623
-        ]
-       }
-      ]
-     },
-     "ones": {
-      "place": "ones",
-      "bubbles": [
-       {
-        "value": 0,
-        "center_norm": [
-         0.52151,
-         0.80623
-        ]
-       },
-       {
-        "value": 1,
-        "center_norm": [
-         0.55233,
-         0.80623
-        ]
-       },
-       {
-        "value": 2,
-        "center_norm": [
-         0.58315,
-         0.80623
-        ]
-       },
-       {
-        "value": 3,
-        "center_norm": [
-         0.61398,
-         0.80623
-        ]
-       },
-       {
-        "value": 4,
-        "center_norm": [
-         0.6448,
-         0.80623
-        ]
-       },
-       {
-        "value": 5,
-        "center_norm": [
-         0.67563,
-         0.80623
-        ]
-       },
-       {
-        "value": 6,
-        "center_norm": [
-         0.70645,
-         0.80623
-        ]
-       },
-       {
-        "value": 7,
-        "center_norm": [
-         0.73728,
-         0.80623
-        ]
-       },
-       {
-        "value": 8,
-        "center_norm": [
-         0.7681,
-         0.80623
-        ]
-       },
-       {
-        "value": 9,
-        "center_norm": [
-         0.79892,
-         0.80623
-        ]
-       }
-      ]
-     }
-    },
-    {
-     "who": {
-      "place": "who",
-      "bubbles": [
-       {
-        "value": "A",
-        "center_norm": [
-         0.07706,
-         0.83062
-        ]
-       },
-       {
-        "value": "B",
-        "center_norm": [
-         0.10789,
-         0.83062
-        ]
-       },
-       {
-        "value": "C",
-        "center_norm": [
-         0.13871,
-         0.83062
-        ]
-       },
-       {
-        "value": "D",
-        "center_norm": [
-         0.16953,
-         0.83062
-        ]
-       },
-       {
-        "value": "E",
-        "center_norm": [
-         0.20036,
-         0.83062
-        ]
-       },
-       {
-        "value": "F",
-        "center_norm": [
-         0.23118,
-         0.83062
-        ]
-       },
-       {
-        "value": "G",
-        "center_norm": [
-         0.26201,
-         0.83062
-        ]
-       },
-       {
-        "value": "H",
-        "center_norm": [
-         0.29283,
-         0.83062
-        ]
-       }
-      ]
-     },
-     "tens": {
-      "place": "tens",
-      "bubbles": [
-       {
-        "value": 1,
-        "center_norm": [
-         0.36022,
-         0.83062
-        ]
-       },
-       {
-        "value": 2,
-        "center_norm": [
-         0.39104,
-         0.83062
-        ]
-       },
-       {
-        "value": 3,
-        "center_norm": [
-         0.42186,
-         0.83062
-        ]
-       },
-       {
-        "value": 4,
-        "center_norm": [
-         0.45269,
-         0.83062
-        ]
-       }
-      ]
-     },
-     "ones": {
-      "place": "ones",
-      "bubbles": [
-       {
-        "value": 0,
-        "center_norm": [
-         0.52151,
-         0.83062
-        ]
-       },
-       {
-        "value": 1,
-        "center_norm": [
-         0.55233,
-         0.83062
-        ]
-       },
-       {
-        "value": 2,
-        "center_norm": [
-         0.58315,
-         0.83062
-        ]
-       },
-       {
-        "value": 3,
-        "center_norm": [
-         0.61398,
-         0.83062
-        ]
-       },
-       {
-        "value": 4,
-        "center_norm": [
-         0.6448,
-         0.83062
-        ]
-       },
-       {
-        "value": 5,
-        "center_norm": [
-         0.67563,
-         0.83062
-        ]
-       },
-       {
-        "value": 6,
-        "center_norm": [
-         0.70645,
-         0.83062
-        ]
-       },
-       {
-        "value": 7,
-        "center_norm": [
-         0.73728,
-         0.83062
-        ]
-       },
-       {
-        "value": 8,
-        "center_norm": [
-         0.7681,
-         0.83062
-        ]
-       },
-       {
-        "value": 9,
-        "center_norm": [
-         0.79892,
-         0.83062
-        ]
-       }
-      ]
-     }
-    },
-    {
-     "who": {
-      "place": "who",
-      "bubbles": [
-       {
-        "value": "A",
-        "center_norm": [
-         0.07706,
-         0.85501
-        ]
-       },
-       {
-        "value": "B",
-        "center_norm": [
-         0.10789,
-         0.85501
-        ]
-       },
-       {
-        "value": "C",
-        "center_norm": [
-         0.13871,
-         0.85501
-        ]
-       },
-       {
-        "value": "D",
-        "center_norm": [
-         0.16953,
-         0.85501
-        ]
-       },
-       {
-        "value": "E",
-        "center_norm": [
-         0.20036,
-         0.85501
-        ]
-       },
-       {
-        "value": "F",
-        "center_norm": [
-         0.23118,
-         0.85501
-        ]
-       },
-       {
-        "value": "G",
-        "center_norm": [
-         0.26201,
-         0.85501
-        ]
-       },
-       {
-        "value": "H",
-        "center_norm": [
-         0.29283,
-         0.85501
-        ]
-       }
-      ]
-     },
-     "tens": {
-      "place": "tens",
-      "bubbles": [
-       {
-        "value": 1,
-        "center_norm": [
-         0.36022,
-         0.85501
-        ]
-       },
-       {
-        "value": 2,
-        "center_norm": [
-         0.39104,
-         0.85501
-        ]
-       },
-       {
-        "value": 3,
-        "center_norm": [
-         0.42186,
-         0.85501
-        ]
-       },
-       {
-        "value": 4,
-        "center_norm": [
-         0.45269,
-         0.85501
-        ]
-       }
-      ]
-     },
-     "ones": {
-      "place": "ones",
-      "bubbles": [
-       {
-        "value": 0,
-        "center_norm": [
-         0.52151,
-         0.85501
-        ]
-       },
-       {
-        "value": 1,
-        "center_norm": [
-         0.55233,
-         0.85501
-        ]
-       },
-       {
-        "value": 2,
-        "center_norm": [
-         0.58315,
-         0.85501
-        ]
-       },
-       {
-        "value": 3,
-        "center_norm": [
-         0.61398,
-         0.85501
-        ]
-       },
-       {
-        "value": 4,
-        "center_norm": [
-         0.6448,
-         0.85501
-        ]
-       },
-       {
-        "value": 5,
-        "center_norm": [
-         0.67563,
-         0.85501
-        ]
-       },
-       {
-        "value": 6,
-        "center_norm": [
-         0.70645,
-         0.85501
-        ]
-       },
-       {
-        "value": 7,
-        "center_norm": [
-         0.73728,
-         0.85501
-        ]
-       },
-       {
-        "value": 8,
-        "center_norm": [
-         0.7681,
-         0.85501
-        ]
-       },
-       {
-        "value": 9,
-        "center_norm": [
-         0.79892,
-         0.85501
-        ]
-       }
-      ]
-     }
-    }
+  "team_g3_s1": {
+   "rule": "exactly one",
+   "options": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H"
    ],
-   "team": {
-    "hundreds": {
-     "place": "hundreds",
-     "type": "flag",
-     "bubbles": [
-      {
-       "value": 1,
-       "center_norm": [
-        0.07706,
-        0.8794
-       ]
-      }
+   "bubbles": [
+    {
+     "value": "A",
+     "center_norm": [
+      0.71439,
+      0.39989
      ]
     },
-    "tens": {
-     "place": "tens",
-     "bubbles": [
-      {
-       "value": 0,
-       "center_norm": [
-        0.36022,
-        0.8794
-       ]
-      },
-      {
-       "value": 1,
-       "center_norm": [
-        0.38746,
-        0.8794
-       ]
-      },
-      {
-       "value": 2,
-       "center_norm": [
-        0.4147,
-        0.8794
-       ]
-      },
-      {
-       "value": 3,
-       "center_norm": [
-        0.44194,
-        0.8794
-       ]
-      },
-      {
-       "value": 4,
-       "center_norm": [
-        0.46918,
-        0.8794
-       ]
-      },
-      {
-       "value": 5,
-       "center_norm": [
-        0.49642,
-        0.8794
-       ]
-      },
-      {
-       "value": 6,
-       "center_norm": [
-        0.52366,
-        0.8794
-       ]
-      },
-      {
-       "value": 7,
-       "center_norm": [
-        0.5509,
-        0.8794
-       ]
-      },
-      {
-       "value": 8,
-       "center_norm": [
-        0.57814,
-        0.8794
-       ]
-      },
-      {
-       "value": 9,
-       "center_norm": [
-        0.60538,
-        0.8794
-       ]
-      }
+    {
+     "value": "B",
+     "center_norm": [
+      0.75008,
+      0.39989
      ]
     },
-    "ones": {
-     "place": "ones",
-     "bubbles": [
-      {
-       "value": 0,
-       "center_norm": [
-        0.65771,
-        0.8794
-       ]
-      },
-      {
-       "value": 1,
-       "center_norm": [
-        0.68495,
-        0.8794
-       ]
-      },
-      {
-       "value": 2,
-       "center_norm": [
-        0.71219,
-        0.8794
-       ]
-      },
-      {
-       "value": 3,
-       "center_norm": [
-        0.73943,
-        0.8794
-       ]
-      },
-      {
-       "value": 4,
-       "center_norm": [
-        0.76667,
-        0.8794
-       ]
-      },
-      {
-       "value": 5,
-       "center_norm": [
-        0.79391,
-        0.8794
-       ]
-      },
-      {
-       "value": 6,
-       "center_norm": [
-        0.82115,
-        0.8794
-       ]
-      },
-      {
-       "value": 7,
-       "center_norm": [
-        0.84839,
-        0.8794
-       ]
-      },
-      {
-       "value": 8,
-       "center_norm": [
-        0.87563,
-        0.8794
-       ]
-      },
-      {
-       "value": 9,
-       "center_norm": [
-        0.90287,
-        0.8794
-       ]
-      }
+    {
+     "value": "C",
+     "center_norm": [
+      0.78578,
+      0.39989
+     ]
+    },
+    {
+     "value": "D",
+     "center_norm": [
+      0.82148,
+      0.39989
+     ]
+    },
+    {
+     "value": "E",
+     "center_norm": [
+      0.71439,
+      0.42604
+     ]
+    },
+    {
+     "value": "F",
+     "center_norm": [
+      0.75008,
+      0.42604
+     ]
+    },
+    {
+     "value": "G",
+     "center_norm": [
+      0.78578,
+      0.42604
+     ]
+    },
+    {
+     "value": "H",
+     "center_norm": [
+      0.82148,
+      0.42604
      ]
     }
-   },
-   "result": [
+   ]
+  },
+  "team_g1_s2": {
+   "rule": "exactly one",
+   "options": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H"
+   ],
+   "bubbles": [
     {
-     "value": "won",
+     "value": "A",
      "center_norm": [
-      0.1129,
-      0.90379
+      0.03797,
+      0.50723
      ]
     },
     {
-     "value": "lost",
+     "value": "B",
      "center_norm": [
-      0.19534,
-      0.90379
+      0.07366,
+      0.50723
+     ]
+    },
+    {
+     "value": "C",
+     "center_norm": [
+      0.10936,
+      0.50723
+     ]
+    },
+    {
+     "value": "D",
+     "center_norm": [
+      0.14506,
+      0.50723
+     ]
+    },
+    {
+     "value": "E",
+     "center_norm": [
+      0.03797,
+      0.53337
+     ]
+    },
+    {
+     "value": "F",
+     "center_norm": [
+      0.07366,
+      0.53337
+     ]
+    },
+    {
+     "value": "G",
+     "center_norm": [
+      0.10936,
+      0.53337
+     ]
+    },
+    {
+     "value": "H",
+     "center_norm": [
+      0.14506,
+      0.53337
+     ]
+    }
+   ]
+  },
+  "team_g2_s2": {
+   "rule": "exactly one",
+   "options": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H"
+   ],
+   "bubbles": [
+    {
+     "value": "A",
+     "center_norm": [
+      0.37618,
+      0.50723
+     ]
+    },
+    {
+     "value": "B",
+     "center_norm": [
+      0.41187,
+      0.50723
+     ]
+    },
+    {
+     "value": "C",
+     "center_norm": [
+      0.44757,
+      0.50723
+     ]
+    },
+    {
+     "value": "D",
+     "center_norm": [
+      0.48327,
+      0.50723
+     ]
+    },
+    {
+     "value": "E",
+     "center_norm": [
+      0.37618,
+      0.53337
+     ]
+    },
+    {
+     "value": "F",
+     "center_norm": [
+      0.41187,
+      0.53337
+     ]
+    },
+    {
+     "value": "G",
+     "center_norm": [
+      0.44757,
+      0.53337
+     ]
+    },
+    {
+     "value": "H",
+     "center_norm": [
+      0.48327,
+      0.53337
+     ]
+    }
+   ]
+  },
+  "team_g3_s2": {
+   "rule": "exactly one",
+   "options": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H"
+   ],
+   "bubbles": [
+    {
+     "value": "A",
+     "center_norm": [
+      0.71439,
+      0.50723
+     ]
+    },
+    {
+     "value": "B",
+     "center_norm": [
+      0.75008,
+      0.50723
+     ]
+    },
+    {
+     "value": "C",
+     "center_norm": [
+      0.78578,
+      0.50723
+     ]
+    },
+    {
+     "value": "D",
+     "center_norm": [
+      0.82148,
+      0.50723
+     ]
+    },
+    {
+     "value": "E",
+     "center_norm": [
+      0.71439,
+      0.53337
+     ]
+    },
+    {
+     "value": "F",
+     "center_norm": [
+      0.75008,
+      0.53337
+     ]
+    },
+    {
+     "value": "G",
+     "center_norm": [
+      0.78578,
+      0.53337
+     ]
+    },
+    {
+     "value": "H",
+     "center_norm": [
+      0.82148,
+      0.53337
+     ]
+    }
+   ]
+  },
+  "team_g1_s3": {
+   "rule": "exactly one",
+   "options": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H"
+   ],
+   "bubbles": [
+    {
+     "value": "A",
+     "center_norm": [
+      0.03797,
+      0.61456
+     ]
+    },
+    {
+     "value": "B",
+     "center_norm": [
+      0.07366,
+      0.61456
+     ]
+    },
+    {
+     "value": "C",
+     "center_norm": [
+      0.10936,
+      0.61456
+     ]
+    },
+    {
+     "value": "D",
+     "center_norm": [
+      0.14506,
+      0.61456
+     ]
+    },
+    {
+     "value": "E",
+     "center_norm": [
+      0.03797,
+      0.64071
+     ]
+    },
+    {
+     "value": "F",
+     "center_norm": [
+      0.07366,
+      0.64071
+     ]
+    },
+    {
+     "value": "G",
+     "center_norm": [
+      0.10936,
+      0.64071
+     ]
+    },
+    {
+     "value": "H",
+     "center_norm": [
+      0.14506,
+      0.64071
+     ]
+    }
+   ]
+  },
+  "team_g2_s3": {
+   "rule": "exactly one",
+   "options": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H"
+   ],
+   "bubbles": [
+    {
+     "value": "A",
+     "center_norm": [
+      0.37618,
+      0.61456
+     ]
+    },
+    {
+     "value": "B",
+     "center_norm": [
+      0.41187,
+      0.61456
+     ]
+    },
+    {
+     "value": "C",
+     "center_norm": [
+      0.44757,
+      0.61456
+     ]
+    },
+    {
+     "value": "D",
+     "center_norm": [
+      0.48327,
+      0.61456
+     ]
+    },
+    {
+     "value": "E",
+     "center_norm": [
+      0.37618,
+      0.64071
+     ]
+    },
+    {
+     "value": "F",
+     "center_norm": [
+      0.41187,
+      0.64071
+     ]
+    },
+    {
+     "value": "G",
+     "center_norm": [
+      0.44757,
+      0.64071
+     ]
+    },
+    {
+     "value": "H",
+     "center_norm": [
+      0.48327,
+      0.64071
+     ]
+    }
+   ]
+  },
+  "team_g3_s3": {
+   "rule": "exactly one",
+   "options": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H"
+   ],
+   "bubbles": [
+    {
+     "value": "A",
+     "center_norm": [
+      0.71439,
+      0.61456
+     ]
+    },
+    {
+     "value": "B",
+     "center_norm": [
+      0.75008,
+      0.61456
+     ]
+    },
+    {
+     "value": "C",
+     "center_norm": [
+      0.78578,
+      0.61456
+     ]
+    },
+    {
+     "value": "D",
+     "center_norm": [
+      0.82148,
+      0.61456
+     ]
+    },
+    {
+     "value": "E",
+     "center_norm": [
+      0.71439,
+      0.64071
+     ]
+    },
+    {
+     "value": "F",
+     "center_norm": [
+      0.75008,
+      0.64071
+     ]
+    },
+    {
+     "value": "G",
+     "center_norm": [
+      0.78578,
+      0.64071
+     ]
+    },
+    {
+     "value": "H",
+     "center_norm": [
+      0.82148,
+      0.64071
+     ]
+    }
+   ]
+  },
+  "team_g1_s4": {
+   "rule": "exactly one",
+   "options": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H"
+   ],
+   "bubbles": [
+    {
+     "value": "A",
+     "center_norm": [
+      0.03797,
+      0.7219
+     ]
+    },
+    {
+     "value": "B",
+     "center_norm": [
+      0.07366,
+      0.7219
+     ]
+    },
+    {
+     "value": "C",
+     "center_norm": [
+      0.10936,
+      0.7219
+     ]
+    },
+    {
+     "value": "D",
+     "center_norm": [
+      0.14506,
+      0.7219
+     ]
+    },
+    {
+     "value": "E",
+     "center_norm": [
+      0.03797,
+      0.74804
+     ]
+    },
+    {
+     "value": "F",
+     "center_norm": [
+      0.07366,
+      0.74804
+     ]
+    },
+    {
+     "value": "G",
+     "center_norm": [
+      0.10936,
+      0.74804
+     ]
+    },
+    {
+     "value": "H",
+     "center_norm": [
+      0.14506,
+      0.74804
+     ]
+    }
+   ]
+  },
+  "team_g2_s4": {
+   "rule": "exactly one",
+   "options": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H"
+   ],
+   "bubbles": [
+    {
+     "value": "A",
+     "center_norm": [
+      0.37618,
+      0.7219
+     ]
+    },
+    {
+     "value": "B",
+     "center_norm": [
+      0.41187,
+      0.7219
+     ]
+    },
+    {
+     "value": "C",
+     "center_norm": [
+      0.44757,
+      0.7219
+     ]
+    },
+    {
+     "value": "D",
+     "center_norm": [
+      0.48327,
+      0.7219
+     ]
+    },
+    {
+     "value": "E",
+     "center_norm": [
+      0.37618,
+      0.74804
+     ]
+    },
+    {
+     "value": "F",
+     "center_norm": [
+      0.41187,
+      0.74804
+     ]
+    },
+    {
+     "value": "G",
+     "center_norm": [
+      0.44757,
+      0.74804
+     ]
+    },
+    {
+     "value": "H",
+     "center_norm": [
+      0.48327,
+      0.74804
+     ]
+    }
+   ]
+  },
+  "team_g3_s4": {
+   "rule": "exactly one",
+   "options": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H"
+   ],
+   "bubbles": [
+    {
+     "value": "A",
+     "center_norm": [
+      0.71439,
+      0.7219
+     ]
+    },
+    {
+     "value": "B",
+     "center_norm": [
+      0.75008,
+      0.7219
+     ]
+    },
+    {
+     "value": "C",
+     "center_norm": [
+      0.78578,
+      0.7219
+     ]
+    },
+    {
+     "value": "D",
+     "center_norm": [
+      0.82148,
+      0.7219
+     ]
+    },
+    {
+     "value": "E",
+     "center_norm": [
+      0.71439,
+      0.74804
+     ]
+    },
+    {
+     "value": "F",
+     "center_norm": [
+      0.75008,
+      0.74804
+     ]
+    },
+    {
+     "value": "G",
+     "center_norm": [
+      0.78578,
+      0.74804
+     ]
+    },
+    {
+     "value": "H",
+     "center_norm": [
+      0.82148,
+      0.74804
      ]
     }
    ]
   }
+ },
+ "number_fields": {
+  "team_g1_s1": {
+   "type": "shooter_game_total",
+   "max": 49,
+   "who_field": "team_g1_s1",
+   "digits": [
+    {
+     "place": "tens",
+     "layout": "column_1_to_4",
+     "blank_means": 0,
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.18939,
+        0.39989
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.18939,
+        0.42604
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.18939,
+        0.45218
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.18939,
+        0.47833
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "layout": "keypad_0_under_8",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.2387,
+        0.39989
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.2807,
+        0.39989
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.3227,
+        0.39989
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.2387,
+        0.42604
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.2807,
+        0.42604
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.3227,
+        0.42604
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.2387,
+        0.45218
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.2807,
+        0.45218
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.3227,
+        0.45218
+       ]
+      },
+      {
+       "value": 0,
+       "center_norm": [
+        0.2807,
+        0.47833
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "team_g2_s1": {
+   "type": "shooter_game_total",
+   "max": 49,
+   "who_field": "team_g2_s1",
+   "digits": [
+    {
+     "place": "tens",
+     "layout": "column_1_to_4",
+     "blank_means": 0,
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.5276,
+        0.39989
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.5276,
+        0.42604
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.5276,
+        0.45218
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.5276,
+        0.47833
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "layout": "keypad_0_under_8",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.57691,
+        0.39989
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.61891,
+        0.39989
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.66091,
+        0.39989
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.57691,
+        0.42604
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.61891,
+        0.42604
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.66091,
+        0.42604
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.57691,
+        0.45218
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.61891,
+        0.45218
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.66091,
+        0.45218
+       ]
+      },
+      {
+       "value": 0,
+       "center_norm": [
+        0.61891,
+        0.47833
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "team_g3_s1": {
+   "type": "shooter_game_total",
+   "max": 49,
+   "who_field": "team_g3_s1",
+   "digits": [
+    {
+     "place": "tens",
+     "layout": "column_1_to_4",
+     "blank_means": 0,
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.86581,
+        0.39989
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.86581,
+        0.42604
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.86581,
+        0.45218
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.86581,
+        0.47833
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "layout": "keypad_0_under_8",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.91512,
+        0.39989
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.95712,
+        0.39989
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.99912,
+        0.39989
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.91512,
+        0.42604
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.95712,
+        0.42604
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.99912,
+        0.42604
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.91512,
+        0.45218
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.95712,
+        0.45218
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.99912,
+        0.45218
+       ]
+      },
+      {
+       "value": 0,
+       "center_norm": [
+        0.95712,
+        0.47833
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "team_g1_s2": {
+   "type": "shooter_game_total",
+   "max": 49,
+   "who_field": "team_g1_s2",
+   "digits": [
+    {
+     "place": "tens",
+     "layout": "column_1_to_4",
+     "blank_means": 0,
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.18939,
+        0.50723
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.18939,
+        0.53337
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.18939,
+        0.55952
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.18939,
+        0.58566
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "layout": "keypad_0_under_8",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.2387,
+        0.50723
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.2807,
+        0.50723
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.3227,
+        0.50723
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.2387,
+        0.53337
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.2807,
+        0.53337
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.3227,
+        0.53337
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.2387,
+        0.55952
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.2807,
+        0.55952
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.3227,
+        0.55952
+       ]
+      },
+      {
+       "value": 0,
+       "center_norm": [
+        0.2807,
+        0.58566
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "team_g2_s2": {
+   "type": "shooter_game_total",
+   "max": 49,
+   "who_field": "team_g2_s2",
+   "digits": [
+    {
+     "place": "tens",
+     "layout": "column_1_to_4",
+     "blank_means": 0,
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.5276,
+        0.50723
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.5276,
+        0.53337
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.5276,
+        0.55952
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.5276,
+        0.58566
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "layout": "keypad_0_under_8",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.57691,
+        0.50723
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.61891,
+        0.50723
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.66091,
+        0.50723
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.57691,
+        0.53337
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.61891,
+        0.53337
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.66091,
+        0.53337
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.57691,
+        0.55952
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.61891,
+        0.55952
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.66091,
+        0.55952
+       ]
+      },
+      {
+       "value": 0,
+       "center_norm": [
+        0.61891,
+        0.58566
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "team_g3_s2": {
+   "type": "shooter_game_total",
+   "max": 49,
+   "who_field": "team_g3_s2",
+   "digits": [
+    {
+     "place": "tens",
+     "layout": "column_1_to_4",
+     "blank_means": 0,
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.86581,
+        0.50723
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.86581,
+        0.53337
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.86581,
+        0.55952
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.86581,
+        0.58566
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "layout": "keypad_0_under_8",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.91512,
+        0.50723
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.95712,
+        0.50723
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.99912,
+        0.50723
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.91512,
+        0.53337
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.95712,
+        0.53337
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.99912,
+        0.53337
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.91512,
+        0.55952
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.95712,
+        0.55952
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.99912,
+        0.55952
+       ]
+      },
+      {
+       "value": 0,
+       "center_norm": [
+        0.95712,
+        0.58566
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "team_g1_s3": {
+   "type": "shooter_game_total",
+   "max": 49,
+   "who_field": "team_g1_s3",
+   "digits": [
+    {
+     "place": "tens",
+     "layout": "column_1_to_4",
+     "blank_means": 0,
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.18939,
+        0.61456
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.18939,
+        0.64071
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.18939,
+        0.66685
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.18939,
+        0.693
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "layout": "keypad_0_under_8",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.2387,
+        0.61456
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.2807,
+        0.61456
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.3227,
+        0.61456
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.2387,
+        0.64071
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.2807,
+        0.64071
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.3227,
+        0.64071
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.2387,
+        0.66685
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.2807,
+        0.66685
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.3227,
+        0.66685
+       ]
+      },
+      {
+       "value": 0,
+       "center_norm": [
+        0.2807,
+        0.693
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "team_g2_s3": {
+   "type": "shooter_game_total",
+   "max": 49,
+   "who_field": "team_g2_s3",
+   "digits": [
+    {
+     "place": "tens",
+     "layout": "column_1_to_4",
+     "blank_means": 0,
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.5276,
+        0.61456
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.5276,
+        0.64071
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.5276,
+        0.66685
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.5276,
+        0.693
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "layout": "keypad_0_under_8",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.57691,
+        0.61456
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.61891,
+        0.61456
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.66091,
+        0.61456
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.57691,
+        0.64071
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.61891,
+        0.64071
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.66091,
+        0.64071
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.57691,
+        0.66685
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.61891,
+        0.66685
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.66091,
+        0.66685
+       ]
+      },
+      {
+       "value": 0,
+       "center_norm": [
+        0.61891,
+        0.693
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "team_g3_s3": {
+   "type": "shooter_game_total",
+   "max": 49,
+   "who_field": "team_g3_s3",
+   "digits": [
+    {
+     "place": "tens",
+     "layout": "column_1_to_4",
+     "blank_means": 0,
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.86581,
+        0.61456
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.86581,
+        0.64071
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.86581,
+        0.66685
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.86581,
+        0.693
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "layout": "keypad_0_under_8",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.91512,
+        0.61456
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.95712,
+        0.61456
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.99912,
+        0.61456
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.91512,
+        0.64071
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.95712,
+        0.64071
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.99912,
+        0.64071
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.91512,
+        0.66685
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.95712,
+        0.66685
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.99912,
+        0.66685
+       ]
+      },
+      {
+       "value": 0,
+       "center_norm": [
+        0.95712,
+        0.693
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "team_g1_s4": {
+   "type": "shooter_game_total",
+   "max": 49,
+   "who_field": "team_g1_s4",
+   "digits": [
+    {
+     "place": "tens",
+     "layout": "column_1_to_4",
+     "blank_means": 0,
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.18939,
+        0.7219
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.18939,
+        0.74804
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.18939,
+        0.77419
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.18939,
+        0.80034
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "layout": "keypad_0_under_8",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.2387,
+        0.7219
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.2807,
+        0.7219
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.3227,
+        0.7219
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.2387,
+        0.74804
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.2807,
+        0.74804
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.3227,
+        0.74804
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.2387,
+        0.77419
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.2807,
+        0.77419
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.3227,
+        0.77419
+       ]
+      },
+      {
+       "value": 0,
+       "center_norm": [
+        0.2807,
+        0.80034
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "team_g2_s4": {
+   "type": "shooter_game_total",
+   "max": 49,
+   "who_field": "team_g2_s4",
+   "digits": [
+    {
+     "place": "tens",
+     "layout": "column_1_to_4",
+     "blank_means": 0,
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.5276,
+        0.7219
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.5276,
+        0.74804
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.5276,
+        0.77419
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.5276,
+        0.80034
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "layout": "keypad_0_under_8",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.57691,
+        0.7219
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.61891,
+        0.7219
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.66091,
+        0.7219
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.57691,
+        0.74804
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.61891,
+        0.74804
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.66091,
+        0.74804
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.57691,
+        0.77419
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.61891,
+        0.77419
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.66091,
+        0.77419
+       ]
+      },
+      {
+       "value": 0,
+       "center_norm": [
+        0.61891,
+        0.80034
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "team_g3_s4": {
+   "type": "shooter_game_total",
+   "max": 49,
+   "who_field": "team_g3_s4",
+   "digits": [
+    {
+     "place": "tens",
+     "layout": "column_1_to_4",
+     "blank_means": 0,
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.86581,
+        0.7219
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.86581,
+        0.74804
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.86581,
+        0.77419
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.86581,
+        0.80034
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "layout": "keypad_0_under_8",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.91512,
+        0.7219
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.95712,
+        0.7219
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.99912,
+        0.7219
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.91512,
+        0.74804
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.95712,
+        0.74804
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.99912,
+        0.74804
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.91512,
+        0.77419
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.95712,
+        0.77419
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.99912,
+        0.77419
+       ]
+      },
+      {
+       "value": 0,
+       "center_norm": [
+        0.95712,
+        0.80034
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "team_g1_team": {
+   "type": "team_game_total",
+   "max": 199,
+   "digits": [
+    {
+     "place": "hundreds",
+     "type": "flag",
+     "meaning": "filled = +100, blank = 0",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.1054,
+        0.82923
+       ]
+      }
+     ]
+    },
+    {
+     "place": "tens",
+     "layout": "keypad_0_under_8",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.1054,
+        0.85538
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.14739,
+        0.85538
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.18939,
+        0.85538
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.1054,
+        0.88153
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.14739,
+        0.88153
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.18939,
+        0.88153
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.1054,
+        0.90767
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.14739,
+        0.90767
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.18939,
+        0.90767
+       ]
+      },
+      {
+       "value": 0,
+       "center_norm": [
+        0.14739,
+        0.93382
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "layout": "keypad_0_under_8",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.2387,
+        0.85538
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.2807,
+        0.85538
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.3227,
+        0.85538
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.2387,
+        0.88153
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.2807,
+        0.88153
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.3227,
+        0.88153
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.2387,
+        0.90767
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.2807,
+        0.90767
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.3227,
+        0.90767
+       ]
+      },
+      {
+       "value": 0,
+       "center_norm": [
+        0.2807,
+        0.93382
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "team_g2_team": {
+   "type": "team_game_total",
+   "max": 199,
+   "digits": [
+    {
+     "place": "hundreds",
+     "type": "flag",
+     "meaning": "filled = +100, blank = 0",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.44361,
+        0.82923
+       ]
+      }
+     ]
+    },
+    {
+     "place": "tens",
+     "layout": "keypad_0_under_8",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.44361,
+        0.85538
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.48561,
+        0.85538
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.5276,
+        0.85538
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.44361,
+        0.88153
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.48561,
+        0.88153
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.5276,
+        0.88153
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.44361,
+        0.90767
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.48561,
+        0.90767
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.5276,
+        0.90767
+       ]
+      },
+      {
+       "value": 0,
+       "center_norm": [
+        0.48561,
+        0.93382
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "layout": "keypad_0_under_8",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.57691,
+        0.85538
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.61891,
+        0.85538
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.66091,
+        0.85538
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.57691,
+        0.88153
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.61891,
+        0.88153
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.66091,
+        0.88153
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.57691,
+        0.90767
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.61891,
+        0.90767
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.66091,
+        0.90767
+       ]
+      },
+      {
+       "value": 0,
+       "center_norm": [
+        0.61891,
+        0.93382
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "team_g3_team": {
+   "type": "team_game_total",
+   "max": 199,
+   "digits": [
+    {
+     "place": "hundreds",
+     "type": "flag",
+     "meaning": "filled = +100, blank = 0",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.78182,
+        0.82923
+       ]
+      }
+     ]
+    },
+    {
+     "place": "tens",
+     "layout": "keypad_0_under_8",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.78182,
+        0.85538
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.82382,
+        0.85538
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.86581,
+        0.85538
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.78182,
+        0.88153
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.82382,
+        0.88153
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.86581,
+        0.88153
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.78182,
+        0.90767
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.82382,
+        0.90767
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.86581,
+        0.90767
+       ]
+      },
+      {
+       "value": 0,
+       "center_norm": [
+        0.82382,
+        0.93382
+       ]
+      }
+     ]
+    },
+    {
+     "place": "ones",
+     "layout": "keypad_0_under_8",
+     "bubbles": [
+      {
+       "value": 1,
+       "center_norm": [
+        0.91512,
+        0.85538
+       ]
+      },
+      {
+       "value": 2,
+       "center_norm": [
+        0.95712,
+        0.85538
+       ]
+      },
+      {
+       "value": 3,
+       "center_norm": [
+        0.99912,
+        0.85538
+       ]
+      },
+      {
+       "value": 4,
+       "center_norm": [
+        0.91512,
+        0.88153
+       ]
+      },
+      {
+       "value": 5,
+       "center_norm": [
+        0.95712,
+        0.88153
+       ]
+      },
+      {
+       "value": 6,
+       "center_norm": [
+        0.99912,
+        0.88153
+       ]
+      },
+      {
+       "value": 7,
+       "center_norm": [
+        0.91512,
+        0.90767
+       ]
+      },
+      {
+       "value": 8,
+       "center_norm": [
+        0.95712,
+        0.90767
+       ]
+      },
+      {
+       "value": 9,
+       "center_norm": [
+        0.99912,
+        0.90767
+       ]
+      },
+      {
+       "value": 0,
+       "center_norm": [
+        0.95712,
+        0.93382
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "side_field": {
+  "rule": "exactly one",
+  "bubbles": [
+   {
+    "value": "home",
+    "center_norm": [
+     0.86284,
+     0.04403
+    ]
+   },
+   {
+    "value": "away",
+    "center_norm": [
+     0.94331,
+     0.04403
+    ]
+   }
+  ]
+ },
+ "result_fields": {
+  "game1_result": [
+   {
+    "value": "won",
+    "center_norm": [
+     0.09396,
+     1.00138
+    ]
+   },
+   {
+    "value": "lost",
+    "center_norm": [
+     0.16163,
+     1.00138
+    ]
+   }
+  ],
+  "game2_result": [
+   {
+    "value": "won",
+    "center_norm": [
+     0.28007,
+     1.00138
+    ]
+   },
+   {
+    "value": "lost",
+    "center_norm": [
+     0.34773,
+     1.00138
+    ]
+   }
+  ],
+  "game3_result": [
+   {
+    "value": "won",
+    "center_norm": [
+     0.46617,
+     1.00138
+    ]
+   },
+   {
+    "value": "lost",
+    "center_norm": [
+     0.53383,
+     1.00138
+    ]
+   }
+  ],
+  "beer_frame_result": [
+   {
+    "value": "won",
+    "center_norm": [
+     0.65227,
+     1.00138
+    ]
+   },
+   {
+    "value": "lost",
+    "center_norm": [
+     0.71993,
+     1.00138
+    ]
+   }
+  ],
+  "total_points_result": [
+   {
+    "value": "won",
+    "center_norm": [
+     0.83837,
+     1.00138
+    ]
+   },
+   {
+    "value": "lost",
+    "center_norm": [
+     0.90604,
+     1.00138
+    ]
+   }
+  ]
  },
  "handwritten_lines": [
   {
    "name": "date",
    "type": "handwritten_not_scanned",
    "bbox_norm": [
-    0.0914,
-    0.0393,
-    0.16129,
-    0.01626
+    0.57435,
+    -0.00963,
+    0.38724,
+    0.01926
+   ]
+  },
+  {
+   "name": "team_name",
+   "type": "handwritten_not_scanned",
+   "bbox_norm": [
+    0.07498,
+    0.02064,
+    0.64887,
+    0.03302
+   ]
+  },
+  {
+   "name": "captain",
+   "type": "handwritten_not_scanned",
+   "bbox_norm": [
+    0.06767,
+    0.06329,
+    0.41587,
+    0.01926
    ]
   },
   {
    "name": "opponent",
    "type": "handwritten_not_scanned",
    "bbox_norm": [
-    0.37455,
-    0.0393,
-    0.21505,
-    0.01626
+    0.61522,
+    0.06329,
+    0.4049,
+    0.01926
    ]
   },
   {
-   "name": "roster_A_name",
+   "name": "team_roster_A_name",
    "type": "handwritten_not_scanned",
    "bbox_norm": [
-    0.0233,
-    0.10163,
-    0.26882,
-    0.01626
+    0.01646,
+    0.11282,
+    0.21251,
+    0.02889
    ]
   },
   {
-   "name": "roster_B_name",
+   "name": "team_roster_B_name",
    "type": "handwritten_not_scanned",
    "bbox_norm": [
-    0.0233,
-    0.12873,
-    0.26882,
-    0.01626
+    0.27652,
+    0.11282,
+    0.21251,
+    0.02889
    ]
   },
   {
-   "name": "roster_C_name",
+   "name": "team_roster_C_name",
    "type": "handwritten_not_scanned",
    "bbox_norm": [
-    0.0233,
-    0.15583,
-    0.26882,
-    0.01626
+    0.53658,
+    0.11282,
+    0.21251,
+    0.02889
    ]
   },
   {
-   "name": "roster_D_name",
+   "name": "team_roster_D_name",
    "type": "handwritten_not_scanned",
    "bbox_norm": [
-    0.0233,
-    0.18293,
-    0.26882,
-    0.01626
+    0.79663,
+    0.11282,
+    0.21251,
+    0.02889
    ]
   },
   {
-   "name": "roster_E_name",
+   "name": "team_roster_E_name",
    "type": "handwritten_not_scanned",
    "bbox_norm": [
-    0.0233,
-    0.21003,
-    0.26882,
-    0.01626
+    0.01646,
+    0.23744,
+    0.21251,
+    0.02889
    ]
   },
   {
-   "name": "roster_F_name",
+   "name": "team_roster_F_name",
    "type": "handwritten_not_scanned",
    "bbox_norm": [
-    0.0233,
-    0.23713,
-    0.26882,
-    0.01626
+    0.27652,
+    0.23744,
+    0.21251,
+    0.02889
    ]
   },
   {
-   "name": "roster_G_name",
+   "name": "team_roster_G_name",
    "type": "handwritten_not_scanned",
    "bbox_norm": [
-    0.0233,
-    0.26423,
-    0.26882,
-    0.01626
+    0.53658,
+    0.23744,
+    0.21251,
+    0.02889
    ]
   },
   {
-   "name": "roster_H_name",
+   "name": "team_roster_H_name",
    "type": "handwritten_not_scanned",
    "bbox_norm": [
-    0.0233,
-    0.29133,
-    0.26882,
-    0.01626
+    0.79663,
+    0.23744,
+    0.21251,
+    0.02889
    ]
   }
  ],
  "human_only": {
-  "note": "Handwritten lines and score boxes. The scanner must ignore them.",
-  "score_boxes": [
+  "note": "Handwritten write-in boxes for people; scanner must ignore.",
+  "write_in_boxes": [
    {
-    "name": "g1_s1_written",
+    "name": "team_g1_s1_score_written",
     "type": "human_only_not_scanned",
+    "covers": "whole 2-digit shooter score",
     "bbox_norm": [
-     0.8405,
-     0.37669,
-     0.06452,
-     0.01897
+     0.02286,
+     0.44241,
+     0.14114,
+     0.04541
     ]
    },
    {
-    "name": "g1_s2_written",
+    "name": "team_g2_s1_score_written",
     "type": "human_only_not_scanned",
+    "covers": "whole 2-digit shooter score",
     "bbox_norm": [
-     0.8405,
-     0.40108,
-     0.06452,
-     0.01897
+     0.36107,
+     0.44241,
+     0.14114,
+     0.04541
     ]
    },
    {
-    "name": "g1_s3_written",
+    "name": "team_g3_s1_score_written",
     "type": "human_only_not_scanned",
+    "covers": "whole 2-digit shooter score",
     "bbox_norm": [
-     0.8405,
-     0.42547,
-     0.06452,
-     0.01897
+     0.69928,
+     0.44241,
+     0.14114,
+     0.04541
     ]
    },
    {
-    "name": "g1_s4_written",
+    "name": "team_g1_s2_score_written",
     "type": "human_only_not_scanned",
+    "covers": "whole 2-digit shooter score",
     "bbox_norm": [
-     0.8405,
-     0.44986,
-     0.06452,
-     0.01897
+     0.02286,
+     0.54975,
+     0.14114,
+     0.04541
     ]
    },
    {
-    "name": "g2_s1_written",
+    "name": "team_g2_s2_score_written",
     "type": "human_only_not_scanned",
+    "covers": "whole 2-digit shooter score",
     "bbox_norm": [
-     0.8405,
-     0.57453,
-     0.06452,
-     0.01897
+     0.36107,
+     0.54975,
+     0.14114,
+     0.04541
     ]
    },
    {
-    "name": "g2_s2_written",
+    "name": "team_g3_s2_score_written",
     "type": "human_only_not_scanned",
+    "covers": "whole 2-digit shooter score",
     "bbox_norm": [
-     0.8405,
-     0.59892,
-     0.06452,
-     0.01897
+     0.69928,
+     0.54975,
+     0.14114,
+     0.04541
     ]
    },
    {
-    "name": "g2_s3_written",
+    "name": "team_g1_s3_score_written",
     "type": "human_only_not_scanned",
+    "covers": "whole 2-digit shooter score",
     "bbox_norm": [
-     0.8405,
-     0.62331,
-     0.06452,
-     0.01897
+     0.02286,
+     0.65708,
+     0.14114,
+     0.04541
     ]
    },
    {
-    "name": "g2_s4_written",
+    "name": "team_g2_s3_score_written",
     "type": "human_only_not_scanned",
+    "covers": "whole 2-digit shooter score",
     "bbox_norm": [
-     0.8405,
-     0.6477,
-     0.06452,
-     0.01897
+     0.36107,
+     0.65708,
+     0.14114,
+     0.04541
     ]
    },
    {
-    "name": "g3_s1_written",
+    "name": "team_g3_s3_score_written",
     "type": "human_only_not_scanned",
+    "covers": "whole 2-digit shooter score",
     "bbox_norm": [
-     0.8405,
-     0.77236,
-     0.06452,
-     0.01897
+     0.69928,
+     0.65708,
+     0.14114,
+     0.04541
     ]
    },
    {
-    "name": "g3_s2_written",
+    "name": "team_g1_s4_score_written",
     "type": "human_only_not_scanned",
+    "covers": "whole 2-digit shooter score",
     "bbox_norm": [
-     0.8405,
-     0.79675,
-     0.06452,
-     0.01897
+     0.02286,
+     0.76442,
+     0.14114,
+     0.04541
     ]
    },
    {
-    "name": "g3_s3_written",
+    "name": "team_g2_s4_score_written",
     "type": "human_only_not_scanned",
+    "covers": "whole 2-digit shooter score",
     "bbox_norm": [
-     0.8405,
-     0.82114,
-     0.06452,
-     0.01897
+     0.36107,
+     0.76442,
+     0.14114,
+     0.04541
     ]
    },
    {
-    "name": "g3_s4_written",
+    "name": "team_g3_s4_score_written",
     "type": "human_only_not_scanned",
+    "covers": "whole 2-digit shooter score",
     "bbox_norm": [
-     0.8405,
-     0.84553,
-     0.06452,
-     0.01897
+     0.69928,
+     0.76442,
+     0.14114,
+     0.04541
+    ]
+   },
+   {
+    "name": "team_g1_team_tens_written",
+    "type": "human_only_not_scanned",
+    "covers": "team total tens digit",
+    "bbox_norm": [
+     0.08641,
+     0.92405,
+     0.0356,
+     0.01954
+    ]
+   },
+   {
+    "name": "team_g1_team_ones_written",
+    "type": "human_only_not_scanned",
+    "covers": "team total ones digit",
+    "bbox_norm": [
+     0.21972,
+     0.92405,
+     0.0356,
+     0.01954
+    ]
+   },
+   {
+    "name": "team_g2_team_tens_written",
+    "type": "human_only_not_scanned",
+    "covers": "team total tens digit",
+    "bbox_norm": [
+     0.42462,
+     0.92405,
+     0.0356,
+     0.01954
+    ]
+   },
+   {
+    "name": "team_g2_team_ones_written",
+    "type": "human_only_not_scanned",
+    "covers": "team total ones digit",
+    "bbox_norm": [
+     0.55793,
+     0.92405,
+     0.0356,
+     0.01954
+    ]
+   },
+   {
+    "name": "team_g3_team_tens_written",
+    "type": "human_only_not_scanned",
+    "covers": "team total tens digit",
+    "bbox_norm": [
+     0.76283,
+     0.92405,
+     0.0356,
+     0.01954
+    ]
+   },
+   {
+    "name": "team_g3_team_ones_written",
+    "type": "human_only_not_scanned",
+    "covers": "team total ones digit",
+    "bbox_norm": [
+     0.89614,
+     0.92405,
+     0.0356,
+     0.01954
     ]
    }
   ]

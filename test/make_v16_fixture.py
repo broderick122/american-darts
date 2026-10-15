@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
-"""Render the v16 one-team sheet with known marks, then warp the photo.
+"""Fill a sheet rendered by scoresheet/make_scansheet_v16.py, then warp it.
 
-The JPEG is rotated a few degrees, perspective-shifted, and lightly blurred.
-expected-v16.json is what the browser reader should recover.
+The generator is run in a temp directory so the committed PDF stays byte-identical
+to the approved file. expected-v16.json is what the reader should recover.
 """
 import json
+import subprocess
+import sys
+import tempfile
 from pathlib import Path
 
 import numpy as np
@@ -13,14 +16,10 @@ from PIL import Image, ImageDraw, ImageFilter
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = Path(__file__).resolve().parent / "fixtures"
-PDF = ROOT / "scoresheet" / "roslyn_scansheet_v16.pdf"
-SPEC = ROOT / "scoresheet" / "scansheet_v16_layout_spec.json"
+SCRIPT = ROOT / "scoresheet" / "make_scansheet_v16.py"
+COMMITTED_SPEC = ROOT / "scoresheet" / "scansheet_v16_layout_spec.json"
 
-# Roster ids. None is an empty slot (not zero).
 ROSTER = {"A": 12, "B": 7, "C": 23, "D": 4, "E": None, "F": 15, "G": 31, "H": 8}
-
-# who is a letter, a list of letters (ambiguous), or None.
-# score None is blank. A score under 10 leaves the tens bubbles empty.
 GAMES = {
     1: {
         "rows": [
@@ -55,6 +54,18 @@ GAMES = {
 }
 
 
+def render_sheet():
+    work = Path(tempfile.mkdtemp(prefix="v16-sheet-"))
+    subprocess.check_call([sys.executable, str(SCRIPT)], cwd=work)
+    spec = json.loads((work / "scansheet_v16_layout_spec.json").read_text())
+    committed = json.loads(COMMITTED_SPEC.read_text())
+    left = spec["roster_fields"]["team_A"]["digits"][0]["bubbles"][0]["center_norm"]
+    right = committed["roster_fields"]["team_A"]["digits"][0]["bubbles"][0]["center_norm"]
+    if left != right:
+        raise SystemExit("generator geometry does not match the committed v16 spec")
+    return spec, work / "roslyn_scansheet_v16.pdf"
+
+
 def mapper(spec, width, height):
     page_w, page_h = spec["page"]["size_pt"]
     sx = width / page_w
@@ -66,51 +77,52 @@ def mapper(spec, width, height):
     origin_y = tl[1] * sy
     span_x = (tr[0] - tl[0]) * sx
     span_y = (bl[1] - tl[1]) * sy
-    radius = spec["bubble_radius"]["pt"] * (sx + sy) / 2.0
+    span_pt_x = tr[0] - tl[0]
+    span_pt_y = bl[1] - tl[1]
 
     def point(nx, ny):
         return origin_x + nx * span_x, origin_y + ny * span_y
 
-    return point, radius
+    def radii(kind):
+        if kind == "side":
+            return 20 / span_pt_x * span_x, 10.5 / span_pt_y * span_y
+        pair = spec["bubble_radius_norm"][kind]
+        return pair[0] * span_x, pair[1] * span_y
+
+    return point, radii
 
 
-def fill_circle(draw, x, y, radius):
-    r = radius * 0.9
-    draw.ellipse((x - r, y - r, x + r, y + r), fill=(6, 6, 8))
+def fill_ellipse(draw, x, y, rx, ry):
+    rx *= 0.82
+    ry *= 0.82
+    draw.ellipse((x - rx, y - ry, x + rx, y + ry), fill=(6, 6, 8))
 
 
-def fill_value(draw, bubbles, value, point, radius):
+def fill_value(draw, bubbles, value, point, radii):
     for bubble in bubbles:
         if bubble["value"] == value:
-            fill_circle(draw, *point(*bubble["center_norm"]), radius)
+            fill_ellipse(draw, *point(*bubble["center_norm"]), *radii)
 
 
-def fill_score(draw, field, score, point, radius):
-    if score is None:
-        return
-    tens, ones = divmod(int(score), 10)
-    if tens:
-        fill_value(draw, field["tens"]["bubbles"], tens, point, radius)
-    fill_value(draw, field["ones"]["bubbles"], ones, point, radius)
-
-
-def fill_roster(draw, field, value, point, radius):
-    if value is None:
-        return
-    tens, ones = divmod(int(value), 10)
-    fill_value(draw, field["tens"]["bubbles"], tens, point, radius)
-    fill_value(draw, field["ones"]["bubbles"], ones, point, radius)
+def fill_digits(draw, field, tens, ones, point, radii, fill_tens):
+    for place in field["digits"]:
+        if place["place"] == "tens" and fill_tens:
+            fill_value(draw, place["bubbles"], tens, point, radii)
+        elif place["place"] == "ones":
+            fill_value(draw, place["bubbles"], ones, point, radii)
+        elif place["place"] == "hundreds" and tens >= 10:
+            fill_value(draw, place["bubbles"], 1, point, radii)
 
 
 def scribble_boxes(draw, spec, point):
-    for box in spec.get("human_only", {}).get("score_boxes") or []:
+    for box in spec.get("human_only", {}).get("write_in_boxes") or []:
         x, y, w, h = box["bbox_norm"]
         a = point(x + 0.18 * w, y + 0.28 * h)
         b = point(x + 0.82 * w, y + 0.72 * h)
         c = point(x + 0.22 * w, y + 0.70 * h)
         d = point(x + 0.78 * w, y + 0.30 * h)
-        draw.line([a, b], fill=(12, 12, 14), width=4)
-        draw.line([c, d], fill=(12, 12, 14), width=4)
+        draw.line([a, b], fill=(12, 12, 14), width=3)
+        draw.line([c, d], fill=(12, 12, 14), width=3)
 
 
 def find_coeffs(output_corners, input_corners):
@@ -126,7 +138,7 @@ def find_coeffs(output_corners, input_corners):
 
 
 def distort(image):
-    pad = 64
+    pad = 72
     table = (176, 166, 150)
     framed = Image.new("RGB", (image.width + pad * 2, image.height + pad * 2), table)
     framed.paste(image, (pad, pad))
@@ -168,12 +180,10 @@ def build_expected():
     games = []
     for number in (1, 2, 3):
         block = GAMES[number]
-        shooters = []
-        for row in block["rows"]:
-            shooters.append({
-                "who": expected_who(row["who"]),
-                "score": expected_score(row["score"]),
-            })
+        shooters = [
+            {"who": expected_who(row["who"]), "score": expected_score(row["score"])}
+            for row in block["rows"]
+        ]
         known = all(item["score"]["value"] is not None for item in shooters)
         shooter_sum = sum(item["score"]["value"] for item in shooters) if known else None
         games.append({
@@ -188,42 +198,49 @@ def build_expected():
         "side": {"value": "home", "status": "ok"},
         "roster": {slot: expected_roster(value) for slot, value in ROSTER.items()},
         "games": games,
+        "beer": {"value": "", "status": "blank"},
+        "points": {"value": "won", "status": "ok"},
     }
 
 
 def main():
-    spec = json.loads(SPEC.read_text())
-    doc = pymupdf.open(PDF)
+    spec, pdf_path = render_sheet()
+    doc = pymupdf.open(pdf_path)
     page = doc[0]
     pix = page.get_pixmap(matrix=pymupdf.Matrix(2.15, 2.15), alpha=False)
     image = Image.frombytes("RGB", (pix.width, pix.height), pix.samples)
-    point, radius = mapper(spec, image.width, image.height)
+    point, radii_of = mapper(spec, image.width, image.height)
     draw = ImageDraw.Draw(image)
-    fill_value(draw, spec["side_field"], "home", point, radius)
+    fill_value(draw, spec["side_field"]["bubbles"], "home", point, radii_of("side"))
     for slot, value in ROSTER.items():
-        fill_roster(draw, spec["roster"][slot], value, point, radius)
+        if value is None:
+            continue
+        tens, ones = divmod(int(value), 10)
+        fill_digits(draw, spec["roster_fields"][f"team_{slot}"], tens, ones, point, radii_of("roster_id"), True)
     for number, block in GAMES.items():
-        game = spec["games"][str(number)]
-        for index, row in enumerate(block["rows"]):
-            who = row["who"]
-            letters = who if isinstance(who, list) else ([] if who is None else [who])
+        for index, row in enumerate(block["rows"], start=1):
+            key = f"team_g{number}_s{index}"
+            letters = row["who"] if isinstance(row["who"], list) else [row["who"]]
             for letter in letters:
-                fill_value(draw, game["shooters"][index]["who"]["bubbles"], letter, point, radius)
-            fill_score(draw, game["shooters"][index], row["score"], point, radius)
+                fill_value(draw, spec["who_fields"][key]["bubbles"], letter, point, radii_of("who"))
+            tens, ones = divmod(int(row["score"]), 10)
+            fill_digits(draw, spec["number_fields"][key], tens, ones, point, radii_of("score"), tens > 0)
         hundreds, rest = divmod(int(block["team"]), 100)
         tens, ones = divmod(rest, 10)
+        team = spec["number_fields"][f"team_g{number}_team"]
         if hundreds:
-            fill_value(draw, game["team"]["hundreds"]["bubbles"], 1, point, radius)
-        fill_value(draw, game["team"]["tens"]["bubbles"], tens, point, radius)
-        fill_value(draw, game["team"]["ones"]["bubbles"], ones, point, radius)
-        fill_value(draw, game["result"], block["result"], point, radius)
+            for place in team["digits"]:
+                if place["place"] == "hundreds":
+                    fill_value(draw, place["bubbles"], 1, point, radii_of("score"))
+        fill_digits(draw, team, tens, ones, point, radii_of("score"), True)
+        fill_value(draw, spec["result_fields"][f"game{number}_result"], block["result"], point, radii_of("result"))
+    fill_value(draw, spec["result_fields"]["total_points_result"], "won", point, radii_of("result"))
     scribble_boxes(draw, spec, point)
     photo = distort(image)
     OUT.mkdir(parents=True, exist_ok=True)
     jpg = OUT / "filled-v16.jpg"
     photo.save(jpg, format="JPEG", quality=78)
-    expected = build_expected()
-    (OUT / "expected-v16.json").write_text(json.dumps(expected, indent=2) + "\n")
+    (OUT / "expected-v16.json").write_text(json.dumps(build_expected(), indent=2) + "\n")
     print("wrote", jpg, photo.size)
 
 

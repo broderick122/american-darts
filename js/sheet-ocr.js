@@ -1,5 +1,6 @@
 /* Reader for the Roslyn results scan sheets.
-   v16 is the letter portrait one-team sheet. Older specs still read if one is passed in.
+   v16 is the letter portrait one-team sheet: keypads, a WHO picker, no QR.
+   Older specs still read if one is passed in.
    Pass one spec, or both, and the corner-marker aspect picks the version.
    Finds the black corner squares, turns a 0/90/180/270 photo upright
    from those squares plus the header and QR pattern, and samples each
@@ -584,24 +585,23 @@
     var H = normHomography(ordered);
     if (!H) return -1;
     var spanPx = dist(ordered.TL, ordered.TR);
-    var radius = Math.max(2.5, spec.bubble_radius.pt * spanPx / markerSpan(spec).x);
-    if (spec.version === "v16") {
-      var places = [];
-      var slotA = spec.roster && spec.roster.A;
-      var slotH = spec.roster && spec.roster.H;
-      var game = spec.games && spec.games["1"];
-      if (slotA) places.push(slotA.tens, slotA.ones);
-      if (slotH) places.push(slotH.tens);
-      if (game && game.shooters && game.shooters[0]) {
-        places.push(game.shooters[0].who, game.shooters[0].tens, game.shooters[0].ones);
-      }
-      if (game && game.team) places.push(game.team.tens, game.team.ones);
+    if (spec.version === "v16" && spec.roster_fields) {
+      var scoreW = (spec.bubble_size_pt && spec.bubble_size_pt.score && spec.bubble_size_pt.score.width) || 20;
+      var radius16 = Math.max(2.5, (scoreW / 2) * spanPx / markerSpan(spec).x);
+      var places16 = [];
+      var slotA = spec.roster_fields.team_A;
+      var shooter = spec.number_fields && spec.number_fields.team_g1_s1;
+      var whoRow = spec.who_fields && spec.who_fields.team_g1_s1;
+      if (slotA && slotA.digits) places16 = places16.concat(slotA.digits);
+      if (shooter && shooter.digits) places16 = places16.concat(shooter.digits);
+      if (whoRow) places16.push(whoRow);
       var total16 = 0;
-      places.forEach(function (place) {
-        total16 += rowContrast(data, width, height, H, place, radius);
+      places16.forEach(function (place) {
+        total16 += rowContrast(data, width, height, H, place, radius16);
       });
       return total16;
     }
+    var radius = Math.max(2.5, spec.bubble_radius.pt * spanPx / markerSpan(spec).x);
     var rows = [
       ["home_g1_s1", "tens"],
       ["home_g1_s1", "ones"],
@@ -1231,41 +1231,128 @@
     return { value: row.value, status: "ok" };
   }
 
+  function ellipseCoverage(data, width, height, cx, cy, rx, ry, located, boxes) {
+    var irx = Math.max(1.2, rx * 0.62);
+    var iry = Math.max(1.2, ry * 0.62);
+    var spanX = located.span.x * located.scale;
+    var spanY = located.span.y * located.scale;
+    var x0 = Math.max(0, Math.floor(cx - irx));
+    var y0 = Math.max(0, Math.floor(cy - iry));
+    var x1 = Math.min(width - 1, Math.ceil(cx + irx));
+    var y1 = Math.min(height - 1, Math.ceil(cy + iry));
+    var dark = 0;
+    var count = 0;
+    var y, x, dx, dy, nx, ny, b, box;
+    for (y = y0; y <= y1; y += 1) {
+      for (x = x0; x <= x1; x += 1) {
+        dx = (x + 0.5 - cx) / irx;
+        dy = (y + 0.5 - cy) / iry;
+        if (dx * dx + dy * dy > 1) continue;
+        if (boxes && boxes.length && spanX && spanY) {
+          nx = (x + 0.5 - PAD) / spanX;
+          ny = (y + 0.5 - PAD) / spanY;
+          for (b = 0; b < boxes.length; b += 1) {
+            box = boxes[b].bbox_norm;
+            if (nx >= box[0] && ny >= box[1] && nx <= box[0] + box[2] && ny <= box[1] + box[3]) break;
+          }
+          if (b < boxes.length) continue;
+        }
+        count += 1;
+        if (luminance(data, (y * width + x) * 4) < 150) dark += 1;
+      }
+    }
+    return count ? dark / count : 0;
+  }
+
+  /* Radii in the aligned photo. Side keys are the 40 by 21 pt HOME/AWAY
+     ellipses from the generator; the spec stores their centers only. */
+  function v16Radii(spec, located, kind) {
+    var span = markerSpan(spec);
+    var rxPt;
+    var ryPt;
+    if (kind === "side") {
+      rxPt = 20;
+      ryPt = 10.5;
+    } else {
+      var size = spec.bubble_size_pt[kind];
+      rxPt = size.width / 2;
+      ryPt = size.height / 2;
+    }
+    return {
+      rx: rxPt * located.span.x * located.scale / span.x,
+      ry: ryPt * located.span.y * located.scale / span.y
+    };
+  }
+
+  function sampleGroup(bubbles, image, located, radii, boxes) {
+    return (bubbles || []).map(function (bubble) {
+      var p = mapPoint(located, bubble.center_norm[0], bubble.center_norm[1]);
+      return {
+        value: bubble.value,
+        lum: bubbleLum(image.data, image.width, image.height, p.x, p.y, Math.min(radii.rx, radii.ry)),
+        cover: ellipseCoverage(image.data, image.width, image.height, p.x, p.y, radii.rx, radii.ry, located, boxes)
+      };
+    });
+  }
+
   function readV16(image, spec, located) {
     var warnings = [];
     if (located.warning) warnings.push(located.warning);
-    var radius = spec.bubble_radius.pt * located.scale;
-    var boxes = (spec.human_only && spec.human_only.score_boxes) || [];
-    var slots = spec.slots || ["A", "B", "C", "D", "E", "F", "G", "H"];
-    var gameNumbers = Object.keys(spec.games).sort();
+    var boxes = (spec.human_only && (spec.human_only.write_in_boxes || spec.human_only.score_boxes)) || [];
+    var slots = ["A", "B", "C", "D", "E", "F", "G", "H"];
+    var scoreR = v16Radii(spec, located, "score");
+    var whoR = v16Radii(spec, located, "who");
+    var idR = v16Radii(spec, located, "roster_id");
+    var resultR = v16Radii(spec, located, "result");
+    var sideR = v16Radii(spec, located, "side");
     var stored = { roster: {}, games: {} };
     var coverRefs = [];
 
-    function take(bubbles) {
-      var samples = grabBubbles(bubbles, image, located, radius, boxes);
+    function take(bubbles, radii) {
+      var samples = sampleGroup(bubbles, image, located, radii, boxes);
       if (samples.length >= 4) {
         coverRefs.push(lighterHalfOf(samples.map(function (sample) { return sample.cover; })));
       }
       return samples;
     }
 
-    stored.side = take(spec.side_field);
+    function place(field, name) {
+      var found = null;
+      (field.digits || []).forEach(function (digit) {
+        if (digit.place === name) found = digit;
+      });
+      return found;
+    }
+
+    stored.side = take(spec.side_field.bubbles, sideR);
     slots.forEach(function (slot) {
-      var field = spec.roster[slot];
-      stored.roster[slot] = { tens: take(field.tens.bubbles), ones: take(field.ones.bubbles) };
-    });
-    gameNumbers.forEach(function (num) {
-      var game = spec.games[num];
-      stored.games[num] = {
-        shooters: game.shooters.map(function (row) {
-          return { who: take(row.who.bubbles), tens: take(row.tens.bubbles), ones: take(row.ones.bubbles) };
-        }),
-        hundreds: take(game.team.hundreds.bubbles),
-        tens: take(game.team.tens.bubbles),
-        ones: take(game.team.ones.bubbles),
-        result: take(game.result)
+      var field = spec.roster_fields["team_" + slot];
+      stored.roster[slot] = {
+        tens: take(place(field, "tens").bubbles, idR),
+        ones: take(place(field, "ones").bubbles, idR)
       };
     });
+    [1, 2, 3].forEach(function (num) {
+      var shooters = [1, 2, 3, 4].map(function (shooter) {
+        var key = "team_g" + num + "_s" + shooter;
+        var numbers = spec.number_fields[key];
+        return {
+          who: take(spec.who_fields[key].bubbles, whoR),
+          tens: take(place(numbers, "tens").bubbles, scoreR),
+          ones: take(place(numbers, "ones").bubbles, scoreR)
+        };
+      });
+      var team = spec.number_fields["team_g" + num + "_team"];
+      stored.games[num] = {
+        shooters: shooters,
+        hundreds: take(place(team, "hundreds").bubbles, scoreR),
+        tens: take(place(team, "tens").bubbles, scoreR),
+        ones: take(place(team, "ones").bubbles, scoreR),
+        result: take(spec.result_fields["game" + num + "_result"], resultR)
+      };
+    });
+    stored.beer = take(spec.result_fields.beer_frame_result, resultR);
+    stored.points = take(spec.result_fields.total_points_result, resultR);
 
     var coverBaseline = median(coverRefs);
     if (coverBaseline == null) coverBaseline = 0.24;
@@ -1291,7 +1378,7 @@
       if (roster[slot].status === "ambiguous") warnings.push("Roster " + slot + ": the id needs both digits, or neither.");
     });
 
-    var games = gameNumbers.map(function (num, index) {
+    var games = [1, 2, 3].map(function (num, index) {
       var pack = stored.games[num];
       var shooters = pack.shooters.map(function (row, shooterIndex) {
         var who = choiceOf(marked(row.who));
@@ -1336,6 +1423,12 @@
       };
     });
 
+    var beer = choiceOf(marked(stored.beer));
+    var points = choiceOf(marked(stored.points));
+    if (points.status === "blank") warnings.push("Total points: WON / LOST is not marked.");
+    else if (points.status === "ambiguous") warnings.push("Total points: both WON and LOST look filled.");
+    if (beer.status === "ambiguous") warnings.push("Beer frame: both WON and LOST look filled.");
+
     var unique = [];
     warnings.forEach(function (item) {
       if (item && unique.indexOf(item) < 0) unique.push(item);
@@ -1351,6 +1444,8 @@
       side: side,
       roster: roster,
       games: games,
+      beer: beer,
+      points: points,
       counts: counts,
       calibration: { coverBaseline: Math.round(coverBaseline * 1000) / 1000 }
     };
@@ -1567,7 +1662,7 @@
     for (i = 0; i < list.length; i += 1) {
       if (!list[i] || !list[i].fiducials) return null;
       if (list[i].version === "v16") {
-        if (!list[i].games || !list[i].roster || !list[i].side_field) return null;
+        if (!list[i].number_fields || !list[i].roster_fields || !list[i].who_fields || !list[i].side_field || !list[i].result_fields) return null;
       } else if (!list[i].number_fields) return null;
     }
     return list;

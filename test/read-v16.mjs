@@ -1,5 +1,6 @@
 import { spawn } from "node:child_process";
 import { createServer } from "node:http";
+import { createHash } from "node:crypto";
 import { readFileSync, existsSync, mkdirSync } from "node:fs";
 import { extname, join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -85,6 +86,8 @@ function compareReading(actual, expected, label) {
     field("g" + (gameIndex + 1) + " result", (gotGame.result && gotGame.result.value) + "/" + (gotGame.result && gotGame.result.status), game.result.value + "/" + game.result.status);
     field("g" + (gameIndex + 1) + " mismatch", !!gotGame.sumMismatch, !!game.sumMismatch);
   });
+  field("beer", (actual.beer && actual.beer.value) + "/" + (actual.beer && actual.beer.status), expected.beer.value + "/" + expected.beer.status);
+  field("points", (actual.points && actual.points.value) + "/" + (actual.points && actual.points.status), expected.points.value + "/" + expected.points.status);
   return { problems, fields, ok };
 }
 
@@ -124,6 +127,10 @@ function installCamera(page, mode, imageUrl) {
 
 async function main() {
   if (!chrome) throw new Error("Chrome was not found.");
+  const pdfHash = createHash("md5").update(readFileSync(join(root, "scoresheet/roslyn_scansheet_v16.pdf"))).digest("hex");
+  if (pdfHash !== "bf40f030043374d0427aba93955ff230") {
+    throw new Error("v16 PDF md5 " + pdfHash);
+  }
   await runPython();
   const expected = JSON.parse(readFileSync(join(root, "test/fixtures/expected-v16.json"), "utf8"));
   const server = await serve(root);
@@ -209,6 +216,8 @@ async function main() {
         g3Check: document.getElementById("g3-check").textContent,
         g3Bad: document.getElementById("g3-check").classList.contains("is-bad"),
         results: [val("g1-result"), val("g2-result"), val("g3-result")],
+        beer: val("beer-result"),
+        points: val("points-result"),
         finalScore: document.getElementById("final-score").textContent,
         summary: document.getElementById("ocr-summary").textContent
       };
@@ -225,6 +234,8 @@ async function main() {
       formProblems.push("game 3 total " + form.g3Team + " " + form.g3Check);
     }
     if (form.results.join(",") !== "won,lost,won") formProblems.push("results " + form.results.join(","));
+    if (form.beer !== "") formProblems.push("beer " + form.beer);
+    if (form.points !== "won") formProblems.push("points " + form.points);
     if (!/2 games won/.test(form.finalScore)) formProblems.push("final " + form.finalScore);
     if (!/home/i.test(form.summary) || !/2 games won/.test(form.summary)) formProblems.push("summary " + form.summary);
     if (formProblems.length) {
