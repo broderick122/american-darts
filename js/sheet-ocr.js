@@ -1,5 +1,5 @@
 /* Reader for the Roslyn results scan sheets.
-   v8 is the legal keypad sheet (HOME left, AWAY right). v7 is the letter bubble sheet.
+   v16 is the letter portrait one-team sheet. Older specs still read if one is passed in.
    Pass one spec, or both, and the corner-marker aspect picks the version.
    Finds the black corner squares, turns a 0/90/180/270 photo upright
    from those squares plus the header and QR pattern, and samples each
@@ -585,6 +585,23 @@
     if (!H) return -1;
     var spanPx = dist(ordered.TL, ordered.TR);
     var radius = Math.max(2.5, spec.bubble_radius.pt * spanPx / markerSpan(spec).x);
+    if (spec.version === "v16") {
+      var places = [];
+      var slotA = spec.roster && spec.roster.A;
+      var slotH = spec.roster && spec.roster.H;
+      var game = spec.games && spec.games["1"];
+      if (slotA) places.push(slotA.tens, slotA.ones);
+      if (slotH) places.push(slotH.tens);
+      if (game && game.shooters && game.shooters[0]) {
+        places.push(game.shooters[0].who, game.shooters[0].tens, game.shooters[0].ones);
+      }
+      if (game && game.team) places.push(game.team.tens, game.team.ones);
+      var total16 = 0;
+      places.forEach(function (place) {
+        total16 += rowContrast(data, width, height, H, place, radius);
+      });
+      return total16;
+    }
     var rows = [
       ["home_g1_s1", "tens"],
       ["home_g1_s1", "ones"],
@@ -1121,11 +1138,230 @@
     return side.charAt(0).toUpperCase() + side.slice(1) + " Game " + game + " " + whoLabel + " " + placeLabel;
   }
 
+  function sharpnessOf(canvas) {
+    var ctx = canvas.getContext("2d", { willReadFrequently: true });
+    var w = canvas.width;
+    var h = canvas.height;
+    if (w < 8 || h < 8) return 0;
+    var data = ctx.getImageData(0, 0, w, h).data;
+    function lumAt(x, y) {
+      var i = (y * w + x) * 4;
+      return data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+    }
+    var step = Math.max(2, Math.round(Math.min(w, h) / 90));
+    var sum = 0;
+    var sum2 = 0;
+    var n = 0;
+    var y, x, lap;
+    for (y = step; y < h - step; y += step) {
+      for (x = step; x < w - step; x += step) {
+        lap = lumAt(x - step, y) + lumAt(x + step, y) + lumAt(x, y - step) + lumAt(x, y + step) - 4 * lumAt(x, y);
+        sum += lap;
+        sum2 += lap * lap;
+        n += 1;
+      }
+    }
+    if (!n) return 0;
+    var mean = sum / n;
+    return sum2 / n - mean * mean;
+  }
+
+  /* Downscaled corner check for the live camera. Does not read bubbles. */
+  function previewCorners(canvas, spec) {
+    var specs = specsOf(spec);
+    var small = limitCanvas(canvas, 640);
+    var sharp = sharpnessOf(small);
+    if (!specs) return { found: false, count: 0, sharpness: sharp, corners: null, width: small.width, height: small.height };
+    var located = locateMarks(small, specs);
+    if (located.mode !== "fiducial") {
+      return {
+        found: false,
+        count: located.squares || 0,
+        sharpness: sharp,
+        corners: null,
+        width: small.width,
+        height: small.height
+      };
+    }
+    return {
+      found: true,
+      count: 4,
+      sharpness: sharp,
+      corners: located.src,
+      width: small.width,
+      height: small.height,
+      rotation: located.rotation || 0,
+      notch: !!located.notch
+    };
+  }
+
+  function grabBubbles(bubbles, image, located, radius, boxes) {
+    return (bubbles || []).map(function (bubble) {
+      return sampleBubble(bubble, image, located, radius, boxes);
+    });
+  }
+
+  function judgeMark(samples, coverBaseline) {
+    if (!samples.length) return { status: "blank", value: null, lum: 255, cover: 0 };
+    if (samples.length === 1) return judgeFlagCoverage(samples[0], coverBaseline);
+    return judgeCoverage(samples);
+  }
+
+  function shooterScore(tens, ones) {
+    if (tens.status === "ambiguous" || ones.status === "ambiguous") {
+      return { value: null, status: "ambiguous" };
+    }
+    if (ones.status !== "filled") return { value: null, status: "blank" };
+    var tensValue = tens.status === "filled" ? tens.value : 0;
+    return { value: tensValue * 10 + ones.value, status: "ok" };
+  }
+
+  function rosterId(tens, ones) {
+    if (tens.status === "blank" && ones.status === "blank") return { value: null, status: "blank" };
+    if (tens.status === "filled" && ones.status === "filled") {
+      return { value: tens.value * 10 + ones.value, status: "ok" };
+    }
+    return { value: null, status: "ambiguous" };
+  }
+
+  function choiceOf(row) {
+    if (!row || row.status !== "filled") {
+      return { value: "", status: row && row.status === "ambiguous" ? "ambiguous" : "blank" };
+    }
+    return { value: row.value, status: "ok" };
+  }
+
+  function readV16(image, spec, located) {
+    var warnings = [];
+    if (located.warning) warnings.push(located.warning);
+    var radius = spec.bubble_radius.pt * located.scale;
+    var boxes = (spec.human_only && spec.human_only.score_boxes) || [];
+    var slots = spec.slots || ["A", "B", "C", "D", "E", "F", "G", "H"];
+    var gameNumbers = Object.keys(spec.games).sort();
+    var stored = { roster: {}, games: {} };
+    var coverRefs = [];
+
+    function take(bubbles) {
+      var samples = grabBubbles(bubbles, image, located, radius, boxes);
+      if (samples.length >= 4) {
+        coverRefs.push(lighterHalfOf(samples.map(function (sample) { return sample.cover; })));
+      }
+      return samples;
+    }
+
+    stored.side = take(spec.side_field);
+    slots.forEach(function (slot) {
+      var field = spec.roster[slot];
+      stored.roster[slot] = { tens: take(field.tens.bubbles), ones: take(field.ones.bubbles) };
+    });
+    gameNumbers.forEach(function (num) {
+      var game = spec.games[num];
+      stored.games[num] = {
+        shooters: game.shooters.map(function (row) {
+          return { who: take(row.who.bubbles), tens: take(row.tens.bubbles), ones: take(row.ones.bubbles) };
+        }),
+        hundreds: take(game.team.hundreds.bubbles),
+        tens: take(game.team.tens.bubbles),
+        ones: take(game.team.ones.bubbles),
+        result: take(game.result)
+      };
+    });
+
+    var coverBaseline = median(coverRefs);
+    if (coverBaseline == null) coverBaseline = 0.24;
+    var counts = { filled: 0, blank: 0, ambiguous: 0 };
+
+    function marked(samples) {
+      var row = judgeMark(samples, coverBaseline);
+      if (row.status === "filled" || row.status === "ok") counts.filled += 1;
+      else if (row.status === "ambiguous") counts.ambiguous += 1;
+      else counts.blank += 1;
+      return row;
+    }
+
+    var side = choiceOf(marked(stored.side));
+    if (side.status === "blank") warnings.push("HOME / AWAY: no bubble filled.");
+    else if (side.status === "ambiguous") warnings.push("HOME / AWAY: both bubbles look filled.");
+
+    var roster = {};
+    slots.forEach(function (slot) {
+      var tens = marked(stored.roster[slot].tens);
+      var ones = marked(stored.roster[slot].ones);
+      roster[slot] = rosterId(tens, ones);
+      if (roster[slot].status === "ambiguous") warnings.push("Roster " + slot + ": the id needs both digits, or neither.");
+    });
+
+    var games = gameNumbers.map(function (num, index) {
+      var pack = stored.games[num];
+      var shooters = pack.shooters.map(function (row, shooterIndex) {
+        var who = choiceOf(marked(row.who));
+        var score = shooterScore(marked(row.tens), marked(row.ones));
+        var label = "Game " + num + " shooter " + (shooterIndex + 1);
+        if (who.status === "blank") warnings.push(label + ": no roster letter filled.");
+        else if (who.status === "ambiguous") warnings.push(label + ": more than one roster letter looks filled.");
+        if (score.status === "blank") warnings.push(label + ": no score filled. Left blank, not read as 0.");
+        else if (score.status === "ambiguous") warnings.push(label + ": the score is too close to call.");
+        return { who: who, score: score };
+      });
+      var hundreds = judgeMark(pack.hundreds, coverBaseline);
+      if (hundreds.status === "ambiguous") counts.ambiguous += 1;
+      else counts.filled += 1;
+      var team = (function () {
+        var tens = marked(pack.tens);
+        var ones = marked(pack.ones);
+        if (hundreds.status === "ambiguous" || tens.status === "ambiguous" || ones.status === "ambiguous") {
+          return { value: null, status: "ambiguous" };
+        }
+        if (tens.status !== "filled" || ones.status !== "filled") return { value: null, status: "blank" };
+        return { value: (hundreds.status === "filled" ? 100 : 0) + tens.value * 10 + ones.value, status: "ok" };
+      }());
+      if (team.status === "blank") warnings.push("Game " + num + " team total: no total filled. Left blank, not read as 0.");
+      else if (team.status === "ambiguous") warnings.push("Game " + num + " team total: the total is too close to call.");
+      var result = choiceOf(marked(pack.result));
+      if (result.status === "blank") warnings.push("Game " + num + ": WON / LOST is not marked.");
+      else if (result.status === "ambiguous") warnings.push("Game " + num + ": both WON and LOST look filled.");
+      var known = shooters.every(function (row) { return row.score.value != null; });
+      var shooterSum = known ? shooters.reduce(function (sum, row) { return sum + row.score.value; }, 0) : null;
+      var sumMismatch = shooterSum != null && team.value != null && shooterSum !== team.value;
+      if (sumMismatch) {
+        warnings.push("Game " + num + ": shooters add up to " + shooterSum + ", the team total reads " + team.value + ".");
+      }
+      return {
+        label: "Game " + (index + 1),
+        shooters: shooters,
+        team: team,
+        result: result,
+        shooterSum: shooterSum,
+        sumMismatch: sumMismatch
+      };
+    });
+
+    var unique = [];
+    warnings.forEach(function (item) {
+      if (item && unique.indexOf(item) < 0) unique.push(item);
+    });
+    return {
+      version: "v16",
+      mode: "fiducial",
+      notch: !!located.notch,
+      upsideDown: (located.rotation || 0) === 180,
+      rotation: located.rotation || 0,
+      estimatedCorner: !!located.estimatedCorner,
+      warnings: unique,
+      side: side,
+      roster: roster,
+      games: games,
+      counts: counts,
+      calibration: { coverBaseline: Math.round(coverBaseline * 1000) / 1000 }
+    };
+  }
+
   function sheetUsesCoverage(spec) {
     return spec.version === "v8" || (spec.digit_layout && String(spec.digit_layout).indexOf("keypad") === 0);
   }
 
   function readAligned(image, spec, located) {
+    if (spec.version === "v16") return readV16(image, spec, located);
     var warnings = [];
     if (located.warning) warnings.push(located.warning);
     var radius = spec.bubble_radius.pt * located.scale;
@@ -1329,7 +1565,10 @@
     var i;
     if (!list.length) return null;
     for (i = 0; i < list.length; i += 1) {
-      if (!list[i] || !list[i].number_fields || !list[i].fiducials) return null;
+      if (!list[i] || !list[i].fiducials) return null;
+      if (list[i].version === "v16") {
+        if (!list[i].games || !list[i].roster || !list[i].side_field) return null;
+      } else if (!list[i].number_fields) return null;
     }
     return list;
   }
@@ -1488,6 +1727,7 @@
 
   root.RAD_OCR = {
     readSheet: readSheet,
-    loadImageFile: loadImageFile
+    loadImageFile: loadImageFile,
+    previewCorners: previewCorners
   };
 })(typeof window !== "undefined" ? window : globalThis);

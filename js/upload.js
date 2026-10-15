@@ -2,14 +2,16 @@
   "use strict";
 
   var UPLOAD_KEY = "rad.uploads.v1";
-  var SIDES = [
-    { id: "home", label: "Home" },
-    { id: "away", label: "Away" }
-  ];
+  var SHEET_KEY = "rad.sheets.v1";
+  var SLOTS = ["A", "B", "C", "D", "E", "F", "G", "H"];
+  var GAMES = [1, 2, 3];
+  var SHOOTERS = [1, 2, 3, 4];
+  var STEADY_MS = 750;
+  var SHARP_MIN = 8;
   var snap = null;
-  var scoresTouched = false;
   var formDirty = false;
   var reading = false;
+  var camera = { stream: null, timer: 0, spec: null, steadySince: 0, lastCorners: null, capturing: false };
 
   var fileInput = document.getElementById("sheet-file");
   var readButton = document.getElementById("read-photo");
@@ -27,6 +29,13 @@
   var savedNote = document.getElementById("saved-note");
   var finalScoreEl = document.getElementById("final-score");
   var sheetPointsEl = document.getElementById("sheet-points");
+  var scanButton = document.getElementById("scan-camera");
+  var cameraPanel = document.getElementById("camera-panel");
+  var cameraVideo = document.getElementById("camera-video");
+  var cameraGuide = document.getElementById("camera-guide");
+  var cameraStatus = document.getElementById("camera-status");
+  var snapButton = document.getElementById("camera-snap");
+  var cancelButton = document.getElementById("camera-cancel");
 
   function esc(value) {
     return String(value == null ? "" : value)
@@ -51,38 +60,41 @@
     el.textContent = message;
   }
 
-  function winnerOptions(optionalBlank) {
-    return '<option value="">' + (optionalBlank ? "Not marked" : "Not marked") + "</option>" +
-      '<option value="home">Home</option><option value="away">Away</option>';
+  function slotOptions(selected) {
+    var html = '<option value="">—</option>';
+    SLOTS.forEach(function (slot) {
+      html += '<option value="' + slot + '"' + (selected === slot ? " selected" : "") + ">" + slot + "</option>";
+    });
+    return html;
   }
 
-  function buildSide(side) {
-    var rows = ["S1", "S2", "S3", "S4", "Team"].map(function (label, index) {
-      var cells = [1, 2, 3].map(function (game) {
-        var who = index < 4 ? "s" + (index + 1) : "team";
-        var id = side.id + "-g" + game + "-" + who;
-        var max = who === "team" ? 199 : 99;
-        return '<td><input id="' + id + '" type="number" min="0" max="' + max + '" inputmode="numeric" placeholder="—" aria-label="' +
-          esc(side.label + " game " + game + " " + label) + '"><span id="' + id + '-flag" class="bubble-flag"></span></td>';
+  function buildReview() {
+    document.getElementById("roster-block").innerHTML =
+      '<div class="table-scroll"><table class="bubble-table roster-table"><caption>Roster ids A through H. An empty id was not read as zero.</caption><thead><tr>' +
+      SLOTS.map(function (slot) { return "<th scope=\"col\">" + slot + "</th>"; }).join("") +
+      "</tr></thead><tbody><tr>" +
+      SLOTS.map(function (slot) {
+        return '<td><input id="roster-' + slot + '" type="number" min="0" max="99" inputmode="numeric" placeholder="—" aria-label="Roster ' + slot + ' id"><span id="roster-' + slot + '-flag" class="bubble-flag"></span></td>';
+      }).join("") +
+      "</tr></tbody></table></div>";
+
+    document.getElementById("games-block").innerHTML = GAMES.map(function (game) {
+      var rows = SHOOTERS.map(function (n) {
+        return "<tr><th scope=\"row\">" + n + "</th><td><select id=\"g" + game + "-s" + n + "-who\" aria-label=\"Game " + game + " shooter " + n + " who\">" +
+          slotOptions("") + "</select><span id=\"g" + game + "-s" + n + "-who-flag\" class=\"bubble-flag\"></span></td>" +
+          "<td><input id=\"g" + game + "-s" + n + "-score\" type=\"number\" min=\"0\" max=\"49\" inputmode=\"numeric\" placeholder=\"—\" aria-label=\"Game " + game + " shooter " + n + " score\">" +
+          "<span id=\"g" + game + "-s" + n + "-score-flag\" class=\"bubble-flag\"></span></td></tr>";
       }).join("");
-      return "<tr><th scope=\"row\">" + label + "</th>" + cells + "</tr>";
+      return '<section class="game-card"><h3>Game ' + game + "</h3>" +
+        '<div class="table-scroll"><table class="bubble-table"><caption>Who threw, and the score. Tens on the sheet only go to 4; a score under 10 has a blank tens bubble.</caption><thead><tr><th scope="col"></th><th scope="col">Who</th><th scope="col">Score</th></tr></thead><tbody>' +
+        rows + "</tbody></table></div>" +
+        '<div class="form-grid cols-3"><label class="field">Team total<input id="g' + game + '-team" type="number" min="0" max="199" inputmode="numeric" placeholder="—"><span id="g' + game + '-team-flag" class="bubble-flag"></span></label>' +
+        '<label class="field">Result<select id="g' + game + '-result"><option value="">Not marked</option><option value="won">Won</option><option value="lost">Lost</option></select><span id="g' + game + '-result-flag" class="bubble-flag"></span></label></div>' +
+        '<p id="g' + game + '-check" class="cross-check"></p></section>';
     }).join("");
-    var checks = [1, 2, 3].map(function (game) {
-      return '<p id="' + side.id + "-g" + game + '-check" class="cross-check"></p>';
-    }).join("");
-    document.getElementById(side.id + "-block").innerHTML =
-      '<h3>' + side.label + "</h3>" +
-      '<div class="table-scroll"><table class="bubble-table"><caption>' + side.label +
-      " shooter totals and the team total for each game. An empty box was not read as zero.</caption><thead><tr><th scope=\"col\"></th>" +
-      "<th scope=\"col\">Game 1</th><th scope=\"col\">Game 2</th><th scope=\"col\">Game 3</th></tr></thead><tbody>" +
-      rows + "</tbody></table></div><div class=\"cross-checks\">" + checks + "</div>";
   }
 
-  SIDES.forEach(buildSide);
-  ["win-g1", "win-g2", "win-g3", "win-points"].forEach(function (id) {
-    document.getElementById(id).innerHTML = winnerOptions(false);
-  });
-  document.getElementById("win-beer").innerHTML = winnerOptions(true);
+  buildReview();
 
   function activeTeams() {
     return ((snap && snap.teams) || []).filter(function (team) { return team.active !== false; })
@@ -118,50 +130,14 @@
     select.value = matched ? matched.id : "new";
   }
 
-  function winnerCount() {
-    var home = 0;
-    var away = 0;
-    [1, 2, 3].forEach(function (n) {
-      var value = document.getElementById("win-g" + n).value;
-      if (value === "home") home += 1;
-      else if (value === "away") away += 1;
-    });
-    return { home: home, away: away };
-  }
-
-  function updateFinalScore() {
-    var home = Number(document.getElementById("home-won").value);
-    var away = Number(document.getElementById("away-won").value);
-    if (!isFinite(home) || home < 0) home = 0;
-    if (!isFinite(away) || away < 0) away = 0;
-    finalScoreEl.textContent = home + "–" + away;
-  }
-
-  function applyWinnerCounts() {
-    if (scoresTouched) return;
-    var counts = winnerCount();
-    document.getElementById("home-won").value = String(counts.home);
-    document.getElementById("away-won").value = String(counts.away);
-    updateFinalScore();
-  }
-
-  function showConfirm() {
-    confirmSection.hidden = false;
-    confirmSection.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-
   function numberOrNull(input) {
-    if (String(input.value).trim() === "") return null;
+    if (!input || String(input.value).trim() === "") return null;
     var value = Number(input.value);
     if (!isFinite(value)) return null;
     return value;
   }
 
-  function scoreInput(side, game, who) {
-    return document.getElementById(side + "-g" + game + "-" + who);
-  }
-
-  function setBubble(id, cell, blankNote) {
+  function setNumber(id, cell, blankNote) {
     var input = document.getElementById(id);
     var flag = document.getElementById(id + "-flag");
     input.classList.remove("is-blank", "is-ambiguous");
@@ -180,67 +156,68 @@
     flag.textContent = "";
   }
 
-  function setWinner(id, cell) {
+  function setChoice(id, value, status, blankNote) {
     var select = document.getElementById(id);
     var flag = document.getElementById(id + "-flag");
-    select.value = cell && (cell.value === "home" || cell.value === "away") ? cell.value : "";
-    if (cell && cell.status === "ambiguous") flag.textContent = "Check — both bubbles";
-    else if (!select.value && id !== "win-beer") flag.textContent = "Not marked";
+    select.value = value && select.querySelector('option[value="' + value + '"]') ? value : "";
+    if (status === "ambiguous") flag.textContent = "Check — two marks";
+    else if (!select.value) flag.textContent = blankNote || "Not marked";
     else flag.textContent = "";
   }
 
-  function refreshChecks() {
-    var notes = [];
-    SIDES.forEach(function (side) {
-      [1, 2, 3].forEach(function (game) {
-        var shooters = [1, 2, 3, 4].map(function (n) { return numberOrNull(scoreInput(side.id, game, "s" + n)); });
-        var team = numberOrNull(scoreInput(side.id, game, "team"));
-        var el = document.getElementById(side.id + "-g" + game + "-check");
-        var filled = shooters.filter(function (value) { return value != null; }).length + (team != null ? 1 : 0);
-        el.classList.remove("is-bad");
-        if (!filled) {
-          el.textContent = "";
-          return;
-        }
-        if (shooters.some(function (value) { return value == null; }) || team == null) {
-          el.textContent = side.label + " Game " + game + ": fill every shooter and the team total to check the sum.";
-          return;
-        }
-        var sum = shooters.reduce(function (total, value) { return total + value; }, 0);
-        if (sum !== team) {
-          el.textContent = side.label + " Game " + game + ": shooters add up to " + sum + ", team total is " + team + ".";
-          el.classList.add("is-bad");
-          notes.push(el.textContent);
-        } else {
-          el.textContent = side.label + " Game " + game + ": shooters add up to the team total (" + sum + ").";
-        }
-      });
+  function wonCount() {
+    var won = 0;
+    GAMES.forEach(function (game) {
+      if (document.getElementById("g" + game + "-result").value === "won") won += 1;
     });
-    var homePoints = [1, 2, 3].map(function (game) { return numberOrNull(scoreInput("home", game, "team")); });
-    var awayPoints = [1, 2, 3].map(function (game) { return numberOrNull(scoreInput("away", game, "team")); });
-    function show(values) {
-      return values.map(function (value) { return value == null ? "—" : value; }).join(" + ");
-    }
-    sheetPointsEl.textContent = "Team totals on the sheet: home " + show(homePoints) + ", away " + show(awayPoints) +
-      ". Standings use the game winners, not these point totals.";
-    return notes;
+    return won;
+  }
+
+  function updateFinalScore() {
+    var won = wonCount();
+    finalScoreEl.textContent = won + (won === 1 ? " game won" : " games won");
+  }
+
+  function refreshChecks() {
+    GAMES.forEach(function (game) {
+      var scores = SHOOTERS.map(function (n) { return numberOrNull(document.getElementById("g" + game + "-s" + n + "-score")); });
+      var team = numberOrNull(document.getElementById("g" + game + "-team"));
+      var el = document.getElementById("g" + game + "-check");
+      el.classList.remove("is-bad");
+      if (scores.every(function (value) { return value == null; }) && team == null) {
+        el.textContent = "";
+        return;
+      }
+      if (scores.some(function (value) { return value == null; }) || team == null) {
+        el.textContent = "Game " + game + ": fill every shooter and the team total to check the sum.";
+        return;
+      }
+      var sum = scores.reduce(function (total, value) { return total + value; }, 0);
+      if (sum !== team) {
+        el.textContent = "Game " + game + ": shooters add up to " + sum + ", team total is " + team + ".";
+        el.classList.add("is-bad");
+      } else {
+        el.textContent = "Game " + game + ": shooters add up to the team total (" + sum + ").";
+      }
+    });
+    var totals = GAMES.map(function (game) {
+      var value = numberOrNull(document.getElementById("g" + game + "-team"));
+      return value == null ? "—" : value;
+    });
+    sheetPointsEl.textContent = "Team totals on this sheet: " + totals.join(" + ") + ". Standings use WON and LOST, not these point totals.";
+    updateFinalScore();
   }
 
   function clearSheet() {
-    SIDES.forEach(function (side) {
-      [1, 2, 3].forEach(function (game) {
-        [1, 2, 3, 4].forEach(function (n) { setBubble(side.id + "-g" + game + "-s" + n, null, ""); });
-        setBubble(side.id + "-g" + game + "-team", null, "");
-        document.getElementById(side.id + "-g" + game + "-s1").classList.remove("is-blank");
+    setChoice("sheet-side", "", "blank");
+    SLOTS.forEach(function (slot) { setNumber("roster-" + slot, { status: "blank" }); });
+    GAMES.forEach(function (game) {
+      SHOOTERS.forEach(function (n) {
+        setChoice("g" + game + "-s" + n + "-who", "", "blank");
+        setNumber("g" + game + "-s" + n + "-score", { status: "blank" });
       });
-    });
-    document.querySelectorAll(".bubble-table input").forEach(function (input) {
-      input.value = "";
-      input.classList.remove("is-blank", "is-ambiguous");
-    });
-    document.querySelectorAll(".bubble-flag").forEach(function (flag) { flag.textContent = ""; });
-    ["win-g1", "win-g2", "win-g3", "win-beer", "win-points"].forEach(function (id) {
-      document.getElementById(id).value = "";
+      setNumber("g" + game + "-team", { status: "blank" });
+      setChoice("g" + game + "-result", "", "blank");
     });
     refreshChecks();
   }
@@ -254,21 +231,15 @@
   function describeReading(result) {
     if (result.mode === "rejected") {
       return (result.warnings && result.warnings[0]) ||
-        "Retake the photo so all four black corner squares are in the frame. Lay the sheet flat, and keep every corner visible.";
+        "Retake the photo so all four black corner squares are in the frame.";
     }
-    var counts = result.counts || { blank: 0, ambiguous: 0 };
-    var estimated = result.estimatedCorner
-      ? " One corner was cut off and estimated from the other three."
-      : "";
-    var notch = result.notch ? "" : " The top-left notch was faint.";
-    var sheet = result.version === "v8"
-      ? " Read as the v8 legal sheet."
-      : result.version === "v7"
-        ? " Read as the v7 letter sheet."
-        : "";
-    return "Read the bubbles. " + result.homeGamesWon + "–" + result.awayGamesWon +
-      " from the game-winner marks. " + counts.blank + " digit rows were blank and left empty. " +
-      counts.ambiguous + " rows need a look." + turnNote(result) + estimated + notch + sheet;
+    var side = result.side && result.side.value ? result.side.value : "unmarked";
+    var won = (result.games || []).filter(function (game) { return game.result && game.result.value === "won"; }).length;
+    return "Read the v16 sheet as " + side + ". This team marked " + won + " games won." + turnNote(result);
+  }
+
+  function showConfirm() {
+    confirmSection.hidden = false;
   }
 
   function applyReading(result) {
@@ -282,14 +253,11 @@
       previewImg.src = result.previewUrl;
       previewFigure.hidden = false;
       previewNote.textContent = result.mode === "fiducial"
-        ? ("Straightened with the corner squares." + turnNote(result) +
-          (result.estimatedCorner ? " One corner was estimated." : ""))
+        ? ("Straightened with the corner squares." + turnNote(result))
         : "This photo was not lined up with the scan sheet.";
     }
     if (result.mode === "rejected") {
-      var reason = (result.warnings && result.warnings[0]) ||
-        "The corner squares were not found, so this photo was not lined up.";
-      showError(errorEl, reason);
+      showError(errorEl, (result.warnings && result.warnings[0]) || "The corner squares were not found, so this photo was not lined up.");
     } else {
       showError(errorEl, "");
     }
@@ -297,31 +265,53 @@
       setStatus("The photo was read, and your edits were left as they are.");
       return;
     }
-    if (result.mode !== "rejected" && result.teams) {
-      SIDES.forEach(function (side) {
-        result.teams[side.id].games.forEach(function (game, index) {
-          game.shooters.forEach(function (shooter, shooterIndex) {
-            setBubble(side.id + "-g" + (index + 1) + "-s" + (shooterIndex + 1), shooter);
-          });
-          setBubble(side.id + "-g" + (index + 1) + "-team", game.team);
-        });
+    if (result.mode !== "rejected" && result.games) {
+      setChoice("sheet-side", result.side && result.side.value, result.side && result.side.status, "Not marked");
+      SLOTS.forEach(function (slot) {
+        setNumber("roster-" + slot, result.roster && result.roster[slot]);
       });
-      setWinner("win-g1", result.winners.game1);
-      setWinner("win-g2", result.winners.game2);
-      setWinner("win-g3", result.winners.game3);
-      setWinner("win-beer", result.winners.beer);
-      setWinner("win-points", result.winners.points);
+      result.games.forEach(function (game, index) {
+        var n = index + 1;
+        game.shooters.forEach(function (row, shooterIndex) {
+          setChoice("g" + n + "-s" + (shooterIndex + 1) + "-who", row.who && row.who.value, row.who && row.who.status);
+          setNumber("g" + n + "-s" + (shooterIndex + 1) + "-score", row.score);
+        });
+        setNumber("g" + n + "-team", game.team);
+        setChoice("g" + n + "-result", game.result && game.result.value, game.result && game.result.status);
+      });
     } else {
       clearSheet();
     }
-    scoresTouched = false;
     formDirty = false;
-    applyWinnerCounts();
     refreshChecks();
     showConfirm();
     setStatus(result.mode === "rejected"
       ? "Retake the photo so all four black corner squares are in the frame. You can still type the score below."
-      : "Check the bubbles, the names, and the date, then save.");
+      : "Check the roster, the scores, and the date, then save.");
+  }
+
+  function loadSpec() {
+    return fetch("scoresheet/scansheet_v16_layout_spec.json").then(function (response) {
+      if (!response.ok) throw new Error("The scan sheet layout could not be loaded.");
+      return response.json();
+    });
+  }
+
+  function readCanvas(canvas) {
+    if (canvas.width < 500 || canvas.height < 360) {
+      return Promise.reject(new Error("That photo is too small to read. Move closer and include all four corner squares."));
+    }
+    setStatus("Opening the sheet…");
+    return loadSpec().then(function (spec) {
+      return RAD_OCR.readSheet(canvas, spec, setStatus);
+    }).then(function (result) {
+      applyReading(result);
+    });
+  }
+
+  function finishRead() {
+    reading = false;
+    readButton.disabled = false;
   }
 
   function readPhoto() {
@@ -336,71 +326,88 @@
     showError(errorEl, "");
     setStatus("Opening the photo…");
     RAD_OCR.loadImageFile(file).then(function (canvas) {
-      if (canvas.width < 500 || canvas.height < 360) {
-        throw new Error("That photo is too small to read. Move closer and include all four corner squares.");
-      }
-      function loadSpec(path) {
-        return fetch(path).then(function (response) {
-          if (!response.ok) throw new Error("The scan sheet layout could not be loaded.");
-          return response.json();
-        });
-      }
-      return Promise.all([
-        loadSpec("scoresheet/scansheet_v8_layout_spec.json"),
-        loadSpec("scoresheet/scansheet_v7_layout_spec.json")
-      ]).then(function (specs) {
-        return RAD_OCR.readSheet(canvas, specs, setStatus);
-      });
-    }).then(function (result) {
-      applyReading(result);
+      return readCanvas(canvas);
     }).catch(function (err) {
       showError(errorEl, err && err.message ? err.message : "The photo could not be read.");
       setStatus("");
       showConfirm();
-    }).then(function () {
-      reading = false;
-      readButton.disabled = false;
-    });
+    }).then(finishRead);
   }
 
-  function gamesForSubmit(homeWon, awayWon) {
-    var fromSelect = winnerCount();
-    if (!scoresTouched && fromSelect.home === homeWon && fromSelect.away === awayWon) {
-      var labeled = [];
-      [1, 2, 3].forEach(function (n) {
-        var winner = document.getElementById("win-g" + n).value;
-        if (winner !== "home" && winner !== "away") return;
-        labeled.push({ label: "Game " + n, winner: winner });
-      });
-      if (labeled.length) return labeled;
+  function sheetRecord() {
+    return {
+      side: document.getElementById("sheet-side").value,
+      roster: SLOTS.map(function (slot) {
+        return { slot: slot, id: numberOrNull(document.getElementById("roster-" + slot)) };
+      }),
+      games: GAMES.map(function (game) {
+        return {
+          who: SHOOTERS.map(function (n) { return document.getElementById("g" + game + "-s" + n + "-who").value; }),
+          scores: SHOOTERS.map(function (n) { return numberOrNull(document.getElementById("g" + game + "-s" + n + "-score")); }),
+          team: numberOrNull(document.getElementById("g" + game + "-team")),
+          result: document.getElementById("g" + game + "-result").value
+        };
+      })
+    };
+  }
+
+  function norm(value) {
+    return String(value || "").trim().toLowerCase();
+  }
+
+  function loadStoredSheets() {
+    try {
+      var list = JSON.parse(localStorage.getItem(SHEET_KEY) || "[]");
+      return Array.isArray(list) ? list : [];
+    } catch (err) {
+      return [];
     }
+  }
+
+  function sheetsPair(a, b) {
+    if (!a || !b || !a.date || a.date !== b.date) return false;
+    if (!a.teamId || !b.teamId || a.teamId === b.teamId) return false;
+    if (a.opponentTeamId && b.opponentTeamId && a.opponentTeamId === b.teamId && b.opponentTeamId === a.teamId) return true;
+    return norm(a.opponentName) && norm(a.teamName) &&
+      norm(a.opponentName) === norm(b.teamName) &&
+      norm(b.opponentName) === norm(a.teamName);
+  }
+
+  function orderSides(a, b) {
+    if (a.side === "home" && b.side !== "home") return { home: a, away: b };
+    if (b.side === "home" && a.side !== "home") return { home: b, away: a };
+    if (a.side === "away" && b.side !== "away") return { home: b, away: a };
+    return { home: a, away: b };
+  }
+
+  function matchGames(home, away) {
+    var count = Math.max((home.games || []).length, (away.games || []).length);
     var games = [];
     var i;
-    for (i = 0; i < homeWon; i += 1) games.push({ label: "Game " + (games.length + 1), winner: "home" });
-    for (i = 0; i < awayWon; i += 1) games.push({ label: "Game " + (games.length + 1), winner: "away" });
+    for (i = 0; i < count; i += 1) {
+      var h = (home.games || [])[i] || {};
+      var a = (away.games || [])[i] || {};
+      var winner = "";
+      if (h.result === "won") winner = "home";
+      else if (h.result === "lost") winner = "away";
+      else if (a.result === "won") winner = "away";
+      else if (a.result === "lost") winner = "home";
+      if (!winner) continue;
+      games.push({ label: "Game " + (i + 1), winner: winner });
+    }
     return games;
   }
 
-  function sheetSnapshot() {
-    function side(id) {
-      return [1, 2, 3].map(function (game) {
-        return {
-          shooters: [1, 2, 3, 4].map(function (n) { return numberOrNull(scoreInput(id, game, "s" + n)); }),
-          team: numberOrNull(scoreInput(id, game, "team"))
-        };
-      });
+  function rememberUpload(entry) {
+    var list = [];
+    try {
+      list = JSON.parse(localStorage.getItem(UPLOAD_KEY) || "[]");
+    } catch (err) {
+      list = [];
     }
-    return {
-      home: side("home"),
-      away: side("away"),
-      winners: {
-        game1: document.getElementById("win-g1").value,
-        game2: document.getElementById("win-g2").value,
-        game3: document.getElementById("win-g3").value,
-        beer: document.getElementById("win-beer").value,
-        points: document.getElementById("win-points").value
-      }
-    };
+    if (!Array.isArray(list)) list = [];
+    list.push(entry);
+    localStorage.setItem(UPLOAD_KEY, JSON.stringify(list));
   }
 
   function ensureTeam(selectValue, typedName) {
@@ -416,16 +423,87 @@
     });
   }
 
-  function rememberUpload(entry) {
-    var list = [];
-    try {
-      list = JSON.parse(localStorage.getItem(UPLOAD_KEY) || "[]");
-    } catch (err) {
-      list = [];
+  function onSubmit(event) {
+    event.preventDefault();
+    showError(confirmError, "");
+    var date = document.getElementById("confirm-date").value;
+    var side = document.getElementById("sheet-side").value;
+    if (!date) {
+      showError(confirmError, "Add the match date.");
+      return;
     }
-    if (!Array.isArray(list)) list = [];
-    list.push(entry);
-    localStorage.setItem(UPLOAD_KEY, JSON.stringify(list));
+    if (side !== "home" && side !== "away") {
+      showError(confirmError, "Mark this sheet as Home or Away.");
+      return;
+    }
+    var teamSelect = document.getElementById("team-select").value;
+    var opponentSelect = document.getElementById("opponent-select").value;
+    var teamTyped = document.getElementById("team-name").value.trim();
+    var opponentTyped = document.getElementById("opponent-name").value.trim();
+    if (teamSelect !== "new" && opponentSelect !== "new" && teamSelect === opponentSelect) {
+      showError(confirmError, "This team and the opponent need to be two different teams.");
+      return;
+    }
+    var submitButton = document.getElementById("confirm-submit");
+    submitButton.disabled = true;
+    var record = sheetRecord();
+    ensureTeam(teamSelect, teamTyped).then(function (teamId) {
+      return ensureTeam(opponentSelect, opponentTyped).then(function (opponentId) {
+        if (teamId === opponentId) throw new Error("This team and the opponent need to be two different teams.");
+        var stored = loadStoredSheets().filter(function (row) {
+          return !(row.date === date && row.teamId === teamId);
+        });
+        var entry = {
+          id: "sheet_" + date + "_" + teamId,
+          at: new Date().toISOString(),
+          date: date,
+          teamId: teamId,
+          opponentTeamId: opponentId,
+          teamName: teamTyped,
+          opponentName: opponentTyped,
+          side: side,
+          games: record.games,
+          roster: record.roster,
+          photoStored: false
+        };
+        var pair = null;
+        stored.forEach(function (other) {
+          if (sheetsPair(entry, other)) pair = other;
+        });
+        stored.push(entry);
+        if (!pair) {
+          localStorage.setItem(SHEET_KEY, JSON.stringify(stored));
+          rememberUpload(entry);
+          savedNote.hidden = false;
+          savedNote.textContent = "Saved this team's sheet for " + date + ". Standings update when the opponent's sheet for the same date is saved on this phone. The photo was not stored.";
+          return null;
+        }
+        var sides = orderSides(entry, pair);
+        var matchId = entry.matchId || pair.matchId || ("m_" + date + "_" + sides.home.teamId + "_" + sides.away.teamId);
+        entry.matchId = matchId;
+        pair.matchId = matchId;
+        return RAD.submitMatch({
+          id: matchId,
+          date: date,
+          homeTeamId: sides.home.teamId,
+          awayTeamId: sides.away.teamId,
+          games: matchGames(sides.home, sides.away)
+        }).then(function (result) {
+          localStorage.setItem(SHEET_KEY, JSON.stringify(stored));
+          rememberUpload(entry);
+          var match = result.match;
+          savedNote.hidden = false;
+          savedNote.textContent = "Paired the two sheets. Match score " + match.homeGamesWon + "–" + match.awayGamesWon +
+            ". The photos were not stored. Standings below include this match.";
+          renderStandings(result.snapshot);
+          document.getElementById("live-standings").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+    }).catch(function (err) {
+      showError(confirmError, err && err.message ? err.message : "The score could not be saved.");
+    }).then(function () {
+      submitButton.disabled = false;
+    });
   }
 
   function sampleTag(name, sample) {
@@ -444,7 +522,7 @@
       return;
     }
     host.innerHTML =
-      '<div class="table-scroll"><table><caption>SAMPLE marks starter teams. A saved upload changes this table immediately.</caption><thead><tr>' +
+      '<div class="table-scroll"><table><caption>SAMPLE marks starter teams. A paired upload changes this table immediately.</caption><thead><tr>' +
       '<th scope="col">Rank</th><th scope="col">Team</th><th scope="col">W</th><th scope="col">L</th><th scope="col">Ties</th><th scope="col">Games won</th><th scope="col">Points</th>' +
       "</tr></thead><tbody>" +
       rows.map(function (row) {
@@ -457,64 +535,194 @@
       "</tbody></table></div>";
   }
 
-  function onSubmit(event) {
-    event.preventDefault();
-    showError(confirmError, "");
-    var date = document.getElementById("confirm-date").value;
-    var homeWon = Math.round(Number(document.getElementById("home-won").value));
-    var awayWon = Math.round(Number(document.getElementById("away-won").value));
-    if (!date) {
-      showError(confirmError, "Add the match date.");
+  function setCameraStatus(message) {
+    cameraStatus.textContent = message || "";
+  }
+
+  function stopCamera() {
+    if (camera.timer) clearTimeout(camera.timer);
+    camera.timer = 0;
+    camera.steadySince = 0;
+    camera.lastCorners = null;
+    camera.capturing = false;
+    if (camera.stream) {
+      camera.stream.getTracks().forEach(function (track) { track.stop(); });
+      camera.stream = null;
+    }
+    if (cameraVideo) cameraVideo.srcObject = null;
+  }
+
+  function drawBrackets(ctx, width, height) {
+    var inset = Math.round(Math.min(width, height) * 0.12);
+    var arm = Math.round(Math.min(width, height) * 0.12);
+    var corners = [
+      [inset, inset, 1, 1],
+      [width - inset, inset, -1, 1],
+      [width - inset, height - inset, -1, -1],
+      [inset, height - inset, 1, -1]
+    ];
+    ctx.strokeStyle = "#ffe14a";
+    ctx.lineWidth = 8;
+    ctx.lineCap = "square";
+    corners.forEach(function (corner) {
+      ctx.beginPath();
+      ctx.moveTo(corner[0], corner[1] + corner[3] * arm);
+      ctx.lineTo(corner[0], corner[1]);
+      ctx.lineTo(corner[0] + corner[2] * arm, corner[1]);
+      ctx.stroke();
+    });
+  }
+
+  function drawGuide(hit) {
+    var width = cameraVideo.clientWidth || 0;
+    var height = cameraVideo.clientHeight || 0;
+    if (!width || !height) return;
+    cameraGuide.width = width;
+    cameraGuide.height = height;
+    var ctx = cameraGuide.getContext("2d");
+    ctx.clearRect(0, 0, width, height);
+    if (!hit || !hit.found || !hit.corners) {
+      drawBrackets(ctx, width, height);
       return;
     }
-    if (!isFinite(homeWon) || !isFinite(awayWon) || homeWon < 0 || awayWon < 0 || homeWon + awayWon < 1) {
-      showError(confirmError, "Mark a winner for at least one of games 1–3.");
+    var sx = width / hit.width;
+    var sy = height / hit.height;
+    var order = ["TL", "TR", "BR", "BL"];
+    ctx.strokeStyle = "#ffe14a";
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    order.forEach(function (name, index) {
+      var point = hit.corners[name];
+      var x = point.x * sx;
+      var y = point.y * sy;
+      if (index) ctx.lineTo(x, y);
+      else ctx.moveTo(x, y);
+    });
+    ctx.closePath();
+    ctx.stroke();
+  }
+
+  function cornerDrift(previous, next, width, height) {
+    var names = ["TL", "TR", "BL", "BR"];
+    var diag = Math.hypot(width, height) || 1;
+    var sum = 0;
+    names.forEach(function (name) {
+      sum += Math.hypot(previous[name].x - next[name].x, previous[name].y - next[name].y);
+    });
+    return (sum / names.length) / diag;
+  }
+
+  function captureFrame() {
+    if (camera.capturing || reading) return;
+    var width = cameraVideo.videoWidth;
+    var height = cameraVideo.videoHeight;
+    if (!width || !height) {
+      setCameraStatus("The camera has no picture yet.");
       return;
     }
-    refreshChecks();
-    var homeSelect = document.getElementById("home-team").value;
-    var awaySelect = document.getElementById("away-team").value;
-    var homeTyped = document.getElementById("home-name").value.trim();
-    var awayTyped = document.getElementById("away-name").value.trim();
-    if (homeSelect === "new" && awaySelect === "new" && homeTyped && homeTyped.toLowerCase() === awayTyped.toLowerCase()) {
-      showError(confirmError, "Home and away need to be two different teams.");
+    camera.capturing = true;
+    var canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    canvas.getContext("2d").drawImage(cameraVideo, 0, 0, width, height);
+    stopCamera();
+    cameraPanel.hidden = true;
+    scanButton.hidden = false;
+    setStatus("Photo captured. Reading the sheet…");
+    reading = true;
+    readButton.disabled = true;
+    readCanvas(canvas).catch(function (err) {
+      showError(errorEl, err && err.message ? err.message : "The photo could not be read.");
+      setStatus("");
+    }).then(finishRead);
+  }
+
+  function cameraTick() {
+    if (!camera.stream || camera.capturing) return;
+    var width = cameraVideo.videoWidth;
+    var height = cameraVideo.videoHeight;
+    if (!width || !height || !camera.spec) {
+      camera.timer = setTimeout(cameraTick, 200);
       return;
     }
-    var sheet = sheetSnapshot();
-    var submitButton = document.getElementById("confirm-submit");
-    submitButton.disabled = true;
-    ensureTeam(homeSelect, homeTyped).then(function (homeId) {
-      return ensureTeam(awaySelect, awayTyped).then(function (awayId) {
-        return RAD.submitMatch({
-          date: date,
-          homeTeamId: homeId,
-          awayTeamId: awayId,
-          games: gamesForSubmit(homeWon, awayWon)
-        });
+    var canvas = document.createElement("canvas");
+    var scale = Math.min(1, 640 / Math.max(width, height));
+    canvas.width = Math.max(1, Math.round(width * scale));
+    canvas.height = Math.max(1, Math.round(height * scale));
+    canvas.getContext("2d").drawImage(cameraVideo, 0, 0, canvas.width, canvas.height);
+    var hit = RAD_OCR.previewCorners(canvas, camera.spec);
+    drawGuide(hit);
+    if (!hit.found) {
+      camera.steadySince = 0;
+      camera.lastCorners = null;
+      setCameraStatus("Fit all 4 corners");
+    } else if (hit.sharpness < SHARP_MIN) {
+      camera.steadySince = 0;
+      camera.lastCorners = hit.corners;
+      setCameraStatus("Hold still — the picture is blurry");
+    } else if (camera.lastCorners && cornerDrift(camera.lastCorners, hit.corners, hit.width, hit.height) > 0.02) {
+      camera.steadySince = 0;
+      camera.lastCorners = hit.corners;
+      setCameraStatus("Hold steady");
+    } else {
+      camera.lastCorners = hit.corners;
+      var now = Date.now();
+      if (!camera.steadySince) camera.steadySince = now;
+      if (now - camera.steadySince >= STEADY_MS) {
+        setCameraStatus("Got it");
+        captureFrame();
+        return;
+      }
+      setCameraStatus("Hold steady");
+    }
+    camera.timer = setTimeout(cameraTick, 280);
+  }
+
+  function openCamera() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      showError(errorEl, "This browser has no camera. Choose a photo instead.");
+      return;
+    }
+    showError(errorEl, "");
+    setCameraStatus("Starting the camera…");
+    cameraPanel.hidden = false;
+    scanButton.hidden = true;
+    cameraVideo.setAttribute("playsinline", "true");
+    cameraVideo.setAttribute("webkit-playsinline", "true");
+    cameraVideo.muted = true;
+    cameraVideo.playsInline = true;
+    var attempts = [
+      { audio: false, video: { facingMode: { ideal: "environment" }, width: { ideal: 1920 }, height: { ideal: 1080 } } },
+      { audio: false, video: { facingMode: "environment" } },
+      { audio: false, video: true }
+    ];
+    function ask(index) {
+      return navigator.mediaDevices.getUserMedia(attempts[index]).catch(function (err) {
+        if (index < attempts.length - 1 && err && err.name === "OverconstrainedError") return ask(index + 1);
+        throw err;
       });
-    }).then(function (result) {
-      var match = result.match;
-      rememberUpload({
-        at: new Date().toISOString(),
-        date: match.date,
-        homeTeamId: match.homeTeamId,
-        awayTeamId: match.awayTeamId,
-        homeGamesWon: match.homeGamesWon,
-        awayGamesWon: match.awayGamesWon,
-        homeName: homeTyped,
-        awayName: awayTyped,
-        photoStored: false,
-        sheet: sheet
-      });
-      savedNote.hidden = false;
-      savedNote.textContent = "Saved in this browser. Final score " + match.homeGamesWon + "–" + match.awayGamesWon +
-        ". The photo itself was not stored. Standings below, and on the home page, include this match.";
-      renderStandings(result.snapshot);
-      document.getElementById("live-standings").scrollIntoView({ behavior: "smooth", block: "start" });
-    }).catch(function (err) {
-      showError(confirmError, err && err.message ? err.message : "The score could not be saved.");
+    }
+    loadSpec().then(function (spec) {
+      camera.spec = spec;
+      return ask(0);
+    }).then(function (stream) {
+      camera.stream = stream;
+      cameraVideo.srcObject = stream;
+      return cameraVideo.play();
     }).then(function () {
-      submitButton.disabled = false;
+      setCameraStatus("Fit all 4 corners");
+      cameraTick();
+    }).catch(function (err) {
+      stopCamera();
+      cameraPanel.hidden = true;
+      scanButton.hidden = false;
+      var name = err && err.name;
+      var message = (name === "NotAllowedError" || name === "PermissionDeniedError")
+        ? "The camera is blocked. Choose a photo instead."
+        : (name === "NotFoundError" || name === "DevicesNotFoundError")
+          ? "No camera was found. Choose a photo instead."
+          : "The camera could not start. Choose a photo instead.";
+      showError(errorEl, message);
     });
   }
 
@@ -542,49 +750,43 @@
   });
   typeButton.addEventListener("click", function () {
     showError(errorEl, "");
-    setStatus("Type the date, the two teams, the shooter totals, and the game winners.");
+    setStatus("Type the date, the two teams, the roster ids, and each game.");
     clearSheet();
-    scoresTouched = false;
     formDirty = false;
-    applyWinnerCounts();
     showConfirm();
+  });
+  scanButton.addEventListener("click", openCamera);
+  snapButton.addEventListener("click", function () {
+    setCameraStatus("Snap");
+    captureFrame();
+  });
+  cancelButton.addEventListener("click", function () {
+    stopCamera();
+    cameraPanel.hidden = true;
+    scanButton.hidden = false;
+    setCameraStatus("Fit all 4 corners");
+    setStatus("Camera off. You can still choose a photo.");
   });
   confirmForm.addEventListener("submit", onSubmit);
   confirmForm.addEventListener("input", function (event) {
     formDirty = true;
     var target = event.target;
-    if (target && target.classList) {
+    if (target && target.classList && target.type === "number") {
       target.classList.remove("is-blank", "is-ambiguous");
       var flag = document.getElementById(target.id + "-flag");
-      if (flag && target.type === "number") flag.textContent = target.value === "" ? "Blank — not zero" : "";
+      if (flag) flag.textContent = target.value === "" ? "Blank — not zero" : "";
     }
     refreshChecks();
   });
-  [1, 2, 3].forEach(function (n) {
-    document.getElementById("win-g" + n).addEventListener("change", function () {
-      var flag = document.getElementById("win-g" + n + "-flag");
-      if (flag) flag.textContent = "";
-      applyWinnerCounts();
-    });
-  });
-  document.getElementById("home-won").addEventListener("input", function () {
-    scoresTouched = true;
-    updateFinalScore();
-  });
-  document.getElementById("away-won").addEventListener("input", function () {
-    scoresTouched = true;
-    updateFinalScore();
-  });
 
-  fillTeamSelect(document.getElementById("home-team"), "");
-  fillTeamSelect(document.getElementById("away-team"), "");
-  updateFinalScore();
+  fillTeamSelect(document.getElementById("team-select"), "");
+  fillTeamSelect(document.getElementById("opponent-select"), "");
   refreshChecks();
 
   RAD.load().then(function (data) {
     snap = data;
-    fillTeamSelect(document.getElementById("home-team"), document.getElementById("home-name").value);
-    fillTeamSelect(document.getElementById("away-team"), document.getElementById("away-name").value);
+    fillTeamSelect(document.getElementById("team-select"), document.getElementById("team-name").value);
+    fillTeamSelect(document.getElementById("opponent-select"), document.getElementById("opponent-name").value);
     renderStandings(data);
   });
   RAD.subscribe(function (data) {
