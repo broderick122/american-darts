@@ -1027,6 +1027,9 @@ tr.is-fresh td { animation: fresh 2.6s ease; }
 
 .camera-stage {
   position: relative;
+  width: 100%;
+  max-height: 70vh;
+  overflow: hidden;
   background: #000;
   border: 4px solid #10241c;
 }
@@ -1034,7 +1037,10 @@ tr.is-fresh td { animation: fresh 2.6s ease; }
 .camera-stage video {
   display: block;
   width: 100%;
+  max-width: 100%;
+  max-height: 70vh;
   height: auto;
+  object-fit: contain;
   background: #000;
 }
 

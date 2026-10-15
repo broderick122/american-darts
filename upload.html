@@ -11,7 +11,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css">
+  <script>window.RAD_ASSET_VERSION = "20261015c";</script>
+  <link rel="stylesheet" href="css/styles.css?v=20261015c">
 </head>
 <body class="page-upload">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -61,7 +62,7 @@
         <button class="btn btn-primary btn-xl" id="scan-camera" type="button">Scan with camera</button>
         <div id="camera-panel" class="camera-panel" hidden>
           <div class="camera-stage">
-            <video id="camera-video" playsinline muted autoplay></video>
+            <video id="camera-video" playsinline muted autoplay style="width:100%;max-width:100%;max-height:70vh;height:auto;object-fit:contain;background:#000;display:block"></video>
             <canvas id="camera-guide" aria-hidden="true"></canvas>
           </div>
           <p id="camera-status" class="camera-status" role="status">Fit all 4 corners</p>
@@ -166,9 +167,9 @@
     </div>
   </footer>
 
-  <script src="config.js"></script>
-  <script src="js/data.js"></script>
-  <script src="js/sheet-ocr.js"></script>
-  <script src="js/upload.js"></script>
+  <script src="config.js?v=20261015c"></script>
+  <script src="js/data.js?v=20261015c"></script>
+  <script src="js/sheet-ocr.js?v=20261015c"></script>
+  <script src="js/upload.js?v=20261015c"></script>
 </body>
 </html>
