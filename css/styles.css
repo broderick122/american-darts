@@ -816,6 +816,14 @@ tr.is-fresh td { animation: fresh 2.6s ease; }
 
 .site-footer a { color: var(--brass-2); }
 
+.asset-version {
+  margin: 0.75rem 0 0;
+  color: var(--brass-2);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
 .site-footer .wordmark { color: var(--cream); margin-bottom: 0.8rem; }
 
 .footer-grid {
@@ -1439,6 +1447,7 @@ tr.is-fresh td { animation: fresh 2.6s ease; }
 .save-score-row {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: start;
   gap: 0.2rem;
   margin: 0.1rem 0 0;
   min-width: 0;
@@ -1471,6 +1480,17 @@ tr.is-fresh td { animation: fresh 2.6s ease; }
 }
 
 .save-score-sum strong { color: var(--red-deep); }
+
+.save-sheet-note {
+  display: block;
+  max-width: 100%;
+  margin-top: 0.05rem;
+  color: var(--red);
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1.05;
+  overflow-wrap: anywhere;
+}
 
 .save-bar .status { margin: 0.2rem 0 0; }
 

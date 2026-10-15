@@ -10,7 +10,22 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css?v=20261015i">
+  <link rel="stylesheet" href="css/styles.css?v=20261015j">
+  <script>
+    window.RAD_ASSET_VERSION = "20261015j";
+    (function () {
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function (regs) {
+          regs.forEach(function (reg) { reg.unregister(); });
+        }).catch(function () {});
+      }
+      if (window.caches && window.caches.keys) {
+        window.caches.keys().then(function (keys) {
+          keys.forEach(function (key) { window.caches.delete(key); });
+        }).catch(function () {});
+      }
+    })();
+  </script>
 </head>
 <body class="page-admin">
   <a class="skip-link" href="#admin-main">Skip to content</a>
@@ -140,14 +155,19 @@
       </section>
     </section>
   </main>
+  <footer class="site-footer">
+    <div class="wrap">
+      <p class="asset-version">v20261015j</p>
+    </div>
+  </footer>
   <nav class="thumb-nav" aria-label="Main">
     <a href="index.html">Home</a>
     <a href="index.html#standings">Standings</a>
     <a href="upload.html">Scan</a>
     <a href="admin.html" aria-current="page">Admin</a>
   </nav>
-  <script src="config.js?v=20261015i"></script>
-  <script src="js/data.js?v=20261015i"></script>
-  <script src="js/admin.js?v=20261015i"></script>
+  <script src="config.js?v=20261015j"></script>
+  <script src="js/data.js?v=20261015j"></script>
+  <script src="js/admin.js?v=20261015j"></script>
 </body>
 </html>

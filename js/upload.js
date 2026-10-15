@@ -97,7 +97,7 @@
       '<div class="roster-grid">' +
       SLOTS.map(function (slot) {
         return fieldBox(slot,
-          '<input id="roster-' + slot + '" type="number" min="0" max="99" inputmode="numeric" placeholder="—" aria-label="Roster ' + slot + ' id">' +
+          numericControl("roster-" + slot, 2, "Roster " + slot + " id") +
           '<span id="roster-' + slot + '-flag" class="bubble-flag"></span>');
       }).join("") +
       "</div>";
@@ -109,14 +109,15 @@
             '<select id="g' + game + "-s" + n + '-who" aria-label="Game ' + game + " shooter " + n + ' who">' +
             slotOptions("") + '</select><span id="g' + game + "-s" + n + '-who-flag" class="bubble-flag"></span>') +
           fieldBox("Score",
-            '<input id="g' + game + "-s" + n + '-score" type="number" min="0" max="49" inputmode="numeric" placeholder="—" aria-label="Game ' + game + " shooter " + n + ' score">' +
+            numericControl("g" + game + "-s" + n + "-score", 2, "Game " + game + " shooter " + n + " score") +
             '<span id="g' + game + "-s" + n + '-score-flag" class="bubble-flag"></span>') +
           "</div>";
       }).join("");
       var totals =
         '<div class="game-totals">' +
         fieldBox("Team total",
-          '<input id="g' + game + '-team" type="number" min="0" max="199" inputmode="numeric" placeholder="—"><span id="g' + game + '-team-flag" class="bubble-flag"></span>') +
+          numericControl("g" + game + "-team", 3, "Game " + game + " team total") +
+          '<span id="g' + game + '-team-flag" class="bubble-flag"></span>') +
         fieldBox("Result",
           '<select id="g' + game + '-result"><option value="">Not marked</option><option value="won">Won</option><option value="lost">Lost</option></select><span id="g' + game + '-result-flag" class="bubble-flag"></span>') +
         "</div>" +
@@ -130,6 +131,12 @@
         fieldBox("Total points",
           '<select id="points-result"><option value="">Not marked</option><option value="won">Won</option><option value="lost">Lost</option></select><span id="points-result-flag" class="bubble-flag"></span>') +
         "</div>");
+  }
+
+  function numericControl(id, maxLength, label) {
+    return '<input id="' + id + '" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="' + maxLength +
+      '" data-numeric="true" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="—" aria-label="' +
+      label + '">';
   }
 
   buildReview();
@@ -203,8 +210,6 @@
     else flag.textContent = "";
   }
 
-  var teamTotalAuto = { 1: true, 2: true, 3: true };
-
   function wonCount() {
     var won = 0;
     GAMES.forEach(function (game) {
@@ -216,16 +221,6 @@
   function updateFinalScore() {
     var won = wonCount();
     finalScoreEl.textContent = won + (won === 1 ? " game won" : " games won");
-  }
-
-  function fieldFlag(input) {
-    return document.getElementById(input.id + "-flag");
-  }
-
-  function ambiguousField(input) {
-    var flag = fieldFlag(input);
-    var text = flag ? String(flag.textContent || "") : "";
-    return input.classList.contains("is-ambiguous") || /two marks/i.test(text);
   }
 
   function shooterScores(game) {
@@ -245,52 +240,13 @@
     return any ? sum : null;
   }
 
-  function setTeamValue(teamInput, value) {
-    var flag = fieldFlag(teamInput);
-    if (value == null) {
-      teamInput.value = "";
-      teamInput.classList.add("is-blank");
-      teamInput.classList.remove("is-ambiguous");
-      if (flag) flag.textContent = "Blank — not zero";
-      return;
-    }
-    teamInput.value = String(value);
-    teamInput.classList.remove("is-blank", "is-ambiguous");
-    if (flag) flag.textContent = "";
-  }
-
-  function markTeamTotalModes() {
-    GAMES.forEach(function (game) {
-      var teamInput = document.getElementById("g" + game + "-team");
-      var team = numberOrNull(teamInput);
-      var scores = shooterScores(game);
-      var complete = scores.every(function (value) { return value != null; });
-      var sum = sumScores(scores);
-      if (ambiguousField(teamInput)) teamTotalAuto[game] = false;
-      else if (team == null) teamTotalAuto[game] = true;
-      else if (complete && sum != null && team === sum) teamTotalAuto[game] = true;
-      else teamTotalAuto[game] = false;
-    });
-  }
-
-  function refreshChecks(editedId) {
+  function refreshChecks() {
     var shown = [];
     GAMES.forEach(function (game) {
       var scores = shooterScores(game);
       var complete = scores.every(function (value) { return value != null; });
       var sum = sumScores(scores);
-      var teamInput = document.getElementById("g" + game + "-team");
-      var editedTeam = editedId === teamInput.id;
-      var editedScore = typeof editedId === "string" && editedId.indexOf("g" + game + "-s") === 0 && /-score$/.test(editedId);
-      if (editedTeam) {
-        var typed = numberOrNull(teamInput);
-        teamTotalAuto[game] = !ambiguousField(teamInput) && (typed == null || (complete && sum != null && typed === sum));
-      } else if (editedScore && teamTotalAuto[game] && !ambiguousField(teamInput)) {
-        setTeamValue(teamInput, complete ? sum : null);
-      } else if (!editedId && teamTotalAuto[game] && !ambiguousField(teamInput) && complete && sum != null && numberOrNull(teamInput) == null) {
-        setTeamValue(teamInput, sum);
-      }
-      var team = numberOrNull(teamInput);
+      var team = numberOrNull(document.getElementById("g" + game + "-team"));
       var el = document.getElementById("g" + game + "-check");
       el.classList.remove("is-bad");
       if (scores.every(function (value) { return value == null; }) && team == null) {
@@ -303,9 +259,12 @@
       } else {
         el.textContent = "Game " + game + ": shooters add up to the team total (" + sum + ").";
       }
-      var display = ambiguousField(teamInput) ? team : ((teamTotalAuto[game] || team == null) ? sum : team);
-      document.getElementById("save-total-" + game).textContent = display == null ? "—" : String(display);
-      shown.push(display);
+      document.getElementById("save-total-" + game).textContent = sum == null ? "—" : String(sum);
+      var note = document.getElementById("save-sheet-" + game);
+      var differs = team != null && sum !== team;
+      note.hidden = !differs;
+      note.textContent = differs ? "sheet says " + team : "";
+      shown.push(sum);
     });
     var allShown = shown.every(function (value) { return value != null; });
     document.getElementById("save-total-sum").textContent = allShown ? String(shown.reduce(function (total, value) { return total + value; }, 0)) : "—";
@@ -326,7 +285,6 @@
     });
     setChoice("beer-result", "", "blank", "Blank is allowed");
     setChoice("points-result", "", "blank");
-    GAMES.forEach(function (game) { teamTotalAuto[game] = true; });
     refreshChecks();
     syncSaveButton();
   }
@@ -397,7 +355,6 @@
       clearSheet();
     }
     formDirty = false;
-    markTeamTotalModes();
     refreshChecks();
     showConfirm();
     if (result.mode === "rejected") {
@@ -412,7 +369,7 @@
   }
 
   function loadSpec() {
-    var version = window.RAD_ASSET_VERSION || "20261015i";
+    var version = window.RAD_ASSET_VERSION || "20261015j";
     return fetch("scoresheet/scansheet_v16_layout_spec.json?v=" + encodeURIComponent(version), { cache: "no-store" }).then(function (response) {
       if (!response.ok) throw new Error("The scan sheet layout could not be loaded (" + response.status + "). Reload the page and try again.");
       return response.json();
@@ -782,7 +739,8 @@
   function focusField(el) {
     var tag = el.tagName;
     var type = String(el.type || "").toLowerCase();
-    var textLike = tag === "INPUT" && (type === "text" || type === "search" || type === "email" || type === "tel" || type === "url" || type === "password");
+    var numeric = el.getAttribute("data-numeric") === "true";
+    var textLike = !numeric && tag === "INPUT" && (type === "text" || type === "search" || type === "email" || type === "tel" || type === "url" || type === "password");
     function focusNow() {
       try { el.focus({ preventScroll: true }); } catch (err) { el.focus(); }
     }
@@ -1213,30 +1171,35 @@
     setStep(1, "Step 1 of 3. Camera off. Scan again, or upload a photo.");
   });
   confirmForm.addEventListener("submit", onSubmit);
+  function numericInput(target) {
+    return !!(target && target.tagName === "INPUT" && (target.type === "number" || target.getAttribute("data-numeric") === "true"));
+  }
+
   function onReviewEdit(event) {
     formDirty = true;
     var target = event.target;
-    if (target && target.id && (target.type === "number" || target.tagName === "SELECT")) {
-      if (target.type === "number") target.classList.remove("is-blank", "is-ambiguous");
+    if (target && target.id && (numericInput(target) || target.tagName === "SELECT")) {
+      if (numericInput(target)) target.classList.remove("is-blank", "is-ambiguous");
       var flag = document.getElementById(target.id + "-flag");
       if (flag) {
-        if (target.type === "number") flag.textContent = String(target.value).trim() === "" ? "Blank — not zero" : "";
+        if (numericInput(target)) flag.textContent = String(target.value).trim() === "" ? "Blank — not zero" : "";
         else if (target.id === "beer-result") flag.textContent = target.value ? "" : "Blank is allowed";
         else flag.textContent = target.value ? "" : "Not marked";
       }
     }
-    refreshChecks(target && target.id);
+    refreshChecks();
     if (reviewInvalid) paintMissing(collectMissing());
     else syncSaveButton();
   }
-  confirmForm.addEventListener("input", onReviewEdit);
-  confirmForm.addEventListener("change", onReviewEdit);
-  confirmForm.addEventListener("keyup", function (event) {
-    var key = event.key || "";
-    if (key.length !== 1 && key !== "Backspace" && key !== "Delete") return;
-    if (!event.target || event.target.tagName !== "INPUT") return;
-    onReviewEdit(event);
-  });
+  function bindLiveFields() {
+    confirmForm.querySelectorAll("input, select, textarea").forEach(function (el) {
+      el.addEventListener("input", onReviewEdit);
+      el.addEventListener("change", onReviewEdit);
+    });
+  }
+  confirmForm.addEventListener("input", onReviewEdit, true);
+  confirmForm.addEventListener("change", onReviewEdit, true);
+  bindLiveFields();
   document.getElementById("games-block").addEventListener("click", function (event) {
     var button = event.target.closest(".game-toggle");
     if (!button) return;

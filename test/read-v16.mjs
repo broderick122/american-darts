@@ -221,6 +221,13 @@ async function main() {
         finalScore: document.getElementById("final-score").textContent,
         finalSize: getComputedStyle(document.getElementById("final-score")).fontSize,
         totals: ["save-total-1", "save-total-2", "save-total-3", "save-total-sum"].map((id) => document.getElementById(id).textContent),
+        notes: [1, 2, 3].map((game) => {
+          const note = document.getElementById("save-sheet-" + game);
+          return note.hidden ? "" : note.textContent;
+        }),
+        scoreType: document.getElementById("g1-s1-score").type,
+        numeric: document.getElementById("g1-s1-score").getAttribute("data-numeric"),
+        version: document.querySelector(".asset-version").textContent,
         summary: document.getElementById("ocr-summary").textContent
       };
     });
@@ -240,7 +247,10 @@ async function main() {
     if (form.points !== "won") formProblems.push("points " + form.points);
     if (!/2 games won/.test(form.finalScore)) formProblems.push("final " + form.finalScore);
     if (parseFloat(form.finalSize) > 22) formProblems.push("final size " + form.finalSize);
-    if (form.totals.join(",") !== "63,50,149,262") formProblems.push("sticky totals " + form.totals.join(","));
+    if (form.totals.join(",") !== "63,54,58,175") formProblems.push("sticky totals " + form.totals.join(","));
+    if (form.notes.join("|") !== "|sheet says 50|sheet says 149") formProblems.push("sheet notes " + form.notes.join("|"));
+    if (form.scoreType !== "text" || form.numeric !== "true") formProblems.push("score field " + form.scoreType + " " + form.numeric);
+    if (form.version !== "v20261015j") formProblems.push("version " + form.version);
     if (!/home/i.test(form.summary) || !/2 games won/.test(form.summary)) formProblems.push("summary " + form.summary);
     if (formProblems.length) {
       console.error(form);
@@ -260,8 +270,11 @@ async function main() {
       el.value = "80";
       el.dispatchEvent(new Event("input", { bubbles: true }));
     });
-    const liveTotals = await upload.evaluate(() => ["save-total-1", "save-total-2", "save-total-3", "save-total-sum"].map((id) => document.getElementById(id).textContent).join(","));
-    if (liveTotals !== "80,50,149,279") throw new Error("live totals " + liveTotals);
+    const typedTotal = await upload.evaluate(() => ({
+      totals: ["save-total-1", "save-total-2", "save-total-3", "save-total-sum"].map((id) => document.getElementById(id).textContent).join(","),
+      note: document.getElementById("save-sheet-1").hidden ? "" : document.getElementById("save-sheet-1").textContent
+    }));
+    if (typedTotal.totals !== "63,54,58,175" || typedTotal.note !== "sheet says 80") throw new Error("typed total " + JSON.stringify(typedTotal));
     await upload.$eval("#g1-team", (el) => {
       el.value = "63";
       el.dispatchEvent(new Event("input", { bubbles: true }));
@@ -273,12 +286,14 @@ async function main() {
     const followed = await upload.evaluate(() => ({
       totals: ["save-total-1", "save-total-2", "save-total-3", "save-total-sum"].map((id) => document.getElementById(id).textContent).join(","),
       team: document.getElementById("g1-team").value,
+      note: document.getElementById("save-sheet-1").hidden ? "" : document.getElementById("save-sheet-1").textContent,
       check: document.getElementById("g1-check").textContent,
       bad: document.getElementById("g1-check").classList.contains("is-bad"),
       won: document.getElementById("final-score").textContent
     }));
-    if (followed.totals !== "72,50,149,271") throw new Error("shooter follow " + followed.totals);
-    if (followed.team !== "72" || followed.bad || !/72/.test(followed.check)) throw new Error("followed team " + JSON.stringify(followed));
+    if (followed.totals !== "72,54,58,184") throw new Error("shooter sum " + followed.totals);
+    if (followed.team !== "63" || followed.note !== "sheet says 63" || !followed.bad) throw new Error("sheet note " + JSON.stringify(followed));
+    if (!/72/.test(followed.check) || !/63/.test(followed.check)) throw new Error("check " + followed.check);
     if (followed.won !== "2 games won") throw new Error("won while editing score " + followed.won);
     await upload.$eval("#g2-s1-score", (el) => {
       el.value = "10";
@@ -287,13 +302,14 @@ async function main() {
     const mismatch = await upload.evaluate(() => ({
       game: document.getElementById("save-total-2").textContent,
       team: document.getElementById("g2-team").value,
+      note: document.getElementById("save-sheet-2").hidden ? "" : document.getElementById("save-sheet-2").textContent,
       check: document.getElementById("g2-check").textContent,
       bad: document.getElementById("g2-check").classList.contains("is-bad"),
       total: document.getElementById("save-total-sum").textContent
     }));
-    if (mismatch.game !== "50" || mismatch.team !== "50" || !mismatch.bad) throw new Error("mismatch panel " + JSON.stringify(mismatch));
+    if (mismatch.game !== "52" || mismatch.team !== "50" || mismatch.note !== "sheet says 50" || !mismatch.bad) throw new Error("mismatch panel " + JSON.stringify(mismatch));
     if (!/52/.test(mismatch.check) || !/50/.test(mismatch.check)) throw new Error("mismatch text " + mismatch.check);
-    if (mismatch.total !== "271") throw new Error("mismatch total " + mismatch.total);
+    if (mismatch.total !== "182") throw new Error("mismatch total " + mismatch.total);
     await upload.$eval("#g2-result", (el) => {
       el.value = "won";
       el.dispatchEvent(new Event("input", { bubbles: true }));
@@ -317,7 +333,7 @@ async function main() {
       team: document.getElementById("g1-team").value,
       won: document.getElementById("final-score").textContent
     }));
-    if (restoredScores.totals !== "63,50,149,262" || restoredScores.team !== "63") throw new Error("restored totals " + JSON.stringify(restoredScores));
+    if (restoredScores.totals !== "63,54,58,175" || restoredScores.team !== "63") throw new Error("restored totals " + JSON.stringify(restoredScores));
     if (restoredScores.won !== "2 games won") throw new Error("restored won " + restoredScores.won);
     console.log("upload review shows the v16 reading and accepts edits");
     mkdirSync("/opt/cursor/artifacts", { recursive: true });
