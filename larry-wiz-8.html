@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Larry Wiz Cricket Qualifier #8 – Live Boards</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#0d1117;color:#e6edf3;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+  header{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:10px 12px;background:#161b22;border-bottom:1px solid #30363d;position:sticky;top:0;z-index:5}
+  h1{font-size:1.05rem;margin:0;flex:1 1 auto}
+  a{color:#58a6ff}
+  button{background:#238636;color:#fff;border:0;border-radius:6px;padding:7px 12px;font-weight:600;cursor:pointer}
+  #status{font-size:.8rem;color:#8b949e}
+  .grid{display:grid;gap:8px;padding:8px;grid-template-columns:repeat(3,1fr)}
+  @media (max-width:1100px){.grid{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:640px){.grid{grid-template-columns:1fr}}
+  .tile{background:#161b22;border:1px solid #30363d;border-radius:8px;overflow:hidden;display:flex;flex-direction:column}
+  .bar{display:flex;align-items:center;gap:8px;padding:6px 10px;background:#21262d;font-size:.85rem}
+  .bar b{font-size:.95rem;white-space:nowrap}
+  .bar .info{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#c9d1d9}
+  .bar a{font-size:.75rem;white-space:nowrap}
+  .tag{font-size:.7rem;padding:1px 6px;border-radius:10px;background:#30363d;color:#8b949e}
+  .tag.live{background:#da3633;color:#fff}.tag.warm{background:#9e6a03;color:#fff}
+  .frame{position:relative;height:62vh;min-height:380px;background:#000}
+  @media (min-width:1101px){.frame{height:calc((100vh - 130px)/2);min-height:300px}}
+  iframe{width:100%;height:100%;border:0;display:block;background:#fff}
+  .idle{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:#8b949e;padding:16px;font-size:.9rem}
+</style>
+</head>
+<body>
+<header>
+  <h1>Larry Wiz Cricket Qualifier #8 – Live Boards</h1>
+  <a href="https://tv.dartconnect.com/event/larrywizcrkqual26e08/matches" target="_blank" rel="noopener">Event live matches ↗</a>
+  <button id="reload">Reload all</button>
+  <span id="status">Connecting…</span>
+</header>
+<main class="grid" id="grid"></main>
+
+<script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.7.5/dist/socket.io.min.js"></script>
+<script>
+const TID = 'larrywizcrkqual26e08';
+const EVENT_URL = 'https://tv.dartconnect.com/event/' + TID + '/matches';
+const BOARDS = [1,2,3,4,5,6];
+const grid = document.getElementById('grid');
+const statusEl = document.getElementById('status');
+const tiles = {};
+let live = [];          // current matches_live list
+let completed = [];     // matches_completed list
+let seq = {};
+
+for (const n of BOARDS) {
+  const t = document.createElement('section');
+  t.className = 'tile';
+  t.innerHTML = `<div class="bar"><b>Board ${n}</b><span class="tag">idle</span><span class="info"></span>
+    <a target="_blank" rel="noopener" href="${EVENT_URL}">open full screen ↗</a></div>
+    <div class="frame"><div class="idle">Waiting for a match on Board ${n}…</div></div>`;
+  grid.appendChild(t);
+  tiles[n] = { el: t, tag: t.querySelector('.tag'), info: t.querySelector('.info'),
+               link: t.querySelector('.bar a'), frame: t.querySelector('.frame'), sk: null };
+}
+
+function liveUrl(sk){ return `https://tv.dartconnect.com/live/${sk}/M/${TID}`; }
+const idOf = x => String(x && typeof x === 'object' ? x.i : x);
+function score(m){ return `${m.hcf||m.hc||'?'} ${m.hs??0} – ${m.as??0} ${m.acf||m.ac||'?'}`; }
+
+function render(){
+  for (const n of BOARDS) {
+    const T = tiles[n];
+    const cands = live.filter(m => String(m.bns) === String(n) && m.sk);
+    // prefer in-progress (O) over warming up (W); newest first
+    cands.sort((a,b) => ((b.sta==='O') - (a.sta==='O')) || String(b.mss||'').localeCompare(String(a.mss||'')));
+    const m = cands[0];
+    if (m) {
+      T.tag.textContent = m.sta === 'O' ? 'LIVE' : 'warming up';
+      T.tag.className = 'tag ' + (m.sta === 'O' ? 'live' : 'warm');
+      T.info.textContent = `${m.r ? m.r + ' · ' : ''}${score(m)}`;
+      T.link.href = liveUrl(m.sk);
+      if (T.sk !== m.sk) {
+        T.sk = m.sk; T.idleMsg = null;
+        T.frame.innerHTML = `<iframe src="${liveUrl(m.sk)}" title="Board ${n}" loading="eager" allow="fullscreen"></iframe>`;
+      }
+    } else {
+      const last = completed.filter(c => String(c.bns) === String(n))
+                            .sort((a,b) => (b.i||0) - (a.i||0))[0];
+      T.tag.textContent = 'idle'; T.tag.className = 'tag';
+      T.info.textContent = last ? `Last: ${score(last)}` : '';
+      T.link.href = EVENT_URL;
+      const msg = `No match on Board ${n} right now.<br>${last ? 'Last result: ' + score(last) + '<br>' : ''}It will appear here automatically when one starts.`;
+      if (T.sk !== null || T.idleMsg !== msg) {
+        T.sk = null; T.idleMsg = msg;
+        T.frame.innerHTML = `<div class="idle">${msg}</div>`;
+      }
+    }
+  }
+}
+
+function applyDiff(arr, d){
+  if (d.removed?.length) { const r = new Set(d.removed.map(idOf)); arr = arr.filter(m => !r.has(idOf(m))); }
+  if (d.modified?.length) for (const p of d.modified) { const m = arr.find(x => idOf(x) === idOf(p)); if (m) Object.assign(m, p); else arr.push(p); }
+  if (d.added?.length) for (const a of d.added) { const i = arr.findIndex(x => idOf(x) === idOf(a)); if (i >= 0) arr[i] = a; else arr.push(a); }
+  return arr;
+}
+
+let socket;
+function handle(topic, msg){
+  const s = msg && msg.sequence;
+  if (msg && msg.is_diff && seq[topic] && s && s > seq[topic] + 1) { reconnect(); return; } // gap -> full resync
+  if (s) seq[topic] = s;
+  const data = msg && (msg.matches || msg.data);
+  if (topic === 'matches_live') live = msg.is_diff ? applyDiff(live, data || {}) : (Array.isArray(data) ? data : []);
+  else completed = msg.is_diff ? applyDiff(completed, data || {}) : (Array.isArray(data) ? data : []);
+  render();
+  statusEl.textContent = 'Live · updated ' + new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit', second:'2-digit'});
+}
+function connect(){
+  seq = {};
+  socket = io('wss://tv.dartconnect.com/', { transports:['websocket'], upgrade:false,
+    query:{ tournament_id: TID, page: 'all' }, reconnection:true, reconnectionDelay:2000, reconnectionDelayMax:30000 });
+  socket.on('connect', () => statusEl.textContent = 'Connected');
+  socket.on('disconnect', () => statusEl.textContent = 'Disconnected – retrying…');
+  socket.on('connect_error', () => statusEl.textContent = 'Connection error – retrying…');
+  socket.on('matches_live', m => handle('matches_live', m));
+  socket.on('matches_completed', m => handle('matches_completed', m));
+}
+function reconnect(){ try { socket && socket.disconnect(); } catch(e){} connect(); }
+
+document.getElementById('reload').onclick = () => {
+  for (const n of BOARDS) { const f = tiles[n].frame.querySelector('iframe'); if (f) f.src = f.src; }
+  reconnect();
+};
+// safety net: full resync every 3 minutes
+setInterval(reconnect, 180000);
+connect();
+</script>
+</body>
+</html>
